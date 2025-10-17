@@ -1,5 +1,5 @@
 export const ExchangeView = () => {
     return (
-        <div></div>
+        <div className="flex"></div>
     )
 }

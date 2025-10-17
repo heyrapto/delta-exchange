@@ -47,7 +47,7 @@ export const Header = () => {
       </div>
       </div>
 
-      <HeaderAnalytics />
+      {/* <HeaderAnalytics /> */}
     </header>
   );
 };
