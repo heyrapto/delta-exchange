@@ -134,7 +134,7 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="w-full max-w-md bg-[#1a1d25] text-white h-[600px] flex flex-col">
+        <div className="relative w-full max-w-md bg-[#1a1d25] text-white h-[600px] flex flex-col">
             {/* Header */}
             <div className="px-3 py-2 border-b border-gray-700">
                 <div className="flex items-center gap-2 mb-2">
