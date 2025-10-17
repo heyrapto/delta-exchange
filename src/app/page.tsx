@@ -1,3 +1,5 @@
+import { Exchange } from "@/components/exchange";
+import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Banner } from "@/components/ui/banner";
 
@@ -6,6 +8,8 @@ export default function Home() {
     <div className="mx-auto md:max-w-full lg:max-w-[90%]">
       <Banner />
       <Header />
+      <Exchange />
+      <Footer/>
     </div>
   );
 }

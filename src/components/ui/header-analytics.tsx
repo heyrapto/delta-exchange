@@ -3,13 +3,15 @@
 import React, { useState } from 'react';
 import { BiChevronDown, BiTrendingDown, BiTrendingUp } from 'react-icons/bi';
 import { BsStar } from 'react-icons/bs';
+import { HiOutlineExternalLink } from 'react-icons/hi';
 
 export const HeaderAnalytics = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [showLotSizeModal, setShowLotSizeModal] = useState(false);
     const [activeTab, setActiveTab] = useState('straddle');
 
     return (
-        <div className="w-full text-white">
+        <div className="w-full text-white relative z-10">
             {/* Main Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-800">
                 {/* Left Section - Contract Info */}
@@ -27,13 +29,13 @@ export const HeaderAnalytics = () => {
                         </button>
                     </div>
 
-                {/* Center Section - Price */}
+                {/* Price */}
                 <div className="flex items-center gap-2">
                     <span className="text-2xl font-semibold text-red-500">$1286.0</span>
                     <BiTrendingDown className="w-5 h-5 text-red-500" />
                 </div>
 
-                {/* Right Section - Analytics */}
+                {/* Analytics */}
                 <div className="flex items-center gap-8 text-sm">
                     <div className="flex flex-col items-end">
                         <span className="text-gray-400">24h Change</span>
@@ -55,16 +57,93 @@ export const HeaderAnalytics = () => {
                 </div>
 
                 {/* Lot Size */}
-                <div className="flex items-center gap-2 text-sm">
+                <button 
+                    onClick={() => setShowLotSizeModal(!showLotSizeModal)}
+                    className="flex items-center gap-2 text-sm hover:bg-gray-800 px-3 py-2 rounded transition-colors relative"
+                >
                     <span className="text-gray-400">Lot Size</span>
                     <span className="text-white font-medium">0.001 BTC</span>
-                    <BiTrendingUp className="w-4 h-4 text-red-400" />
-                </div>
+                    <BiChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showLotSizeModal ? 'rotate-180' : ''}`} />
+                </button>
             </div>
 
-            {/* Expanded Section */}
-            {isExpanded && (
-                <div className="px-6 py-4 border-b border-gray-800 w-[700px] h-screen">
+            {/* Lot Size Modal */}
+            {showLotSizeModal && (
+                <div className="absolute right-6 top-20 w-[520px] bg-gray-900 border border-gray-800 rounded-lg shadow-2xl z-50 animate-slideInFromLeft">
+                    <div className="p-6">
+                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-800">
+                            <h3 className="text-lg font-medium">BTC Call</h3>
+                        </div>
+
+                        <div className="space-y-4 text-sm">
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Exercise Style</span>
+                                <span className="text-white">Cash-settled European option</span>
+                            </div>
+
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Expires at (Local Time)</span>
+                                <span className="text-white">2025-10-18 13:00:00</span>
+                            </div>
+
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Effective Settlement Currency</span>
+                                <span className="text-white">INR</span>
+                            </div>
+
+                            <div className="flex justify-between items-start py-2">
+                                <span className="text-gray-400">Initial Margin(Short)</span>
+                                <div className="text-right">
+                                    <div className="text-white">0.5 % × Index Price</div>
+                                    <div className="text-white">+ Option Mark Price</div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Max Leverage</span>
+                                <span className="text-white">200x</span>
+                            </div>
+
+                            <div className="flex justify-between items-start py-2">
+                                <span className="text-gray-400">Maintenance Margin (Short)</span>
+                                <div className="text-right">
+                                    <div className="text-white">0.25 % × Index Price</div>
+                                    <div className="text-white">+ Option Mark Price</div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Underlying Index</span>
+                                <span className="text-orange-500">.DEXBTUSD</span>
+                            </div>
+
+                            <div className="flex justify-between items-start py-2">
+                                <span className="text-gray-400">Position Limit</span>
+                                <div className="text-right">
+                                    <div className="text-white">255.633 BTC</div>
+                                    <div className="text-white">255,633 contracts</div>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-between items-center py-2">
+                                <span className="text-gray-400">Status</span>
+                                <span className="text-white">Operational</span>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 pt-4 border-t border-gray-800">
+                            <button className="flex items-center justify-center gap-2 w-full text-orange-500 hover:text-orange-400 transition-colors text-sm">
+                                See full contract specifications
+                                <HiOutlineExternalLink className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Expanded Section - Slides in from Left */}
+            <div className={`absolute left-0 top-full w-[700px] h-screen bg-gray-900 border-r border-gray-800 border-b transform transition-transform duration-300 ease-in-out z-40 ${isExpanded ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="px-6 py-4 max-h-[calc(100vh-150px)] overflow-y-auto">
                     {/* Search Bar */}
                     <div className="mb-4">
                         <input
@@ -135,7 +214,31 @@ export const HeaderAnalytics = () => {
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Overlay for Lot Size Modal */}
+            {showLotSizeModal && (
+                <div 
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowLotSizeModal(false)}
+                />
             )}
+
+            <style jsx>{`
+                @keyframes slideInFromLeft {
+                    from {
+                        opacity: 0;
+                        transform: translateX(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+                .animate-slideInFromLeft {
+                    animation: slideInFromLeft 0.2s ease-out;
+                }
+            `}</style>
         </div>
     );
 };
