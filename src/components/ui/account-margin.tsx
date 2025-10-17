@@ -13,16 +13,16 @@ export const AccountMargin = () => {
     <div className="relative group inline-block text-white">
       {/* Trigger Box */}
       <div
-        className="bg-gray-800 cursor-pointer px-4 py-2 h-[45px] rounded-none flex items-center border border-gray-700 group-hover:border-orange-500 transition-colors duration-150"
+        className="bg-gray-800 cursor-pointer px-4 h-[42px] rounded-none flex items-center border border-gray-700 group-hover:border-orange-500 transition-colors duration-150"
       >
-        <div className="flex items-center justify-between gap-2 w-full">
-          <div>
+        <div className="flex items-center justify-between gap-2 w-[110px]">
+          <div className="flex gap-3">
             <h1 className="text-xs font-bold text-gray-400">Account Margin</h1>
             <p className="text-xs text-gray-200">Main Cross</p>
           </div>
           <BiChevronDown
-            className="text-gray-500 group-hover:text-orange-500 transition-colors"
-            size={20}
+            className="text-gray-500 group-hover:text-orange-500 group-hover:rotate-[180deg] transition-colors"
+            size={25}
           />
         </div>
       </div>

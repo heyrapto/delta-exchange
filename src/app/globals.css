@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  @apply bg-[#101013] text-white h-[90vh];
+  @apply bg-[#101013] text-white min-h-[90vh];
 }
 
 .container {
