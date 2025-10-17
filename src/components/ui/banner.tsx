@@ -6,7 +6,7 @@ export const Banner = () => {
         <div className="flex justify-between bg-gradient-to-r from-violet-500 from-5% to-violet-500 p-3">
             <div className="flex items-center gap-2">
                 <BiCheckCircle />
-                <p>Pay zero closing fee on the closing leg when you exit futures trades in the Scalper Offer. Join now</p>
+                <p className="text-sm">Pay zero closing fee on the closing leg when you exit futures trades in the Scalper Offer. Join now</p>
                 <BiLink />
             </div>
 
