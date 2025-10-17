@@ -5,11 +5,11 @@ import { Banner } from "@/components/ui/banner";
 
 export default function Home() {
   return (
-    <div className="mx-auto md:max-w-full lg:max-w-[90%]">
+    <div className="relative mx-auto md:max-w-full lg:max-w-[90%] h-screen">
       <Banner />
       <Header />
       <Exchange />
-      <Footer/>
+      <Footer />
     </div>
   );
 }

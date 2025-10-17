@@ -1,12 +1,14 @@
-import { BiSignal1 } from "react-icons/bi"
-import { CgArrowTopRight } from "react-icons/cg"
+import { BiSignal1 } from "react-icons/bi";
+import { CgArrowTopRight } from "react-icons/cg";
 
 export const Footer = () => {
-    return (
-        <footer className="inline-flex items-center fixed bottom-0 left-0 w-full border-t border-gray-700">
-            <BiSignal1 className="text-green-500" />
-            <span>Connected</span>
-            <CgArrowTopRight />
-        </footer>
-    )
-}
+  return (
+    <footer className="absolute bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-700 px-4 py-2 text-sm text-gray-300">
+      <div className="flex items-center gap-2">
+        <BiSignal1 className="text-green-500" />
+        <span>Connected</span>
+      </div>
+      <CgArrowTopRight className="text-gray-400" />
+    </footer>
+  );
+};
