@@ -2,8 +2,9 @@ import Image from 'next/image'
 
 export const StrategyBuilder = () => {
   return (
-    <div className="h-[700px] w-full flex flex-col items-center justify-center text-gray-300">
+    <div className="h-[700px] w-full flex flex-col items-center justify-between text-gray-300">
       {/* Placeholder Image */}
+      <div className="flex flex-col items-center gap-2 mt-[150px]">
       <Image src={"/basket-order.webp"} width={150} height={150} alt="Add Contracts" className="mb-4 opacity-80" />
 
       {/* Main Text */}
@@ -13,21 +14,21 @@ export const StrategyBuilder = () => {
           Selected contracts will show up here
         </p>
       </div>
+      </div>
 
-      {/* Learn More Link */}
+      {/* Footer */}
+      <div className="mt-auto w-full px-4 py-2 text-sm text-gray-300 justify-center items-center flex flex-col">
+
+         {/* Learn More Link */}
       <a
         href="#"
-        className="text-orange-500 text-sm mt-6 hover:underline flex items-center gap-1"
+        className="text-orange-500 text-sm mb-6 hover:underline flex items-center gap-1"
         target="_blank"
       >
         Learn more about basket orders
         <span className="inline-block">↗</span>
       </a>
-
-      {/* Footer */}
-      <div className="mt-auto w-full px-4 py-2 border-t border-gray-700 text-sm text-gray-300 flex justify-between">
-        <span>Available Margin</span>
-        <span>0 USD</span>
+        <span>Available Margin 0 USD</span>
       </div>
     </div>
   )
