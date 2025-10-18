@@ -137,7 +137,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                         }`}
                     >
                         Strategy Builder
-                        <div className="w-8 h-4 bg-gray-700 rounded-full relative">
+                        <div className={`w-8 h-4 rounded-full relative ${strategyView ? "bg-green-700" : "bg-gray-700"}`}>
                             <div
                                 className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${
                                     strategyView ? "right-4" : "right-0.5"
