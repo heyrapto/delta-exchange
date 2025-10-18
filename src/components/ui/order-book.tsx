@@ -28,13 +28,23 @@ const OrderBookRow = ({
     price: number
     size: number
     type: "buy" | "sell"
-    onHover: (data: { price: number; size: number } | null) => void
+    onHover: (data: { price: number; size: number } | null, pos?: { x: number; y: number }) => void
 }) => {
+    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect()
+        // Position tooltip slightly to the right of the row
+        onHover({ price, size }, { x: rect.right + 10, y: rect.top + rect.height / 2 })
+    }
+
+    const handleMouseLeave = () => {
+        onHover(null)
+    }
+
     return (
         <div
             className="grid grid-cols-2 py-0.5 hover:bg-gray-800/50 cursor-pointer text-[10px] relative"
-            onMouseEnter={() => onHover({ price, size })}
-            onMouseLeave={() => onHover(null)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
         >
             <div className={type === "sell" ? "text-red-400" : "text-green-400"}>
                 {price.toFixed(1)}
@@ -81,6 +91,7 @@ export const OrderBook = () => {
     const [viewMode, setViewMode] = useState<ViewMode>("all")
     const [lotSize, setLotSize] = useState(0.1)
     const [hoveredData, setHoveredData] = useState<{ price: number; size: number } | null>(null)
+    const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null)
 
     // Sample data
     const sellOrders: OrderBookEntry[] = [
@@ -120,6 +131,14 @@ export const OrderBook = () => {
         { mode: "all" as ViewMode, icon: "📈", color: "text-gray-400" },
         { mode: "buy" as ViewMode, icon: "📉", color: "text-green-400" },
     ]
+
+    const handleHover = (
+        data: { price: number; size: number } | null, 
+        pos?: { x: number; y: number }
+    ) => {
+        setHoveredData(data)
+        setHoverPosition(pos || null)
+    }
 
     const calculateHoverStats = () => {
         if (!hoveredData) return null
@@ -198,7 +217,7 @@ export const OrderBook = () => {
                                 price={order.price}
                                 size={order.size}
                                 type="sell"
-                                onHover={setHoveredData}
+                                onHover={handleHover}
                             />
                         ))}
                     </div>
@@ -235,16 +254,23 @@ export const OrderBook = () => {
                                 price={order.price}
                                 size={order.size}
                                 type="buy"
-                                onHover={setHoveredData}
+                                onHover={handleHover}
                             />
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* Hover Stats Overlay */}
-            {hoverStats && (
-                <div className="absolute right-0 top-32 bg-[#23262f] rounded-l-lg shadow-lg p-2 border border-gray-700">
+            {/* Floating Hover Tooltip */}
+            {hoverStats && hoverPosition && (
+                <div
+                    className="absolute z-50 bg-[#23262f] rounded-lg shadow-lg p-2 border border-gray-700 pointer-events-none transition-opacity duration-150"
+                    style={{
+                        top: hoverPosition.y,
+                        left: hoverPosition.x,
+                        transform: "translateY(-50%)",
+                    }}
+                >
                     <div className="space-y-1 text-[9px]">
                         <div className="flex justify-between gap-3">
                             <span className="text-gray-400">Avg. Price</span>
