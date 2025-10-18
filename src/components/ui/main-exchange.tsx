@@ -5,7 +5,7 @@ import { BiChevronDown } from "react-icons/bi"
 import { SiStackblitz } from "react-icons/si"
 import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
-import { TableHeader, OptionsTableRow } from "./table"
+import { OptionsChain } from "./options-chain"
 
 interface MainExchangeProps {
     strategyView: boolean
@@ -207,26 +207,13 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
             {/* Main Content Area */}
             <div className="flex-1 overflow-hidden">
                 {viewMode === "table" ? (
-                    <div className="h-full overflow-y-auto">
-                        {loading ? (
-                            <div className="flex items-center justify-center h-full">
-                                <div className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
-                            </div>
-                        ) : (
-                            <div>
-                                <TableHeader type="calls" view={tableView} />
-                                {optionsData.map((data, idx) => (
-                                    <OptionsTableRow
-                                        key={idx}
-                                        data={data}
-                                        type="calls"
-                                        isSelected={data.strike === selectedStrike}
-                                        view={tableView}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                    <OptionsChain
+                        optionsData={optionsData}
+                        selectedStrike={selectedStrike}
+                        onStrikeSelect={setSelectedStrike}
+                        view={tableView}
+                        loading={loading}
+                    />
                 ) : (
                     <TradingViewChart symbol={`BINANCE:${selectedContract}USDT`} />
                 )}
