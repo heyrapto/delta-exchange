@@ -7,7 +7,12 @@ import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
 import { TableHeader, OptionsTableRow } from "./table"
 
-export const MainExchange = () => {
+interface MainExchangeProps {
+    strategyView: boolean
+    setStrategyView: (value: boolean) => void
+}
+
+export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps) => {
     const [viewMode, setViewMode] = useState<ViewMode>("table")
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setSelectedContract] = useState("BTC")
@@ -125,10 +130,19 @@ export const MainExchange = () => {
                         <SiStackblitz /> Resources
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
                     </button>
-                    <button className="flex items-center gap-1 px-3 py-1 rounded text-[11px] text-orange-400 border border-orange-500/30">
+                    <button
+                        onClick={() => setStrategyView(!strategyView)}
+                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] ${
+                            strategyView ? "text-orange-400 border border-orange-500" : "text-gray-400 border border-gray-700"
+                        }`}
+                    >
                         Strategy Builder
                         <div className="w-8 h-4 bg-gray-700 rounded-full relative">
-                            <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></div>
+                            <div
+                                className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${
+                                    strategyView ? "right-4" : "right-0.5"
+                                }`}
+                            ></div>
                         </div>
                     </button>
                     <button className="p-1 text-gray-400 hover:text-white">

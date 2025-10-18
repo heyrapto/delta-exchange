@@ -4,7 +4,7 @@ export const StrategyBuilder = () => {
   return (
     <div className="h-[700px] w-full flex flex-col items-center justify-center bg-[#1a1d25] text-gray-300">
       {/* Placeholder Image */}
-      <Image src={"/basket-order.webp"} width={20} height={20} alt="Add Contracts" className="mb-4 opacity-80" />
+      <Image src={"/basket-order.webp"} width={150} height={150} alt="Add Contracts" className="mb-4 opacity-80" />
 
       {/* Main Text */}
       <div className="text-center">
