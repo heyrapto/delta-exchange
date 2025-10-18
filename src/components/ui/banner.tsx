@@ -1,16 +1,26 @@
-import { BiCheckCircle, BiLink } from "react-icons/bi"
-import { CgClose } from "react-icons/cg"
+import { useState } from "react";
+import { BiCheckCircle, BiLink } from "react-icons/bi";
+import { CgClose } from "react-icons/cg";
 
 export const Banner = () => {
-    return (
-        <div className="flex justify-between bg-gradient-to-r from-violet-500 from-5% to-violet-500 p-3">
-            <div className="flex items-center gap-2">
-                <BiCheckCircle />
-                <p className="text-sm">Pay zero closing fee on the closing leg when you exit futures trades in the Scalper Offer. Join now</p>
-                <BiLink />
-            </div>
+  const [isVisible, setIsVisible] = useState(true);
 
-            <CgClose />
-        </div>
-    )
-}
+  if (!isVisible) return null; 
+
+  return (
+    <div className="flex justify-between bg-gradient-to-r from-violet-500 from-2% to-violet-600 p-3">
+      <div className="flex items-center gap-2">
+        <BiCheckCircle />
+        <p className="text-sm">
+          Pay zero closing fee on the closing leg when you exit futures trades in the Scalper Offer. Join now
+        </p>
+        <BiLink />
+      </div>
+
+      <CgClose
+        className="cursor-pointer"
+        onClick={() => setIsVisible(false)} 
+      />
+    </div>
+  );
+};

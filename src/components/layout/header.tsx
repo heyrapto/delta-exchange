@@ -19,7 +19,7 @@ export const Header = () => {
         {/* Left section */}
         <div className="flex flex-wrap items-center gap-3 min-w-0">
           {/* Logo */}
-          {/* <Image src="/logo.svg" alt="Logo" width={100} height={100} /> */}
+          <Image src="/logo.svg" alt="Logo" width={100} height={100} />
 
           {/* Nav */}
           <ul className="flex flex-wrap items-center gap-4 shrink-0 text-sm">
