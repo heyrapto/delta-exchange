@@ -100,11 +100,10 @@ export const TradeCard = () => {
                         <button
                             key={btn.label}
                             onClick={() => setTradeType(btn.type)}
-                            className={`py-2 rounded text-[11px] font-medium transition-colors ${
-                                tradeType === btn.type
+                            className={`py-2 rounded text-[11px] font-medium transition-colors ${tradeType === btn.type
                                     ? `${btn.activeColor} text-white`
                                     : "bg-gray-800 text-gray-400"
-                            }`}
+                                }`}
                         >
                             {btn.label}
                         </button>
@@ -144,9 +143,8 @@ export const TradeCard = () => {
                                     onChange={(e) => handleLeverageChange(Number(e.target.value))}
                                     className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                                     style={{
-                                        background: `linear-gradient(to right, #f97316 0%, #f97316 ${
-                                            ((leverage - 1) / 19) * 100
-                                        }%, #374151 ${((leverage - 1) / 19) * 100}%, #374151 100%)`,
+                                        background: `linear-gradient(to right, #f97316 0%, #f97316 ${((leverage - 1) / 19) * 100
+                                            }%, #374151 ${((leverage - 1) / 19) * 100}%, #374151 100%)`,
                                     }}
                                 />
                                 <div className="flex justify-between mt-1 text-[10px] text-gray-500">
@@ -186,9 +184,8 @@ export const TradeCard = () => {
                         <button
                             key={tab.key}
                             onClick={() => setOrderType(tab.key)}
-                            className={`pb-1.5 text-[11px] relative ${
-                                orderType === tab.key ? "text-white" : "text-gray-400"
-                            } flex items-center gap-1`}
+                            className={`pb-1.5 text-[11px] relative ${orderType === tab.key ? "text-white" : "text-gray-400"
+                                } flex items-center gap-1`}
                         >
                             {tab.label}
                             {tab.hasDropdown && (
@@ -214,9 +211,8 @@ export const TradeCard = () => {
                                         setStopLimitType(opt.value as typeof stopLimitType)
                                         setShowStopLimitDropdown(false)
                                     }}
-                                    className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer ${
-                                        stopLimitType === opt.value ? "text-orange-500" : ""
-                                    }`}
+                                    className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer ${stopLimitType === opt.value ? "text-orange-500" : ""
+                                        }`}
                                 >
                                     {opt.label}
                                 </div>
@@ -247,9 +243,8 @@ export const TradeCard = () => {
                                                     setStopPriceType(opt)
                                                     setShowStopPriceDropdown(false)
                                                 }}
-                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer capitalize ${
-                                                    stopPriceType === opt ? "text-orange-500" : ""
-                                                }`}
+                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer capitalize ${stopPriceType === opt ? "text-orange-500" : ""
+                                                    }`}
                                             >
                                                 {opt}
                                             </div>
@@ -378,25 +373,25 @@ export const TradeCard = () => {
 
                 {/* FOOTER LINKS */}
                 <div className="flex items-center gap-2 text-[10px] text-gray-400 pb-3 border-b border-gray-700">
-                {footerLinks
-  .filter((link) => link.condition)
-  .map((link, idx, arr) => (
-    <div key={link.label} className="flex items-center gap-1">
-      {link.hasDropdown ? (
-        <button className="flex items-center gap-0.5">
-          <span className="text-xs">ⓘ</span> {link.label}
-          <BiChevronDown className="w-2.5 h-2.5" />
-        </button>
-      ) : (
-        <button
-          className={link.isDotted ? "border-b border-dotted border-gray-600" : ""}
-        >
-          {link.label}
-        </button>
-      )}
-      {idx < arr.length - 1 && orderType === "limit" && <span>|</span>}
-    </div>
-  ))}
+                    {footerLinks
+                        .filter((link) => link.condition)
+                        .map((link, idx, arr) => (
+                            <div key={link.label} className="flex items-center gap-1">
+                                {link.hasDropdown ? (
+                                    <button className="flex items-center gap-0.5">
+                                        <span className="text-xs">ⓘ</span> {link.label}
+                                        <BiChevronDown className="w-2.5 h-2.5" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        className={link.isDotted ? "border-b border-dotted border-gray-600" : ""}
+                                    >
+                                        {link.label}
+                                    </button>
+                                )}
+                                {idx < arr.length - 1 && orderType === "limit" && <span>|</span>}
+                            </div>
+                        ))}
 
                 </div>
 
