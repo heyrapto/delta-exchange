@@ -145,11 +145,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                             ></div>
                         </div>
                     </button>
-                    <button className="p-1 text-gray-400 hover:text-white">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
-                        </svg>
-                    </button>
+                   
                 </div>
             </div>
 
@@ -163,7 +159,8 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
             )}
 
             {/* Date Selection */}
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-700 overflow-x-auto scrollbar-hide">
+            <div className="flex justify-between items-center gap-2 px-3 py-2 border-b border-gray-700 overflow-x-auto scrollbar-hide">
+                <div className="">
                 {dates.map((date) => (
                     <button
                         key={date}
@@ -177,6 +174,13 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                         {date}
                     </button>
                 ))}
+                </div>
+
+<button className="p-1 text-gray-400 hover:text-white">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
+                        </svg>
+                    </button>
             </div>
 
             {/* Price Info Bar */}

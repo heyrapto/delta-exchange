@@ -7,7 +7,7 @@ import { TradeCard } from "../ui/trade-card"
 import { StrategyBuilder } from "../ui/strategy-buillder"
 
 export const ExchangeView = () => {
-    const [strategyView, setStrategyView] = useState(false) // false = normal view
+    const [strategyView, setStrategyView] = useState(false);
 
     return (
         <div className="flex h-[700px] overflow-hidden">
