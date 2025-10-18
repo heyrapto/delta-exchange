@@ -378,11 +378,11 @@ export const TradeCard = () => {
                 </button>
 
                 {/* CHECKBOXES */}
-                <div className="space-y-2 mb-3">
+                <div className="mb-3 flex gap-3 items-center">
                     {checkboxes
                         .filter((c) => c.condition)
                         .map((c) => (
-                            <label key={c.label} className="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer">
+                            <label key={c.label} className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
                                 <input
                                     type="checkbox"
                                     checked={c.checked}
