@@ -60,7 +60,7 @@ export const ExchangePanel = () => {
 
     return (
         <div className="w-full flex flex-col min-h-[500px]">
-            <div className="flex justify-between items-center border-b pb-2 border-gray-700">
+            <div className="flex justify-between items-center border-b py-2 border-gray-700">
                 {/* Tabs */}
                 <div className="flex gap-6">
                     {panelTabs.map((p) => (

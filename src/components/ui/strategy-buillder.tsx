@@ -2,13 +2,13 @@ import Image from 'next/image'
 
 export const StrategyBuilder = () => {
   return (
-    <div className="h-[700px] w-full flex flex-col items-center justify-center bg-[#1a1d25] text-gray-300">
+    <div className="h-[700px] w-full flex flex-col items-center justify-center text-gray-300">
       {/* Placeholder Image */}
       <Image src={"/basket-order.webp"} width={150} height={150} alt="Add Contracts" className="mb-4 opacity-80" />
 
       {/* Main Text */}
       <div className="text-center">
-        <p className="text-white font-medium mb-1">+ Add Contracts from Options Chain</p>
+        <p className="text-white font-medium text-lg mb-1">+ Add Contracts from Options Chain</p>
         <p className="text-gray-400 text-sm">
           Selected contracts will show up here
         </p>
