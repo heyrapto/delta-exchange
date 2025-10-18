@@ -69,7 +69,7 @@ export const TradeCard = () => {
     return (
         <div className="w-full bg-[#1a1d25] text-white h-[700px] overflow-y-auto">
             {/* HEADER STATS */}
-            <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-gray-700">
+            <div className="flex justify-end gap-2 px-3 py-2 border-b border-gray-700">
                 {headerStats.map((s, i) => (
                     <div
                         key={i}
@@ -100,12 +100,35 @@ export const TradeCard = () => {
                         <button
                             key={btn.label}
                             onClick={() => setTradeType(btn.type)}
-                            className={`py-2 rounded text-[11px] font-medium transition-colors ${tradeType === btn.type
-                                    ? `${btn.activeColor} text-white`
-                                    : "bg-gray-800 text-gray-400"
-                                }`}
+                            className={`
+        relative
+        flex items-center justify-center
+        h-7
+        rounded
+        text-[11px] font-medium
+        transition-colors
+        mr-2
+        overflow-hidden
+        cursor-pointer
+        ${tradeType === btn.type ? `${btn.activeColor} text-white` : 'bg-gray-800 text-gray-400'}
+      `}
+                            style={{
+                                transform: 'skewX(-20deg)',
+                            }}
                         >
-                            {btn.label}
+                            {/* Button Text Skewed Back */}
+                            <span className="relative z-10" style={{ transform: 'skewX(20deg)' }}>
+                                {btn.label}
+                            </span>
+
+                            {/* After / angled end */}
+                            <span
+                                className="absolute top-0 h-full w-[15px] right-[-7px] rounded"
+                                style={{
+                                    backgroundColor: tradeType === btn.type ? 'var(--orange-500)' : 'var(--gray-800)',
+                                    transform: 'skewX(20deg)',
+                                }}
+                            />
                         </button>
                     ))}
                 </div>
