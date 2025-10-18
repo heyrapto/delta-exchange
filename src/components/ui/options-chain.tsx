@@ -18,41 +18,16 @@ export const OptionsChain = ({
   view, 
   loading 
 }: OptionsChainProps) => {
+  const mainScrollRef = useRef<HTMLDivElement>(null)
   const callsScrollRef = useRef<HTMLDivElement>(null)
   const putsScrollRef = useRef<HTMLDivElement>(null)
   const callsHeaderRef = useRef<HTMLDivElement>(null)
   const putsHeaderRef = useRef<HTMLDivElement>(null)
-  const mainContainerRef = useRef<HTMLDivElement>(null)
 
-  // Handle calls side horizontal scroll - MIRROR BOTH HEADERS AND CONTENT
-  const handleCallsScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const scrollLeft = e.currentTarget.scrollLeft
-    
-    // Mirror puts header AND content with calls scroll
-    if (putsHeaderRef.current) {
-      putsHeaderRef.current.scrollLeft = scrollLeft
-    }
-    if (putsScrollRef.current) {
-      putsScrollRef.current.scrollLeft = scrollLeft
-    }
-  }
-
-  // Handle puts side horizontal scroll - MIRROR BOTH HEADERS AND CONTENT
-  const handlePutsScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const scrollLeft = e.currentTarget.scrollLeft
-    
-    // Mirror calls header AND content with puts scroll
-    if (callsHeaderRef.current) {
-      callsHeaderRef.current.scrollLeft = scrollLeft
-    }
-    if (callsScrollRef.current) {
-      callsScrollRef.current.scrollLeft = scrollLeft
-    }
-  }
-
-  // Handle main container vertical scroll - SYNC ALL SECTIONS
+  // Handle main container scroll - sync everything
   const handleMainScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
+    const scrollLeft = e.currentTarget.scrollLeft
     
     // Sync vertical scroll for both sides
     if (callsScrollRef.current) {
@@ -61,31 +36,65 @@ export const OptionsChain = ({
     if (putsScrollRef.current) {
       putsScrollRef.current.scrollTop = scrollTop
     }
+    
+    // Sync horizontal scroll for headers
+    if (callsHeaderRef.current) {
+      callsHeaderRef.current.scrollLeft = scrollLeft
+    }
+    if (putsHeaderRef.current) {
+      putsHeaderRef.current.scrollLeft = scrollLeft
+    }
   }
 
-  // Handle calls vertical scroll - SYNC WITH MAIN
-  const handleCallsVerticalScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  // Handle calls scroll - sync with puts
+  const handleCallsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
+    const scrollLeft = e.currentTarget.scrollLeft
     
-    // Sync with main container and puts
-    if (mainContainerRef.current) {
-      mainContainerRef.current.scrollTop = scrollTop
+    // Sync with main container
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTop = scrollTop
+      mainScrollRef.current.scrollLeft = scrollLeft
     }
+    
+    // Sync with puts
     if (putsScrollRef.current) {
       putsScrollRef.current.scrollTop = scrollTop
+      putsScrollRef.current.scrollLeft = scrollLeft
+    }
+    
+    // Sync headers
+    if (callsHeaderRef.current) {
+      callsHeaderRef.current.scrollLeft = scrollLeft
+    }
+    if (putsHeaderRef.current) {
+      putsHeaderRef.current.scrollLeft = scrollLeft
     }
   }
 
-  // Handle puts vertical scroll - SYNC WITH MAIN
-  const handlePutsVerticalScroll = (e: React.UIEvent<HTMLDivElement>) => {
+  // Handle puts scroll - sync with calls
+  const handlePutsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
+    const scrollLeft = e.currentTarget.scrollLeft
     
-    // Sync with main container and calls
-    if (mainContainerRef.current) {
-      mainContainerRef.current.scrollTop = scrollTop
+    // Sync with main container
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTop = scrollTop
+      mainScrollRef.current.scrollLeft = scrollLeft
     }
+    
+    // Sync with calls
     if (callsScrollRef.current) {
       callsScrollRef.current.scrollTop = scrollTop
+      callsScrollRef.current.scrollLeft = scrollLeft
+    }
+    
+    // Sync headers
+    if (callsHeaderRef.current) {
+      callsHeaderRef.current.scrollLeft = scrollLeft
+    }
+    if (putsHeaderRef.current) {
+      putsHeaderRef.current.scrollLeft = scrollLeft
     }
   }
 
@@ -98,97 +107,93 @@ export const OptionsChain = ({
   }
 
   return (
-    <div 
-      ref={mainContainerRef}
-      className="h-full flex overflow-hidden"
-      onScroll={handleMainScroll}
-    >
-      {/* CALLS SECTION */}
-      <div className="flex-1 flex flex-col min-w-0">
+    <div className="h-full flex flex-col">
+      {/* HEADER ROW */}
+      <div className="flex border-b border-gray-700 bg-gray-900/50">
         {/* Calls Header */}
         <div 
           ref={callsHeaderRef}
-          className="overflow-x-auto scrollbar-hide border-b border-gray-700 bg-gray-900/50"
+          className="flex-1 overflow-x-auto scrollbar-hide" 
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <CallsHeader view={view} />
         </div>
         
-        {/* Calls Data */}
-        <div 
-          ref={callsScrollRef}
-          className="flex-1 overflow-x-auto overflow-y-auto scrollbar-hide"
-          onScroll={(e) => {
-            handleCallsScroll(e)
-            handleCallsVerticalScroll(e)
-          }}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="min-w-max">
-            {optionsData.map((data, idx) => (
-              <CallsRow
-                key={idx}
-                data={data}
-                isSelected={data.strike === selectedStrike}
-                view={view}
-                onSelect={() => onStrikeSelect(data.strike)}
-              />
-            ))}
+        {/* Strike Header */}
+        <div className="w-20 flex-shrink-0 bg-gray-900/30 border-l border-r border-gray-700">
+          <div className="text-gray-400 text-[8px] px-1 py-1 font-medium text-center">
+            <div>Strike 🔽</div>
           </div>
         </div>
-      </div>
-
-      {/* FIXED STRIKE COLUMN */}
-      <div className="w-20 flex-shrink-0 bg-gray-900/30 border-l border-r border-gray-700">
-        {/* Strike Header */}
-        <div className="text-gray-400 text-[8px] px-1 py-1 font-medium text-center border-b border-gray-700 bg-gray-900/50">
-          <div>Strike 🔽</div>
-        </div>
         
-        {/* Strike Data - PERFECTLY ALIGNED WITH ROWS */}
-        <div className="overflow-y-auto scrollbar-hide">
-          {optionsData.map((data, idx) => (
-            <StrikeCell
-              key={idx}
-              strike={data.strike}
-              isSelected={data.strike === selectedStrike}
-              onSelect={() => onStrikeSelect(data.strike)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* PUTS SECTION */}
-      <div className="flex-1 flex flex-col min-w-0">
         {/* Puts Header */}
         <div 
           ref={putsHeaderRef}
-          className="overflow-x-auto scrollbar-hide border-b border-gray-700 bg-gray-900/50"
+          className="flex-1 overflow-x-auto scrollbar-hide" 
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <PutsHeader view={view} />
         </div>
-        
-        {/* Puts Data */}
-        <div 
-          ref={putsScrollRef}
-          className="flex-1 overflow-x-auto overflow-y-auto scrollbar-hide"
-          onScroll={(e) => {
-            handlePutsScroll(e)
-            handlePutsVerticalScroll(e)
-          }}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          <div className="min-w-max">
+      </div>
+
+      {/* MAIN CONTENT AREA - SINGLE UNIFIED TABLE */}
+      <div 
+        ref={mainScrollRef}
+        className="flex-1 overflow-auto scrollbar-hide"
+        onScroll={handleMainScroll}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        <div className="flex">
+          {/* CALLS SECTION */}
+          <div 
+            ref={callsScrollRef}
+            className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-hide"
+            onScroll={handleCallsScroll}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="min-w-max">
+              {optionsData.map((data, idx) => (
+                <CallsRow
+                  key={idx}
+                  data={data}
+                  isSelected={data.strike === selectedStrike}
+                  view={view}
+                  onSelect={() => onStrikeSelect(data.strike)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* FIXED STRIKE COLUMN */}
+          <div className="w-20 flex-shrink-0 bg-gray-900/30 border-l border-r border-gray-700">
             {optionsData.map((data, idx) => (
-              <PutsRow
+              <StrikeCell
                 key={idx}
-                data={data}
+                strike={data.strike}
                 isSelected={data.strike === selectedStrike}
-                view={view}
                 onSelect={() => onStrikeSelect(data.strike)}
               />
             ))}
+          </div>
+
+          {/* PUTS SECTION */}
+          <div 
+            ref={putsScrollRef}
+            className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-hide"
+            onScroll={handlePutsScroll}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="min-w-max">
+              {optionsData.map((data, idx) => (
+                <PutsRow
+                  key={idx}
+                  data={data}
+                  isSelected={data.strike === selectedStrike}
+                  view={view}
+                  onSelect={() => onStrikeSelect(data.strike)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -631,7 +636,7 @@ const PutsRow = ({
   )
 }
 
-// STRIKE CELL COMPONENT - PERFECTLY ALIGNED
+// STRIKE CELL COMPONENT - PERFECTLY ALIGNED WITH ROW BORDERS
 const StrikeCell = ({ 
   strike, 
   isSelected, 
@@ -646,7 +651,7 @@ const StrikeCell = ({
 
   return (
     <div
-      className={`text-center font-medium px-1 py-0.5 flex items-center justify-center gap-1 cursor-pointer hover:bg-gray-800/50 border-b border-gray-800/50 ${
+      className={`text-center min-h-[30px] font-medium px-1 py-0.5 flex items-center justify-center gap-1 cursor-pointer hover:bg-gray-800/50 border-b border-gray-800/50 ${
         isSelected ? "bg-orange-900/20" : ""
       }`}
       onMouseEnter={() => setIsHovered(true)}
