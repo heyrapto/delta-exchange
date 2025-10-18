@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { BiChevronDown } from "react-icons/bi"
+import { SiStackblitz } from "react-icons/si"
 
 // ============= TYPES =============
 type ViewMode = "table" | "chart"
@@ -271,7 +272,7 @@ export const MainExchange = () => {
     }, [selectedContract, selectedDate])
 
     return (
-        <div className="w-full bg-[#1a1d25] text-white h-[600px] flex flex-col overflow-hidden">
+        <div className="w-full bg-[#1a1d25] text-white h-[700px] flex flex-col overflow-hidden">
             {/* Top Navigation Bar */}
             <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-900/50">
                 <div className="flex items-center gap-2">
@@ -306,12 +307,12 @@ export const MainExchange = () => {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 relative">
                     <button
                         onClick={() => setShowResources(!showResources)}
-                        className="flex items-center gap-1 px-3 py-1 rounded text-[11px] bg-gray-800 text-gray-300 hover:bg-gray-700"
+                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] bg-transparent cursor-pointer text-gray-300 border ${showResources ? "border-orange-500 text-orange-500": "border-gray-700"} hover:bg-gray-700 relative`}
                     >
-                        📚 Resources
+                        <SiStackblitz /> Resources
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
                     </button>
                     <button className="flex items-center gap-1 px-3 py-1 rounded text-[11px] text-orange-400 border border-orange-500/30">
@@ -404,7 +405,7 @@ export const MainExchange = () => {
             </div>
 
             {/* Bottom Controls (if table view) */}
-            {viewMode === "table" && (
+            {/* {viewMode === "table" && (
                 <div className="px-3 py-1.5 border-t border-gray-700 bg-gray-900/50">
                     <div className="flex items-center gap-2 text-[10px]">
                         <button
@@ -427,7 +428,7 @@ export const MainExchange = () => {
                         </button>
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     )
 }

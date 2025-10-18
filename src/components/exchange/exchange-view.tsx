@@ -4,7 +4,7 @@ import { TradeCard } from "../ui/trade-card"
 
 export const ExchangeView = () => {
     return (
-        <div className="flex h-[600px] overflow-hidden">
+        <div className="flex h-[700px] overflow-hidden">
             <div className="w-[60%]">
                 <MainExchange />
             </div>

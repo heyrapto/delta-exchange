@@ -67,12 +67,12 @@ export const TradeCard = () => {
     const handleQuantityPercentChange = (percent: number) => setQuantityPercent(percent)
 
     return (
-        <div className="w-full bg-[#1a1d25] text-white h-[600px] overflow-y-auto">
+        <div className="w-full bg-[#1a1d25] text-white h-[700px] overflow-y-auto">
             {/* HEADER STATS */}
             <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-gray-700">
                 {headerStats.map((s, i) => (
                     <div
-                        key={s.label}
+                        key={i}
                         className={`flex items-center gap-1 ${s.center ? "justify-center" : ""}`}
                     >
                         <span className="text-gray-400 text-[10px]">{s.label}</span>

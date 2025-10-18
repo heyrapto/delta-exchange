@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BiChevronDown } from "react-icons/bi"
+import { BiChevronDown, BiStar } from "react-icons/bi"
 
 // Types
 type OrderBookEntry = {
@@ -134,11 +134,11 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="relative w-full max-w-md bg-[#1a1d25] text-white h-[600px] flex flex-col">
+        <div className="relative w-full max-w-md bg-[#1a1d25] text-white h-[700px] flex flex-col">
             {/* Header */}
             <div className="px-3 py-2 border-b border-gray-700">
                 <div className="flex items-center gap-2 mb-2">
-                    <span className="text-orange-500 text-xs">⭐</span>
+                    <BiStar className="text-orange-500 text-sm" />
                     <span className="text-white text-xs font-medium">P-BTC-106000-281125</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
