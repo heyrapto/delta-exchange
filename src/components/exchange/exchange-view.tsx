@@ -7,7 +7,7 @@ import { TradeCard } from "../ui/trade-card"
 import { StrategyBuilder } from "../ui/strategy-buillder"
 
 export const ExchangeView = () => {
-    const [strategyView, setStrategyView] = useState("Normal");
+    const [strategyView, setStrategyView] = useState(false);
 
     return (
         <div className="flex h-[700px] overflow-hidden">
@@ -15,17 +15,21 @@ export const ExchangeView = () => {
                 <MainExchange />
             </div>
 
-            <div className="w-[15%]">
-                <OrderBook />
-            </div>
-            
-            <div className="w-[25%]">
-                <TradeCard />
-            </div>
-
-            {/* <div className="w-[40%]">
-                <StrategyBuilder />
-            </div> */}
+            {strategyView ? (
+                <div className="w-[40%]">
+                    <StrategyBuilder />
+                </div>
+            ) : (
+                <>
+                    <div className="w-[15%]">
+                        <OrderBook />
+                    </div>
+                    
+                    <div className="w-[25%]">
+                        <TradeCard />
+                    </div>
+                </>
+            )}
         </div>
     )
 }
