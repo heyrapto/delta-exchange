@@ -378,26 +378,26 @@ export const TradeCard = () => {
 
                 {/* FOOTER LINKS */}
                 <div className="flex items-center gap-2 text-[10px] text-gray-400 pb-3 border-b border-gray-700">
-                    {footerLinks
-                        .filter((link) => link.condition)
-                        .map((link, idx, arr) => (
-                            <>
-                                {link.hasDropdown ? (
-                                    <button key={link.label} className="flex items-center gap-0.5">
-                                        <span className="text-xs">ⓘ</span> {link.label}
-                                        <BiChevronDown className="w-2.5 h-2.5" />
-                                    </button>
-                                ) : (
-                                    <button
-                                        key={link.label}
-                                        className={link.isDotted ? "border-b border-dotted border-gray-600" : ""}
-                                    >
-                                        {link.label}
-                                    </button>
-                                )}
-                                {idx < arr.length - 1 && orderType === "limit" && <span>|</span>}
-                            </>
-                        ))}
+                {footerLinks
+  .filter((link) => link.condition)
+  .map((link, idx, arr) => (
+    <div key={link.label} className="flex items-center gap-1">
+      {link.hasDropdown ? (
+        <button className="flex items-center gap-0.5">
+          <span className="text-xs">ⓘ</span> {link.label}
+          <BiChevronDown className="w-2.5 h-2.5" />
+        </button>
+      ) : (
+        <button
+          className={link.isDotted ? "border-b border-dotted border-gray-600" : ""}
+        >
+          {link.label}
+        </button>
+      )}
+      {idx < arr.length - 1 && orderType === "limit" && <span>|</span>}
+    </div>
+  ))}
+
                 </div>
 
                 {/* PROMO BANNER */}
