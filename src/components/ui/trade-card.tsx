@@ -248,12 +248,12 @@ export const TradeCard = () => {
                                 />
                             )}
                             {orderType === tab.key && (
-                                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-500" />
                             )}
                         </button>
                     ))}
                     {showStopLimitDropdown && (
-                        <div className="absolute top-7 left-0 bg-[#23262f] rounded shadow-lg py-1 z-10 min-w-[140px]">
+                        <div className="absolute top-7 left-0 bg-gray-100/50 rounded shadow-lg py-1 z-10 min-w-[140px]">
                             {stopLimitOptions.map((opt) => (
                                 <div
                                     key={opt.value}
@@ -261,7 +261,7 @@ export const TradeCard = () => {
                                         setStopLimitType(opt.value as typeof stopLimitType)
                                         setShowStopLimitDropdown(false)
                                     }}
-                                    className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer ${stopLimitType === opt.value ? "text-orange-500" : ""
+                                    className={`px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer ${stopLimitType === opt.value ? "text-green-500" : ""
                                         }`}
                                 >
                                     {opt.label}
@@ -293,7 +293,7 @@ export const TradeCard = () => {
                                                     setStopPriceType(opt)
                                                     setShowStopPriceDropdown(false)
                                                 }}
-                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer capitalize ${stopPriceType === opt ? "text-green-500" : ""
+                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer capitalize ${stopPriceType === opt ? "text-green-500" : ""
                                                     }`}
                                             >
                                                 {opt}
@@ -391,11 +391,11 @@ export const TradeCard = () => {
                                 <span className="text-green-500 text-[8px]">!</span>
                             </div>
                         </span>
-                        <span className="text-white">~0.00 USD</span>
+                        <span className="text-black">~0.00 USD</span>
                     </div>
                     <div className="flex items-center justify-between text-[10px]">
                         <span className="text-gray-400">Available Margin</span>
-                        <span className="text-white">0 USD</span>
+                        <span className="text-black">0 USD</span>
                     </div>
                 </div>
 
