@@ -101,17 +101,17 @@ export const TradeCard = () => {
                             key={btn.label}
                             onClick={() => setTradeType(btn.type)}
                             className={`
-        relative
-        flex items-center justify-center
-        h-7
-        rounded
-        text-[11px] font-medium
-        transition-colors
-        mr-2
-        overflow-hidden
-        cursor-pointer
-        ${tradeType === btn.type ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
-      `}
+                            relative
+                            flex items-center justify-center
+                            h-7
+                            rounded
+                            text-[11px] font-medium
+                            transition-colors
+                            mr-2
+                            overflow-hidden
+                            cursor-pointer
+                            ${tradeType === btn.type ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
+                        `}
                             style={{
                                 transform: 'skewX(-20deg)',
                             }}
@@ -140,8 +140,8 @@ export const TradeCard = () => {
                         className="flex items-center justify-between py-2 cursor-pointer"
                     >
                         <div className="flex gap-2 items-center">
-                        <span className="text-gray-900 text-[11px]">Leverage</span>
-                        <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
+                            <span className="text-gray-900 text-[11px]">Leverage</span>
+                            <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {showLeveragePanel ? (
@@ -153,32 +153,55 @@ export const TradeCard = () => {
                     </div>
 
                     {showLeveragePanel && (
-                        <div className="bg-transparent rounded p-3 space-y-3">
-                            <div className="border border-[#ADFF2F] rounded px-3 py-2 text-right text-[20px]">
-                                {leverage}x
+                        <div className="bg-transparent rounded p-3 space-y-3 relative">
+                            {/* Editable Leverage Input */}
+                            <div className="relative border border-[#ADFF2F] rounded px-3 py-2 text-right">
+                                <input
+                                    type="number"
+                                    value={leverage}
+                                    onChange={(e) => {
+                                        const val = Number(e.target.value)
+                                        if (val >= 1 && val <= 20) setLeverage(val)
+                                    }}
+                                    className="bg-transparent w-full text-right text-[20px] font-semibold outline-none text-black pr-5"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-black text-[20px] font-semibold">
+                                    x
+                                </span>
                             </div>
 
-                            {/* SLIDER */}
-                            <div>
+                            {/* Slider */}
+                            <div className="relative">
                                 <input
                                     type="range"
                                     min="1"
                                     max="20"
+                                    step="1"
                                     value={leverage}
                                     onChange={(e) => handleLeverageChange(Number(e.target.value))}
-                                    className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full h-[4px] rounded-lg appearance-none cursor-pointer bg-gray-300"
                                     style={{
                                         background: `linear-gradient(to right, #ADFF2F 0%, #ADFF2F ${((leverage - 1) / 19) * 100
-                                            }%, #ADFF2F ${((leverage - 1) / 19) * 100}%, #ADFF2F 100%)`,
+                                            }%, #E5E7EB ${((leverage - 1) / 19) * 100}%, #E5E7EB 100%)`,
                                     }}
                                 />
-                                <div className="flex justify-between mt-1 text-[12px] text-gray-500">
+
+                                {/* Tick Labels */}
+                                <div className="flex justify-between mt-1 text-[11px] text-gray-500 font-medium">
                                     {leverageOptions.map((opt) => (
-                                        <span key={opt}>{opt}x</span>
+                                        <button
+                                            key={opt}
+                                            onClick={() => handleLeverageChange(opt)}
+                                            className={`transition ${leverage === opt ? 'text-black font-semibold' : 'hover:text-gray-700'
+                                                }`}
+                                        >
+                                            {opt}x
+                                        </button>
                                     ))}
                                 </div>
                             </div>
 
+                            {/* Checkbox */}
                             <label className="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -189,14 +212,16 @@ export const TradeCard = () => {
                                 Set {leverage}x as default leverage for all BTC options
                             </label>
 
+                            {/* Max Position */}
                             <div className="flex justify-between text-[10px]">
                                 <span className="text-gray-400 border-b border-dotted border-gray-600">
                                     Max position at {leverage}x
                                 </span>
-                                <span className="text-white">{maxPosition.toLocaleString()} USD</span>
+                                <span className="text-black font-medium">{maxPosition.toLocaleString()} USD</span>
                             </div>
 
-                            <button className="w-full bg-[#ADFF2F] text-black py-2 rounded font-medium transition-colors text-[11px]">
+                            {/* CTA Button */}
+                            <button className="w-full bg-[#ADFF2F] text-black py-2 rounded font-medium transition-colors text-[11px] hover:bg-lime-400">
                                 Set to {leverage}x
                             </button>
                         </div>
