@@ -122,13 +122,13 @@ export const TradeCard = () => {
                             </span>
 
                             {/* After / angled end */}
-                            <span
+                            {/* <span
                                 className="absolute top-0 h-full w-[15px] right-[-7px] rounded"
                                 style={{
                                     backgroundColor: tradeType === btn.type ? 'bg-orange-500' : 'bg-gray-500',
                                     transform: 'skewX(20deg)',
                                 }}
-                            />
+                            /> */}
                         </button>
                     ))}
                 </div>
