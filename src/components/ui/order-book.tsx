@@ -49,7 +49,7 @@ const OrderBookRow = ({
             <div className={type === "sell" ? "text-red-400" : "text-green-400"}>
                 {price.toFixed(1)}
             </div>
-            <div className="text-right text-gray-300">
+            <div className="text-right text-gray-900">
                 {size.toFixed(3)}
             </div>
             {/* Background bar */}
@@ -76,10 +76,10 @@ const RecentTradeRow = ({
                 {price.toFixed(1)}
                 {type === "sell" && <span className="text-[8px]">↓</span>}
             </div>
-            <div className="text-right text-gray-300">
+            <div className="text-right text-gray-900">
                 {size.toFixed(3)}
             </div>
-            <div className="text-right text-gray-400">
+            <div className="text-right text-gray-900">
                 {time}
             </div>
         </div>
