@@ -17,6 +17,24 @@ export const ExchangePanel = () => {
         </div>
     )
 
+    const tableData = [
+        {
+          status: 'Healthy',
+          initialMargin: '$0.00',
+          initialPercent: '0.00%',
+          maintenanceMargin: '$0.00',
+          maintenancePercent: '0.00%',
+        },
+        // {
+        //   status: 'Warning',
+        //   initialMargin: '$2,400.00',
+        //   initialPercent: '8.15%',
+        //   maintenanceMargin: '$1,200.00',
+        //   maintenancePercent: '4.07%',
+        // },
+      ]
+      
+
     const renderContent = () => {
         switch (activePanel) {
             case 0: return <EmptyPanelState title="Positions" />
@@ -25,21 +43,59 @@ export const ExchangePanel = () => {
             case 3: return <EmptyPanelState title="Tracker Assets" />
             case 4:
                 return (
-                    <div className="p-6 flex justify-between">
-                        <div>
-                            <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Status</p>
-                            <span className="border-b border-dotted pb-3 text-xs" style={{ borderColor: 'var(--text-success)', color: 'var(--text-success)' }}>Healthy</span>
-                        </div>
-                        <div>
-                            <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Initial Margin</p>
-                            <p className="text-xs" style={{ color: 'var(--text-primary)' }}>$0.00 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>(0.00%)</span></p>
-                        </div>
-                        <div>
-                            <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)' }}>Maintenance Margin</p>
-                            <p className="text-xs" style={{ color: 'var(--text-primary)' }}>$0.00 <span className="text-xs" style={{ color: 'var(--text-muted)' }}>(0.00%)</span></p>
-                        </div>
+                    <div className="p-4">
+                      <table className="w-full text-xs border-separate border-spacing-y-2">
+                        <thead>
+                          <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                            <th className="text-left font-medium px-2 py-1">Status</th>
+                            <th className="text-left font-medium px-2 py-1">Initial Margin</th>
+                            <th className="text-left font-medium px-2 py-1">Maintenance Margin</th>
+                          </tr>
+                        </thead>
+                  
+                        <tbody>
+                          {tableData.map((row, i) => (
+                            <tr key={i} className="bg-gray-100/50 rounded">
+                              <td className="px-2 py-2 border-b border-gray-300">
+                                <span
+                                  className="border-b border-dotted pb-[2px]"
+                                  style={{
+                                    borderColor:
+                                      row.status.toLowerCase() === 'healthy'
+                                        ? 'var(--text-success)'
+                                        : 'var(--text-warning)',
+                                    color:
+                                      row.status.toLowerCase() === 'healthy'
+                                        ? 'var(--text-success)'
+                                        : 'var(--text-warning)',
+                                  }}
+                                >
+                                  {row.status}
+                                </span>
+                              </td>
+                  
+                              <td
+                                className="px-2 py-2 border-b border-gray-300 text-[11px]"
+                                style={{ color: 'var(--text-primary)' }}
+                              >
+                                {row.initialMargin}{' '}
+                                <span className="text-gray-400">({row.initialPercent})</span>
+                              </td>
+                  
+                              <td
+                                className="px-2 py-2 border-b border-gray-300 text-[11px]"
+                                style={{ color: 'var(--text-primary)' }}
+                              >
+                                {row.maintenanceMargin}{' '}
+                                <span className="text-gray-400">({row.maintenancePercent})</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                )
+                  )
+                  
             case 5: return <EmptyPanelState title="Fills" />
             case 6: return <EmptyPanelState title="Order History" />
             default: return null
