@@ -1,90 +1,11 @@
 "use client"
 
+import { OrderBookEntry, RecentTrade } from "@/types"
 import { useState } from "react"
 import { BiChart, BiChevronDown, BiStar, BiTrendingDown, BiTrendingUp } from "react-icons/bi"
-
-// Types
-type OrderBookEntry = {
-    price: number
-    size: number
-}
-
-type RecentTrade = {
-    price: number
-    size: number
-    time: string
-    type: "buy" | "sell"
-}
+import { OrderBookRow, RecentTradeRow } from "../shared/order-book-card"
 
 type ViewMode = "all" | "buy" | "sell"
-
-// Order Book Row Component
-const OrderBookRow = ({ 
-    price, 
-    size, 
-    type, 
-    onHover 
-}: { 
-    price: number
-    size: number
-    type: "buy" | "sell"
-    onHover: (data: { price: number; size: number } | null, pos?: { x: number; y: number }) => void
-}) => {
-    const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect()
-        // Position tooltip slightly to the right of the row
-        onHover({ price, size }, { x: rect.right + 10, y: rect.top + rect.height / 2 })
-    }
-
-    const handleMouseLeave = () => {
-        onHover(null)
-    }
-
-    return (
-        <div
-            className="grid grid-cols-2 py-0.5 hover:bg-gray-100/50 cursor-pointer text-[10px] relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-        >
-            <div className={type === "sell" ? "text-red-400" : "text-green-400"}>
-                {price.toFixed(1)}
-            </div>
-            <div className="text-right text-gray-900">
-                {size.toFixed(3)}
-            </div>
-            {/* Background bar */}
-            <div 
-                className={`absolute right-0 top-0 bottom-0 ${
-                    type === "sell" ? "bg-red-900/20" : "bg-green-900/20"
-                }`}
-                style={{ width: `${Math.min(size / 5, 100)}%` }}
-            />
-        </div>
-    )
-}
-
-// Recent Trade Row Component
-const RecentTradeRow = ({ 
-    price, 
-    size, 
-    time, 
-    type 
-}: RecentTrade) => {
-    return (
-        <div className="grid grid-cols-3 py-0.5 hover:bg-gray-100/50 cursor-pointer text-[10px]">
-            <div className={`flex items-center gap-1 ${type === "buy" ? "text-green-400" : "text-red-400"}`}>
-                {price.toFixed(1)}
-                {type === "sell" && <span className="text-[8px]">↓</span>}
-            </div>
-            <div className="text-right text-gray-900">
-                {size.toFixed(3)}
-            </div>
-            <div className="text-right text-gray-900">
-                {time}
-            </div>
-        </div>
-    )
-}
 
 // Main OrderBook Component
 export const OrderBook = () => {
@@ -93,7 +14,6 @@ export const OrderBook = () => {
     const [hoveredData, setHoveredData] = useState<{ price: number; size: number } | null>(null)
     const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null)
 
-    // Sample data
     const sellOrders: OrderBookEntry[] = [
         { price: 6041.0, size: 1.293 },
         { price: 5972.0, size: 1.189 },
@@ -247,7 +167,7 @@ export const OrderBook = () => {
 
                 {/* Buy Orders */}
                 {(viewMode === "all" || viewMode === "buy") && (
-                    <div className="overflow-y-auto px-3 py-1 flex-1">
+                    <div className="overflow-y-auto px-3 py-1 flex-1 ">
                         {buyOrders.map((order, idx) => (
                             <OrderBookRow
                                 key={`buy-${idx}`}

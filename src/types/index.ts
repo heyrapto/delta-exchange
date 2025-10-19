@@ -22,3 +22,16 @@ export interface OptionData {
 export type ViewMode = "table" | "chart"
 export type TableView = "standard" | "greek" | "greekDetailed"
 export type OptionType = "calls" | "puts"
+
+export type OrderBookEntry = {
+    price: number
+    size: number
+}
+
+export type RecentTrade = {
+    price: number
+    size: number
+    time: string
+    type: "buy" | "sell"
+}
+
