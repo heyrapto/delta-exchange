@@ -18,7 +18,7 @@ export default function Home() {
   if (loading) return <LoadingScreen />
 
   return (
-    <div className="relative mx-auto w-full xl:max-w-[120rem] min-h-screen">
+    <div className="relative mx-auto w-full xl:max-w-[120rem] min-h-screen" style={{ backgroundColor: 'var(--page-bg-color)' }}>
       <Banner />
       <Header />
       <Exchange />

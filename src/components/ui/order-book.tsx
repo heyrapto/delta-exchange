@@ -42,7 +42,7 @@ const OrderBookRow = ({
 
     return (
         <div
-            className="grid grid-cols-2 py-0.5 hover:bg-gray-800/50 cursor-pointer text-[10px] relative"
+            className="grid grid-cols-2 py-0.5 hover:bg-gray-100/50 cursor-pointer text-[10px] relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -71,7 +71,7 @@ const RecentTradeRow = ({
     type 
 }: RecentTrade) => {
     return (
-        <div className="grid grid-cols-3 py-0.5 hover:bg-gray-800/50 cursor-pointer text-[10px]">
+        <div className="grid grid-cols-3 py-0.5 hover:bg-gray-100/50 cursor-pointer text-[10px]">
             <div className={`flex items-center gap-1 ${type === "buy" ? "text-green-400" : "text-red-400"}`}>
                 {price.toFixed(1)}
                 {type === "sell" && <span className="text-[8px]">↓</span>}
@@ -153,29 +153,29 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="relative w-full max-w-md bg-[#1a1d25] text-white h-[700px] flex flex-col">
+        <div className="relative w-full max-w-md h-[700px] flex flex-col" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
             {/* Header */}
-            <div className="px-3 py-2 border-b border-gray-700">
+            <div className="px-3 py-2 border-b border-gray-300">
                 <div className="flex items-center gap-2 mb-2">
-                    <BiStar className="text-orange-500 text-sm" />
-                    <span className="text-white text-xs font-medium">P-BTC-106000-281125</span>
+                    <BiStar className="text-sm" style={{ color: 'var(--warning-color)' }} />
+                    <span className="text-xs font-medium" style={{ color: 'var(--orderbook-text)' }}>P-BTC-106000-281125</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                     <div>
-                        <div className="text-gray-400 text-[9px]">24h Change</div>
-                        <div className="text-green-400 text-[11px] font-medium">14.68%</div>
+                        <div className="text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>24h Change</div>
+                        <div className="text-[11px] font-medium text-green-500">14.68%</div>
                     </div>
                     <div className="text-right">
-                        <div className="text-gray-400 text-[9px]">Price</div>
-                        <div className="text-red-400 text-[11px] font-medium">$5390</div>
+                        <div className="text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>Price</div>
+                        <div className="text-[11px] font-medium text-green-500">$5390</div>
                     </div>
                 </div>
             </div>
 
             {/* Order Book Title & Controls */}
-            <div className="px-3 py-2 border-b border-gray-700">
+            <div className="px-3 py-2 border-b border-gray-300">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-white text-xs font-medium">Order Book</h3>
+                    <h3 className="text-xs font-medium" style={{ color: 'var(--orderbook-text)' }}>Order Book</h3>
                     <div className="flex items-center gap-2">
                         {/* View Mode Icons */}
                         <div className="flex gap-1">
@@ -192,7 +192,7 @@ export const OrderBook = () => {
                             ))}
                         </div>
                         {/* Lot Size Dropdown */}
-                        <button className="flex items-center gap-1 text-[10px] text-white">
+                        <button className="flex items-center gap-1 text-[10px] text-black">
                             {lotSize}
                             <BiChevronDown className="w-3 h-3" />
                         </button>
@@ -224,23 +224,23 @@ export const OrderBook = () => {
                 )}
 
                 {/* Current Price & Spread */}
-                <div className="px-3 py-1.5 bg-[#23262f] border-y border-gray-700">
+                <div className="px-3 py-1.5 border-y border-gray-300">
                     <div className="flex items-center justify-between">
                         <div className="text-red-400 text-sm font-bold">
                             ${currentPrice.toFixed(1)}
                         </div>
-                        <div className="text-gray-400 text-[9px]">
-                            Spread: <span className="text-white">{spread}</span> ({spreadPercent}%)
+                        <div className="text-gray-900 text-[9px]">
+                            Spread: <span className="text-black">{spread}</span> ({spreadPercent}%)
                         </div>
                     </div>
                     <div className="flex items-center gap-3 mt-0.5 text-[9px]">
                         <div className="flex items-center gap-1">
-                            <span className="text-gray-400">I</span>
-                            <span className="text-white">106913.4</span>
+                            <span className="text-gray-900">I</span>
+                            <span className="text-black">106913.4</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <span className="text-gray-400">M</span>
-                            <span className="text-white">5582.1</span>
+                            <span className="text-gray-900">M</span>
+                            <span className="text-black">5582.1</span>
                         </div>
                     </div>
                 </div>
@@ -289,11 +289,11 @@ export const OrderBook = () => {
             )}
 
             {/* Recent Trades */}
-            <div className="border-t border-gray-700 px-3 py-2">
-                <h3 className="text-white text-xs font-medium mb-2">Recent Trades</h3>
+            <div className="border-t border-gray-300 px-3 py-2">
+                <h3 className="text-black text-xs font-medium mb-2">Recent Trades</h3>
                 
                 {/* Column Headers */}
-                <div className="grid grid-cols-3 text-[9px] text-gray-400 mb-1">
+                <div className="grid grid-cols-3 text-[9px] mb-1" style={{ color: "var(--text-secondary)" }}>
                     <div>Price (USD)</div>
                     <div className="text-right">Size (BTC)</div>
                     <div className="text-right">Time</div>

@@ -1,9 +1,169 @@
 @import "tailwindcss";
 
+:root {
+  /* NeoStox AI Color Theme */
+  
+  /* Page Background */
+  --page-bg-color: #FFFFFF;
+  --page-bg-pattern: #F8F9FA;
+  
+  /* Header Colors */
+  --header-bg-gradient-start: #ADFF2F;
+  --header-bg-gradient-end: #90EE90;
+  --header-logo-text-primary: #333333;
+  --header-logo-text-accent: #ADFF2F;
+  --header-nav-link-color: #333333;
+  --get-started-button-bg: #ADFF2F;
+  --get-started-button-text: #FFFFFF;
+  
+  /* Main Content */
+  --main-heading-color: #333333;
+  --subheading-color: #666666;
+  
+  /* Buttons */
+  --whitepaper-button-bg: #FFFFFF;
+  --whitepaper-button-border: #DDDDDD;
+  --whitepaper-button-text: #333333;
+  --chart-button-bg: #ADFF2F;
+  --chart-button-text: #333333;
+  
+  /* Terminal/Trading Interface */
+  --terminal-bg-color: #FFFFFF;
+  --terminal-border-color: #ADFF2F;
+  --terminal-header-logo-text-primary: #333333;
+  --terminal-header-logo-text-accent: #ADFF2F;
+  --terminal-nav-link-color: #333333;
+  --pitchdeck-button-bg: #333333;
+  --pitchdeck-button-text: #FFFFFF;
+  --terminal-chart-button-bg: #ADFF2F;
+  --terminal-chart-button-text: #333333;
+
+  --trading-bg: #ffffff;
+  --trading-border: #dfe3df;
+  --trading-header-bg: #ADFF2F;
+  --trading-panel-bg: #f3f7f4;
+  
+  /* Order Entry Panel */
+  --order-entry-label-color: #333333;
+  --input-field-bg: #F5F5F5;
+  --input-field-text: #333333;
+  --input-field-border: #DDDDDD;
+  --long-button-bg: #ADFF2F;
+  --long-button-text: #FFFFFF;
+  --short-button-bg: #FFFFFF;
+  --short-button-text: #333333;
+  --short-button-border: #DDDDDD;
+  --slider-track-color: #DDDDDD;
+  --slider-thumb-color: #ADFF2F;
+  --set-stop-loss-button-text: #333333;
+  
+  /* Chart Colors */
+  --current-price-color: #333333;
+  --price-change-positive-color: #228B22;
+  --price-change-negative-color: #FF0000;
+  --chart-stats-label-color: #333333;
+  --chart-stats-value-color: #333333;
+  --candlestick-up-color: #228B22;
+  --candlestick-down-color: #FF0000;
+  --chart-grid-line-color: #EEEEEE;
+  --chart-axis-label-color: #666666;
+  
+  /* Table Colors */
+  --table-header-color: #333333;
+  --table-row-text-color: #333333;
+  --order-book-buy-price-color: #228B22;
+  --order-book-sell-price-color: #FF0000;
+  --table-bg-color: #FFFFFF;
+  --table-border-color: #DDDDDD;
+  --table-hover-bg: #F8F9FA;
+  
+  /* Options Chain Colors */
+  --options-chain-bg: #FFFFFF;
+  --options-chain-border: #DDDDDD;
+  --options-chain-header-bg: #F8F9FA;
+  --options-chain-strike-bg: #F0F0F0;
+  --options-chain-row-hover: #F8F9FA;
+  --options-chain-selected-bg: #E8F5E8;
+  --options-chain-selected-border: #ADFF2F;
+  
+  /* Text Colors */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --text-white: #FFFFFF;
+  
+  /* Status Colors */
+  --success-color: #228B22;
+  --error-color: #FF0000;
+  --warning-color: #FFA500;
+  --info-color: #0066CC;
+  
+  /* Interactive Elements */
+  --button-primary-bg: #ADFF2F;
+  --button-primary-text: #333333;
+  --button-secondary-bg: #FFFFFF;
+  --button-secondary-text: #333333;
+  --button-secondary-border: #DDDDDD;
+  --button-dark-bg: #333333;
+  --button-dark-text: #FFFFFF;
+  
+  /* Form Elements */
+  --form-input-bg: #F5F5F5;
+  --form-input-border: #DDDDDD;
+  --form-input-focus-border: #ADFF2F;
+  --form-label-color: #333333;
+  
+  /* Navigation */
+  --nav-bg: #FFFFFF;
+  --nav-link-color: #333333;
+  --nav-link-hover-color: #ADFF2F;
+  --nav-link-active-color: #ADFF2F;
+  
+  /* Cards and Panels */
+  --card-bg: #FFFFFF;
+  --card-border: #DDDDDD;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --panel-bg: #FFFFFF;
+  --panel-border: #DDDDDD;
+}
+
 body {
-  @apply bg-[#1a1d25] text-white min-h-[90vh];
+  background-color: var(--page-bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
 }
 
 .container {
-  @apply max-w-[80%] mx-auto px-5 flex;
+  max-width: 80%;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+}
+
+/* Utility Classes for Common Colors */
+.bg-primary { background-color: var(--button-primary-bg); }
+.bg-secondary { background-color: var(--button-secondary-bg); }
+.bg-dark { background-color: var(--button-dark-bg); }
+.bg-success { background-color: var(--success-color); }
+.bg-error { background-color: var(--error-color); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-white { color: var(--text-white); }
+.text-success { color: var(--success-color); }
+.text-error { color: var(--error-color); }
+
+.border-primary { border-color: var(--button-primary-bg); }
+.border-secondary { border-color: var(--button-secondary-border); }
+
+/* Scrollbar Styling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

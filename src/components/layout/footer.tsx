@@ -41,15 +41,15 @@ export const Footer = () => {
     : "text-red-500";
 
   return (
-    <footer className="fixed mx-auto w-full xl:max-w-[120rem] bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-700 px-4 py-2 text-sm text-gray-300">
+    <footer className="fixed mx-auto w-full xl:max-w-[120rem] bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-300 px-4 py-2 text-sm text-gray-900">
       <div className="flex items-center gap-2">
       <FaSignal className={statusColor} />
         <span className="capitalize">{connectionStatus}</span>
         {connectionStatus === "connected" && lastUpdated && (
-          <span className="text-gray-400">• Last updated {timeSinceUpdate}</span>
+          <span className="text-gray-900">• Last updated {timeSinceUpdate}</span>
         )}
       </div>
-      <CgArrowTopRight className="text-gray-400" />
+      <CgArrowTopRight className="text-black" size={20} />
     </footer>
   );
 };

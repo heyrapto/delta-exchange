@@ -14,23 +14,27 @@ import { navItems } from "@/consants";
 
 export const Header = () => {
   return (
-    <header className="w-full border-b border-gray-700 text-white sticky top-0 z-50">
+    <header className="w-full border-b sticky top-0 z-50 border-gray-300" style={{backgroundColor: 'var(--header-bg)', color: 'var(--text-primary)' }}>
       <div className="flex flex-wrap items-center justify-between px-4 py-2 gap-3 lg:gap-6">
         {/* Left section */}
         <div className="flex flex-wrap items-center gap-3 min-w-0">
           {/* Logo */}
-          <Image src="/logo.svg" alt="Logo" width={100} height={100} />
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold" style={{ color: 'var(--header-logo-text)' }}>NeoStox</span>
+            <span className="text-xl font-bold" style={{ color: 'var(--button-primary-bg)' }}>AI</span>
+          </div>
 
           {/* Nav */}
           <ul className="flex flex-wrap items-center gap-4 shrink-0 text-sm">
             {navItems.map((item, index) => (
-              <li key={index} className="relative hover:text-orange-500 transition-colors">
+              <li key={index} className="relative transition-colors" style={{ color: 'var(--nav-link-color)' }}>
                 {item.hasNew && (
-                    <p className="text-gray-900 absolute top-[-15px] right-0 bg-yellow-500 w-fit px-2 text-center text-[9px]">New</p>
+                    <p className="absolute top-[-15px] right-0 w-fit px-2 text-center text-[9px] text-white" style={{ backgroundColor: 'var(--warning-color)' }}>New</p>
                 )}
                 <Link
                   href={item.href}
-                  className=" whitespace-nowrap"
+                  className="whitespace-nowrap hover:opacity-70 transition-opacity"
+                  style={{ color: 'var(--nav-link-color)' }}
                 >
                   {item.label}
                 </Link>
@@ -43,11 +47,16 @@ export const Header = () => {
 
           {/* Search */}
           <div className="relative flex-shrink">
-            <BiSearch className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-400" />
+            <BiSearch className="absolute top-1/2 left-2 transform -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               placeholder="Search"
-              className="pl-8 pr-4 px-4 h-[42px] w-[180px] rounded-none border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-800 text-sm"
+              className="pl-8 pr-4 px-4 h-[42px] w-[180px] rounded-none border focus:outline-none focus:ring-2 text-sm"
+              style={{ 
+                borderColor: 'var(--form-input-border)', 
+                backgroundColor: 'var(--form-input-bg)', 
+                color: 'var(--form-input-text)'
+              } as React.CSSProperties}
             />
           </div>
         </div>
@@ -69,7 +78,8 @@ export const Header = () => {
                 <Icon
                   key={i}
                   size={20}
-                  className="cursor-pointer text-gray-400 hover:text-orange-500 transition-colors"
+                  className="cursor-pointer transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                 />
               )
             )}

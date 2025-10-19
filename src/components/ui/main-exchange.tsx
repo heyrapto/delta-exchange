@@ -87,19 +87,19 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
     }, [selectedContract, selectedDate])
 
     return (
-        <div className="w-full bg-[#1a1d25] text-white h-[700px] flex flex-col overflow-hidden">
+        <div className="relative w-full h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
             {/* Top Navigation Bar */}
-            <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-900/50">
+            <div className="flex items-center justify-between px-3 py-2 border" style={{ borderColor: 'var(--trading-border)', backgroundColor: 'var(--trading-header-bg)' }}>
                 <div className="flex items-center gap-2">
                     {/* Table/Chart Toggle */}
                     {viewTabs.map((tab) => (
                         <button
                             key={tab.value}
                             onClick={() => setViewMode(tab.value)}
-                            className={`px-3 py-1 rounded text-[11px] font-medium transition-colors ${
+                            className={`px-3 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
                                 viewMode === tab.value
-                                    ? "bg-orange-500 text-white"
-                                    : "bg-gray-800 text-gray-400 hover:text-white"
+                                    ? "bg-green-500 text-black"
+                                    : "bg-transparent text-gray-900"
                             }`}
                         >
                             {tab.label}
@@ -111,11 +111,11 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                         <button
                             key={tab.value}
                             onClick={() => setSelectedContract(tab.value)}
-                            className={`px-3 py-1 rounded text-[11px] font-medium transition-colors border ${
-                                selectedContract === tab.value
-                                    ? "border-orange-500 text-white"
-                                    : "border-gray-700 text-gray-400 hover:text-white"
-                            }`}
+                            className="px-3 py-1 rounded text-[11px] font-medium transition-colors"
+                            style={{
+                                borderColor: selectedContract === tab.value ? 'var(--button-primary-bg)' : 'var(--form-input-border)',
+                                color: selectedContract === tab.value ? 'var(--text-primary)' : 'var(--text-secondary)'
+                            }}
                         >
                             {tab.label}
                         </button>
@@ -125,7 +125,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 <div className="flex items-center gap-2 relative">
                     <button
                         onClick={() => setShowResources(!showResources)}
-                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] bg-transparent cursor-pointer text-gray-300 border ${showResources ? "border-orange-500 text-orange-500": "border-gray-700"} hover:bg-gray-700 relative`}
+                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500": "border-gray-300"} relative`}
                     >
                         <SiStackblitz /> Resources
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
@@ -133,7 +133,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                     <button
                         onClick={() => setStrategyView(!strategyView)}
                         className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] ${
-                            strategyView ? "text-orange-400 border border-orange-500" : "text-gray-400 border border-gray-700"
+                            strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
                         }`}
                     >
                         Strategy Builder
@@ -146,30 +146,30 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                         </div>
                     </button>
                    
-                </div>
-            </div>
-
-            {/* Resources Dropdown */}
+                {/* Resources Dropdown */}
             {showResources && (
-                <div className="absolute top-12 right-3 bg-[#23262f] rounded-lg shadow-lg p-2 z-50 min-w-[150px] border border-gray-700">
-                    <button className="w-full text-left px-3 py-2 text-[11px] hover:bg-gray-700 rounded text-orange-400">
+                <div className="absolute top-10 left-3 bg-gray-100/50 rounded-lg shadow-lg z-50 min-w-[150px] border border-gray-300">
+                    <button className="w-full text-left px-3 py-2 text-xs rounded text-green-400">
                         📊 Settlement Prices
                     </button>
                 </div>
             )}
+                </div>
+            </div>
 
             {/* Date Selection */}
-            <div className="flex justify-between items-center gap-2 px-3 py-2 border-b border-gray-700 overflow-x-auto scrollbar-hide">
+            <div className="flex justify-between items-center gap-2 px-3 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="">
                 {dates.map((date) => (
                     <button
                         key={date}
                         onClick={() => setSelectedDate(date)}
-                        className={`px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap transition-colors ${
-                            selectedDate === date
-                                ? "bg-gray-800 text-white border border-orange-500"
-                                : "text-gray-400 hover:text-white"
-                        }`}
+                        className="px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap transition-colors"
+                        style={{
+                            backgroundColor: selectedDate === date ? 'var(--button-primary-bg)' : 'transparent',
+                            color: selectedDate === date ? 'var(--button-primary-text)' : 'var(--text-secondary)',
+                            border: selectedDate === date ? '1px solid var(--button-primary-bg)' : '1px solid transparent'
+                        }}
                     >
                         {date}
                     </button>
@@ -184,22 +184,22 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
             </div>
 
             {/* Price Info Bar */}
-            <div className="px-3 py-2 border-b border-gray-700 bg-gray-900/30">
+            <div className="px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)', backgroundColor: 'var(--trading-header-bg)' }}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                        <span className="text-gray-400 text-[10px]">{selectedContract === "calls" ? "Calls" : "Calls"}</span>
+                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-center">
-                            <span className="text-gray-400 text-[10px] mr-1">BTC</span>
-                            <span className="text-green-400 text-[11px] font-bold">${btcPrice.toFixed(1)}</span>
+                            <span className="text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>BTC</span>
+                            <span className="text-[10px] font-bold" style={{ color: 'var(--text-success)' }}>${btcPrice.toFixed(1)}</span>
                         </div>
-                        <div className="text-gray-400 text-[10px]">
-                            Time to Expiry <span className="text-white">{timeToExpiry}</span>
+                        <div className="text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
+                            Time to Expiry <span style={{ color: 'var(--text-primary)' }}>{timeToExpiry}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <span className="text-gray-400 text-[10px]">Puts</span>
+                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>Puts</span>
                     </div>
                 </div>
             </div>

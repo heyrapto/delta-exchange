@@ -11,9 +11,9 @@ export const HeaderAnalytics = () => {
     const [activeTab, setActiveTab] = useState('straddle');
 
     return (
-        <div className="w-full text-white relative z-10">
+        <div className="w-full relative z-10" style={{ color: 'var(--text-primary)' }}>
             {/* Main Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-800">
+            <div className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'var(--table-border)' }}>
                 {/* Left Section - Contract Info */}
                 <div className="flex items-center gap-4">
                     <button className="text-gray-400 hover:text-yellow-500 transition-colors">

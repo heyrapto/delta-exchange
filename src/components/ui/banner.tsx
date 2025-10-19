@@ -8,7 +8,10 @@ export const Banner = () => {
   if (!isVisible) return null; 
 
   return (
-    <div className="flex justify-between bg-gradient-to-r from-violet-500 from-2% to-violet-600 p-3">
+    <div className="flex justify-between p-3" style={{ 
+      background: 'linear-gradient(to right, var(--header-bg-gradient-start), var(--header-bg-gradient-end))',
+      color: 'var(--text-primary)'
+    }}>
       <div className="flex items-center gap-2">
         <BiCheckCircle />
         <p className="text-sm">

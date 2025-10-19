@@ -24,8 +24,8 @@ export const TradeCard = () => {
     const maxPosition = 199999.9
 
     const headerStats = [
-        { label: "Delta", value: "-0.44", icon: <BiChevronDown className="w-4 h-4 text-orange-500" /> },
-        { label: "Lot Size", value: "0.001 BTC", icon: <BiChevronDown className="w-4 h-4 text-gray-400" />, center: true },
+        { label: "Delta", value: "-0.44", icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--warning-color)' }} /> },
+        { label: "Lot Size", value: "0.001 BTC", icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />, center: true },
     ]
 
     const midStats = [
@@ -35,8 +35,8 @@ export const TradeCard = () => {
     ]
 
     const tradeButtons = [
-        { label: "Buy | Long", type: "long", activeColor: "bg-green-600" },
-        { label: "Sell | Short", type: "short", activeColor: "bg-red-500" },
+        { label: "Buy | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
+        { label: "Sell | Short", type: "short", activeColor: "bg-red-500 text-white" },
     ] as const
 
     const orderTabs = [
@@ -67,27 +67,27 @@ export const TradeCard = () => {
     const handleQuantityPercentChange = (percent: number) => setQuantityPercent(percent)
 
     return (
-        <div className="w-full bg-[#1a1d25] text-white h-[700px] overflow-y-auto">
+        <div className="w-full h-[700px] overflow-y-auto" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
             {/* HEADER STATS */}
-            <div className="flex justify-end gap-2 px-3 py-2 border-b border-gray-700">
+            <div className="flex justify-end gap-2 px-3 py-2 border-b border-gray-300">
                 {headerStats.map((s, i) => (
                     <div
                         key={i}
                         className={`flex items-center gap-1 ${s.center ? "justify-center" : ""}`}
                     >
-                        <span className="text-gray-400 text-[10px]">{s.label}</span>
-                        <span className="text-white text-[10px]">{s.value}</span>
+                        <span className="text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
+                        <span className="text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
                         {s.icon}
                     </div>
                 ))}
             </div>
 
             {/* MID STATS */}
-            <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-gray-700">
+            <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-gray-300">
                 {midStats.map((s) => (
                     <div key={s.label} className="text-center">
-                        <div className="text-gray-400 text-[10px] mb-0.5">{s.label}</div>
-                        <div className="text-white text-[10px]">{s.value}</div>
+                        <div className="text-[10px] mb-0.5" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</div>
+                        <div className="text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</div>
                     </div>
                 ))}
             </div>
@@ -110,7 +110,7 @@ export const TradeCard = () => {
         mr-2
         overflow-hidden
         cursor-pointer
-        ${tradeType === btn.type ? `${btn.activeColor} text-white` : 'bg-gray-800 text-gray-400'}
+        ${tradeType === btn.type ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
       `}
                             style={{
                                 transform: 'skewX(-20deg)',
@@ -125,7 +125,7 @@ export const TradeCard = () => {
                             <span
                                 className="absolute top-0 h-full w-[15px] right-[-7px] rounded"
                                 style={{
-                                    backgroundColor: tradeType === btn.type ? 'var(--orange-500)' : 'var(--gray-800)',
+                                    backgroundColor: tradeType === btn.type ? 'bg-orange-500' : 'bg-gray-500',
                                     transform: 'skewX(20deg)',
                                 }}
                             />
@@ -134,14 +134,16 @@ export const TradeCard = () => {
                 </div>
 
                 {/* LEVERAGE PANEL */}
-                <div className="mb-3">
+                <div className="mb-3 bg-gray-100/50 p-3">
                     <div
                         onClick={() => setShowLeveragePanel(!showLeveragePanel)}
                         className="flex items-center justify-between py-2 cursor-pointer"
                     >
-                        <span className="text-gray-400 text-[11px]">Leverage</span>
+                        <div className="flex gap-2 items-center">
+                        <span className="text-gray-900 text-[11px]">Leverage</span>
+                        <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
+                        </div>
                         <div className="flex items-center gap-2">
-                            <span className="text-orange-500 text-[11px] font-medium">{leverage}x</span>
                             {showLeveragePanel ? (
                                 <BiChevronUp className="w-3 h-3 text-gray-400" />
                             ) : (
@@ -151,8 +153,8 @@ export const TradeCard = () => {
                     </div>
 
                     {showLeveragePanel && (
-                        <div className="bg-[#23262f] rounded p-3 space-y-3">
-                            <div className="border border-orange-500 rounded px-3 py-2 text-right text-[11px]">
+                        <div className="bg-transparent rounded p-3 space-y-3">
+                            <div className="border border-[#ADFF2F] rounded px-3 py-2 text-right text-[20px]">
                                 {leverage}x
                             </div>
 
@@ -166,11 +168,11 @@ export const TradeCard = () => {
                                     onChange={(e) => handleLeverageChange(Number(e.target.value))}
                                     className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
                                     style={{
-                                        background: `linear-gradient(to right, #f97316 0%, #f97316 ${((leverage - 1) / 19) * 100
-                                            }%, #374151 ${((leverage - 1) / 19) * 100}%, #374151 100%)`,
+                                        background: `linear-gradient(to right, #ADFF2F 0%, #ADFF2F ${((leverage - 1) / 19) * 100
+                                            }%, #ADFF2F ${((leverage - 1) / 19) * 100}%, #ADFF2F 100%)`,
                                     }}
                                 />
-                                <div className="flex justify-between mt-1 text-[10px] text-gray-500">
+                                <div className="flex justify-between mt-1 text-[12px] text-gray-500">
                                     {leverageOptions.map((opt) => (
                                         <span key={opt}>{opt}x</span>
                                     ))}
@@ -194,7 +196,7 @@ export const TradeCard = () => {
                                 <span className="text-white">{maxPosition.toLocaleString()} USD</span>
                             </div>
 
-                            <button className="w-full bg-orange-900 hover:bg-orange-800 text-white py-2 rounded font-medium transition-colors text-[11px]">
+                            <button className="w-full bg-[#ADFF2F] text-black py-2 rounded font-medium transition-colors text-[11px]">
                                 Set to {leverage}x
                             </button>
                         </div>
@@ -202,13 +204,13 @@ export const TradeCard = () => {
                 </div>
 
                 {/* ORDER TABS */}
-                <div className="flex gap-3 mb-3 border-b border-gray-700 relative">
+                <div className="flex gap-3 mb-3 border-b border-gray-300 relative">
                     {orderTabs.map((tab) => (
                         <button
                             key={tab.key}
                             onClick={() => setOrderType(tab.key)}
-                            className={`pb-1.5 text-[11px] relative ${orderType === tab.key ? "text-white" : "text-gray-400"
-                                } flex items-center gap-1`}
+                            className={`pb-1.5 text-[11px] relative ${orderType === tab.key ? "text-black" : "text-gray-400"
+                                } flex items-center gap-1 cursor-pointer`}
                         >
                             {tab.label}
                             {tab.hasDropdown && (
@@ -252,13 +254,13 @@ export const TradeCard = () => {
                             <div className="relative flex-1">
                                 <button
                                     onClick={() => setShowStopPriceDropdown(!showStopPriceDropdown)}
-                                    className="w-full bg-[#23262f] rounded px-3 py-2 flex items-center justify-between"
+                                    className="w-full bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between"
                                 >
-                                    <span className="text-orange-500 text-[11px] capitalize">{stopPriceType}</span>
+                                    <span className="text-green-500 text-[11px] capitalize">{stopPriceType}</span>
                                     <BiChevronDown className="w-3 h-3 text-gray-400" />
                                 </button>
                                 {showStopPriceDropdown && (
-                                    <div className="absolute top-full left-0 right-0 bg-[#23262f] rounded mt-1 shadow-lg py-1 z-10">
+                                    <div className="absolute top-full left-0 right-0 bg-gray-100/50 rounded mt-1 shadow-lg py-1 z-10">
                                         {stopPriceOptions.map((opt) => (
                                             <div
                                                 key={opt}
@@ -266,7 +268,7 @@ export const TradeCard = () => {
                                                     setStopPriceType(opt)
                                                     setShowStopPriceDropdown(false)
                                                 }}
-                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer capitalize ${stopPriceType === opt ? "text-orange-500" : ""
+                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-700 cursor-pointer capitalize ${stopPriceType === opt ? "text-green-500" : ""
                                                     }`}
                                             >
                                                 {opt}
@@ -275,12 +277,12 @@ export const TradeCard = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="flex-1 bg-[#23262f] rounded px-3 py-2 flex items-center justify-between">
+                            <div className="flex-1 bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between">
                                 <input
                                     type="text"
                                     value={stopPrice}
                                     onChange={(e) => setStopPrice(e.target.value)}
-                                    className="bg-transparent text-[11px] outline-none text-white flex-1"
+                                    className="bg-transparent text-[11px] outline-none text-black flex-1"
                                     placeholder="0.00"
                                 />
                                 <span className="text-gray-400 ml-1 text-[10px]">USD</span>
@@ -301,13 +303,13 @@ export const TradeCard = () => {
                                 </span>
                             )}
                         </div>
-                        <div className="bg-[#23262f] rounded px-3 py-2 flex items-center justify-between">
+                        <div className="bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between">
                             <input
                                 type="text"
                                 value={limitPrice}
                                 onChange={(e) => setLimitPrice(e.target.value)}
                                 placeholder={tradeType === "long" ? "Best Offer" : "Best Bid"}
-                                className="bg-transparent outline-none text-orange-500 text-[11px] flex-1 placeholder-orange-500/60"
+                                className="bg-transparent outline-none text-green-500 text-[11px] flex-1 placeholder-gray-500/60"
                             />
                             <span className="text-gray-400 ml-1 text-[10px]">USD</span>
                             <BiChevronUp className="w-3 h-3 text-gray-400 ml-1" />
@@ -318,13 +320,13 @@ export const TradeCard = () => {
                 {/* QUANTITY */}
                 <div className="mb-3">
                     <label className="text-gray-400 text-[10px] mb-1 block">Quantity</label>
-                    <div className="bg-[#23262f] rounded px-3 py-2 flex items-center justify-between mb-1.5">
+                    <div className="bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between mb-1.5">
                         <input
                             type="text"
                             value={quantity}
                             onChange={(e) => setQuantity(e.target.value)}
                             placeholder="1 Lot = 0.001 BTC"
-                            className="bg-transparent text-[11px] outline-none text-white flex-1 placeholder-gray-500"
+                            className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
                         <span className="text-gray-400 ml-1 text-[10px]">Lot</span>
                         <BiChevronDown className="w-3 h-3 text-gray-400 ml-1" />
@@ -345,11 +347,11 @@ export const TradeCard = () => {
 
                 {/* BRACKET ORDER & ADD TP/SL */}
                 {orderType === "limit" && (
-                    <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-700">
-                        <span className="text-gray-400 text-[10px] border-b border-dotted border-gray-600">
+                    <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-300">
+                        <span className="text-gray-400 text-[10px] border-b border-dotted border-gray-300">
                             Bracket Order
                         </span>
-                        <button className="text-orange-500 text-[10px] flex items-center gap-0.5">
+                        <button className="text-green-500 text-[10px] flex items-center gap-0.5">
                             <span className="text-sm">+</span> Add TP/SL
                         </button>
                     </div>
@@ -358,10 +360,10 @@ export const TradeCard = () => {
                 {/* FUNDS REQUIRED & AVAILABLE MARGIN */}
                 <div className="space-y-1.5 mb-3">
                     <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 flex items-center gap-1 border-b border-dotted border-gray-600">
+                        <span className="text-gray-400 flex items-center gap-1 border-b border-dotted border-gray-300">
                             Funds req.
-                            <div className="w-2.5 h-2.5 border border-orange-500 rounded-full flex items-center justify-center">
-                                <span className="text-orange-500 text-[8px]">!</span>
+                            <div className="w-2.5 h-2.5 border border-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-green-500 text-[8px]">!</span>
                             </div>
                         </span>
                         <span className="text-white">~0.00 USD</span>
@@ -373,7 +375,7 @@ export const TradeCard = () => {
                 </div>
 
                 {/* GET VERIFIED BUTTON */}
-                <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded font-medium mb-3 transition-colors text-[11px]">
+                <button className="w-full bg-[#ADFF2F] hover:bg-green-600 text-black cursor-pointer py-2.5 rounded font-medium mb-3 transition-colors text-[11px]">
                     Get Verified To Trade
                 </button>
 
@@ -425,7 +427,7 @@ export const TradeCard = () => {
                         <span className="text-green-400 text-[10px] font-medium">Flat 50% off</span>
                         <span className="text-gray-400 text-[10px]">on Option Fee</span>
                     </div>
-                    <span className="text-orange-500 text-base">→</span>
+                    <span className="text-green-500 text-base">→</span>
                 </div>
             </div>
         </div>

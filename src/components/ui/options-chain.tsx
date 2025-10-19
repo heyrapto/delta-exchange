@@ -109,7 +109,7 @@ export const OptionsChain = ({
   return (
     <div className="h-full flex flex-col">
       {/* HEADER ROW */}
-      <div className="flex border-b border-gray-700 bg-gray-900/50">
+      <div className="flex border-b" style={{ borderColor: 'var(--options-chain-border)', backgroundColor: 'var(--options-chain-header-bg)' }}>
         {/* Calls Header */}
         <div 
           ref={callsHeaderRef}
@@ -120,8 +120,8 @@ export const OptionsChain = ({
         </div>
         
         {/* Strike Header */}
-        <div className="w-20 flex-shrink-0 bg-gray-900/30 border-l border-r border-gray-700">
-          <div className="text-gray-400 text-[8px] px-1 py-1 font-medium text-center">
+        <div className="w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
+          <div className="text-[8px] px-1 py-1 font-medium text-center" style={{ color: 'var(--options-chain-text-secondary)' }}>
             <div>Strike 🔽</div>
           </div>
         </div>
@@ -165,7 +165,7 @@ export const OptionsChain = ({
           </div>
 
           {/* FIXED STRIKE COLUMN */}
-          <div className="w-20 flex-shrink-0 bg-gray-900/30 border-l border-r border-gray-700">
+          <div className="w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
             {optionsData.map((data, idx) => (
               <StrikeCell
                 key={idx}
@@ -203,7 +203,7 @@ export const OptionsChain = ({
 
 // CALLS HEADER COMPONENT
 const CallsHeader = ({ view }: { view: TableView }) => {
-  const headerClass = "text-gray-400 text-[8px] px-1 py-1 font-medium text-right whitespace-nowrap min-w-[80px]"
+  const headerClass = "text-[8px] px-1 py-1 font-medium text-right whitespace-nowrap min-w-[80px]"
   
   if (view === "standard") {
     const headers = [
@@ -343,11 +343,11 @@ const CallsRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-800/50 hover:bg-gray-800/50 ${
-    isSelected ? "bg-orange-900/20 border-orange-500/30" : ""
+  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-300 ${
+    isSelected ? "border-1" : ""
   }`
 
-  const cellClass = "text-gray-300 px-1 text-right min-w-[80px] flex items-center justify-end text-[9px]"
+  const cellClass = "px-1 text-right min-w-[80px] flex items-center justify-end text-[9px]"
 
   return (
     <div
@@ -493,11 +493,11 @@ const PutsRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-800/50 hover:bg-gray-800/50 ${
-    isSelected ? "bg-orange-900/20 border-orange-500/30" : ""
+  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-300 hover:bg-[#ADFF2F] ${
+    isSelected ? "bg-green-900/20 border-green-500/30" : ""
   }`
 
-  const cellClass = "text-gray-300 px-1 text-left min-w-[80px] flex items-center text-[9px]"
+  const cellClass = "text-gray-800 px-1 text-left min-w-[80px] flex items-center text-[9px]"
 
   // Generate PUTS data (mirrored from CALLS)
   const putsDelta = -data.delta
@@ -651,16 +651,18 @@ const StrikeCell = ({
 
   return (
     <div
-      className={`text-center min-h-[30px] font-medium px-1 py-0.5 flex items-center justify-center gap-1 cursor-pointer hover:bg-gray-800/50 border-b border-gray-800/50 ${
-        isSelected ? "bg-orange-900/20" : ""
-      }`}
+      className="text-center min-h-[30px] font-medium px-1 py-0.5 flex items-center justify-center gap-1 cursor-pointer border-b"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onSelect}
+      style={{
+        borderColor: 'var(--options-chain-border)',
+        backgroundColor: isSelected ? 'var(--options-chain-selected-bg)' : isHovered ? 'var(--options-chain-row-hover)' : 'transparent'
+      }}
     >
-      {showStars && <span className="text-blue-400">★</span>}
-      <span className="text-white text-[9px]">{strike}</span>
-      {showStars && <span className="text-blue-400">★</span>}
+      {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
+      <span className="text-[9px]" style={{ color: 'var(--text-primary)' }}>{strike}</span>
+      {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
     </div>
   )
 }
