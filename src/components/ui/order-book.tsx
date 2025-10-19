@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BiChevronDown, BiStar } from "react-icons/bi"
+import { BiChart, BiChevronDown, BiStar, BiTrendingDown, BiTrendingUp } from "react-icons/bi"
 
 // Types
 type OrderBookEntry = {
@@ -127,9 +127,9 @@ export const OrderBook = () => {
     const spreadPercent = 0.09
 
     const viewModeIcons = [
-        { mode: "sell" as ViewMode, icon: "📊", color: "text-red-400" },
-        { mode: "all" as ViewMode, icon: "📈", color: "text-gray-400" },
-        { mode: "buy" as ViewMode, icon: "📉", color: "text-green-400" },
+        { mode: "sell" as ViewMode, icon: <BiTrendingDown />, color: "text-red-400" },
+        { mode: "all" as ViewMode, icon: <BiChart />, color: "text-gray-400" },
+        { mode: "buy" as ViewMode, icon: <BiTrendingUp />, color: "text-green-400" },
     ]
 
     const handleHover = (
@@ -183,7 +183,7 @@ export const OrderBook = () => {
                                 <button
                                     key={item.mode}
                                     onClick={() => setViewMode(item.mode)}
-                                    className={`text-xs ${
+                                    className={`text-sm ${
                                         viewMode === item.mode ? item.color : "text-gray-600"
                                     } hover:opacity-80`}
                                 >
