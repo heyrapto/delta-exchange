@@ -164,7 +164,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                     <button
                         key={date}
                         onClick={() => setSelectedDate(date)}
-                        className="px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap transition-colors"
+                        className="px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                         style={{
                             backgroundColor: selectedDate === date ? 'var(--button-primary-bg)' : 'transparent',
                             color: selectedDate === date ? 'var(--button-primary-text)' : 'var(--text-secondary)',
@@ -184,22 +184,22 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
             </div>
 
             {/* Price Info Bar */}
-            <div className="px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)', backgroundColor: 'var(--trading-header-bg)' }}>
+            <div className="px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)'}}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
-                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
+                        <span className="text-[16px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="text-center">
                             <span className="text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>BTC</span>
-                            <span className="text-[10px] font-bold" style={{ color: 'var(--text-success)' }}>${btcPrice.toFixed(1)}</span>
+                            <span className="text-[10px] font-bold text-red-500">${btcPrice.toFixed(1)}</span>
                         </div>
                         <div className="text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
                             Time to Expiry <span style={{ color: 'var(--text-primary)' }}>{timeToExpiry}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>Puts</span>
+                        <span className="text-[16px]" style={{ color: 'var(--text-secondary)' }}>Puts</span>
                     </div>
                 </div>
             </div>
