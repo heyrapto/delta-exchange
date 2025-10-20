@@ -67,35 +67,35 @@ export const TradeCard = () => {
     const handleQuantityPercentChange = (percent: number) => setQuantityPercent(percent)
 
     return (
-        <div className="w-full h-[700px] overflow-y-auto" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
+        <div className="w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-y-auto" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
             {/* HEADER STATS */}
-            <div className="flex justify-end gap-2 px-3 py-2 border-b border-gray-300">
+            <div className="flex justify-end gap-1 sm:gap-2 px-2 sm:px-3 py-2 border-b border-gray-300">
                 {headerStats.map((s, i) => (
                     <div
                         key={i}
                         className={`flex items-center gap-1 ${s.center ? "justify-center" : ""}`}
                     >
-                        <span className="text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
-                        <span className="text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
+                        <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
+                        <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
                         {s.icon}
                     </div>
                 ))}
             </div>
 
             {/* MID STATS */}
-            <div className="grid grid-cols-3 gap-2 px-3 py-2 border-b border-gray-300">
+            <div className="grid grid-cols-3 gap-1 sm:gap-2 px-2 sm:px-3 py-2 border-b border-gray-300">
                 {midStats.map((s) => (
                     <div key={s.label} className="text-center">
-                        <div className="text-[10px] mb-0.5" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</div>
-                        <div className="text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</div>
+                        <div className="text-[9px] sm:text-[10px] mb-0.5" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</div>
+                        <div className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</div>
                     </div>
                 ))}
             </div>
 
             {/* MAIN BODY */}
-            <div className="px-3 py-2">
+            <div className="px-2 sm:px-3 py-2">
                 {/* TRADE TYPE BUTTONS */}
-                <div className="grid grid-cols-2 gap-2 mb-3">
+                <div className="grid grid-cols-2 gap-1 sm:gap-2 mb-2 sm:mb-3">
                     {tradeButtons.map((btn) => (
                         <button
                             key={btn.label}

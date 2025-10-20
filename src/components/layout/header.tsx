@@ -15,17 +15,19 @@ import { navItems } from "@/consants";
 export const Header = () => {
   return (
     <header className="w-full border-b sticky top-0 z-50 border-gray-300" style={{backgroundColor: 'var(--header-bg)', color: 'var(--text-primary)' }}>
-      <div className="flex flex-wrap items-center justify-between px-4 py-2 gap-3 lg:gap-6">
+      <div className="md:flex hidden flex-nowrap items-center justify-between px-4 py-2 gap-3 lg:gap-6">
         {/* Left section */}
         <div className="flex flex-wrap items-center gap-3 min-w-0">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold" style={{ color: 'var(--header-logo-text)' }}>NeoStox</span>
-            <span className="text-xl font-bold" style={{ color: 'var(--button-primary-bg)' }}>AI</span>
-          </div>
+          <Image
+          src="/logo.svg"
+          width={100}
+          height={30}
+          alt="Logo"
+          />
 
           {/* Nav */}
-          <ul className="flex flex-wrap items-center gap-4 shrink-0 text-sm">
+          <ul className="xl:flex hidden flex-wrap items-center gap-4 shrink-0 text-sm">
             {navItems.map((item, index) => (
               <li key={index} className="relative transition-colors" style={{ color: 'var(--nav-link-color)' }}>
                 {item.hasNew && (

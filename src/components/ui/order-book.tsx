@@ -73,37 +73,37 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="relative w-full max-w-md h-[700px] flex flex-col" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
+        <div className="relative w-full max-w-sm sm:max-w-md h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
             {/* Header */}
-            <div className="px-3 py-2 border-b border-gray-300">
-                <div className="flex items-center gap-2 mb-2">
-                    <BiStar className="text-sm" style={{ color: 'var(--warning-color)' }} />
-                    <span className="text-xs font-medium" style={{ color: 'var(--orderbook-text)' }}>P-BTC-106000-281125</span>
+            <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
+                <div className="flex items-center gap-1 sm:gap-2 mb-2">
+                    <BiStar className="text-xs sm:text-sm" style={{ color: 'var(--warning-color)' }} />
+                    <span className="text-[10px] sm:text-xs font-medium truncate" style={{ color: 'var(--orderbook-text)' }}>P-BTC-106000-281125</span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-1 sm:gap-2">
                     <div>
-                        <div className="text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>24h Change</div>
-                        <div className="text-[11px] font-medium text-green-500">14.68%</div>
+                        <div className="text-[8px] sm:text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>24h Change</div>
+                        <div className="text-[10px] sm:text-[11px] font-medium text-green-500">14.68%</div>
                     </div>
                     <div className="text-right">
-                        <div className="text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>Price</div>
-                        <div className="text-[11px] font-medium text-green-500">$5390</div>
+                        <div className="text-[8px] sm:text-[9px]" style={{ color: 'var(--orderbook-text-secondary)' }}>Price</div>
+                        <div className="text-[10px] sm:text-[11px] font-medium text-green-500">$5390</div>
                     </div>
                 </div>
             </div>
 
             {/* Order Book Title & Controls */}
-            <div className="px-3 py-2 border-b border-gray-300">
+            <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-medium" style={{ color: 'var(--orderbook-text)' }}>Order Book</h3>
-                    <div className="flex items-center gap-2">
+                    <h3 className="text-[10px] sm:text-xs font-medium" style={{ color: 'var(--orderbook-text)' }}>Order Book</h3>
+                    <div className="flex items-center gap-1 sm:gap-2">
                         {/* View Mode Icons */}
                         <div className="flex gap-1">
                             {viewModeIcons.map((item) => (
                                 <button
                                     key={item.mode}
                                     onClick={() => setViewMode(item.mode)}
-                                    className={`text-sm ${
+                                    className={`text-xs sm:text-sm ${
                                         viewMode === item.mode ? item.color : "text-gray-600"
                                     } hover:opacity-80`}
                                 >
@@ -112,15 +112,15 @@ export const OrderBook = () => {
                             ))}
                         </div>
                         {/* Lot Size Dropdown */}
-                        <button className="flex items-center gap-1 text-[10px] text-black">
+                        <button className="flex items-center gap-1 text-[9px] sm:text-[10px] text-black">
                             {lotSize}
-                            <BiChevronDown className="w-3 h-3" />
+                            <BiChevronDown className="w-2 h-2 sm:w-3 sm:h-3" />
                         </button>
                     </div>
                 </div>
 
                 {/* Column Headers */}
-                <div className="grid grid-cols-2 mt-2 text-[9px] text-gray-400">
+                <div className="grid grid-cols-2 mt-1 sm:mt-2 text-[8px] sm:text-[9px] text-gray-400">
                     <div>Price (USD)</div>
                     <div className="text-right">Size (BTC)</div>
                 </div>

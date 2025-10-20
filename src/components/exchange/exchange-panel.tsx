@@ -115,25 +115,25 @@ export const ExchangePanel = () => {
     const handlePanelToggle = (id: number) => setActivePanel(id)
 
     return (
-        <div className="w-full flex flex-col min-h-[500px]">
-            <div className="flex justify-between items-center border-b py-2 border-gray-300">
+        <div className="w-full flex flex-col min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] px-3 md:mt-0 mt-[10px]">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b py-2 border-gray-300 gap-2 sm:gap-0">
                 {/* Tabs */}
-                <div className="flex gap-6">
+                <div className="flex flex-wrap gap-2 sm:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide">
                     {panelTabs.map((p) => (
                         <div
                             key={p.id}
                             onClick={() => handlePanelToggle(p.id)}
-                            className="text-[14px] flex items-center gap-2 cursor-pointer relative pb-2"
+                            className="text-[12px] sm:text-[14px] flex items-center gap-1 sm:gap-2 cursor-pointer relative pb-2 whitespace-nowrap"
                             style={{ color: 'var(--text-primary)' }}
                         >
-                            <h1>{p.title}</h1>
+                            <h1 className="truncate">{p.title}</h1>
                             {p.isHealthy && (
-                                <span className="border rounded-[40%] px-1 py-[1px] text-[9px]" style={{ borderColor: 'var(--text-success)', backgroundColor: 'var(--text-success)', color: 'var(--text-primary)' }}>
+                                <span className="border rounded-[40%] px-1 py-[1px] text-[8px] sm:text-[9px]" style={{ borderColor: 'var(--text-success)', backgroundColor: 'var(--text-success)', color: 'var(--text-primary)' }}>
                                     Healthy
                                 </span>
                             )}
                             {activePanel === p.id && (
-                                <span className="absolute bottom-[-8px] w-[30px] left-0 right-0 mx-auto h-[2px] rounded-full" style={{ backgroundColor: 'var(--button-primary-bg)' }} />
+                                <span className="absolute bottom-[-8px] w-[20px] sm:w-[30px] left-0 right-0 mx-auto h-[2px] rounded-full" style={{ backgroundColor: 'var(--button-primary-bg)' }} />
                             )}
                         </div>
                     ))}

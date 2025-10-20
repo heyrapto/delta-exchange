@@ -113,15 +113,15 @@ export const OptionsChain = ({
         {/* Calls Header */}
         <div 
           ref={callsHeaderRef}
-          className="flex-1 overflow-x-auto scrollbar-hide" 
+          className="flex-1 overflow-x-auto scrollbar-hide min-w-0" 
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <CallsHeader view={view} />
         </div>
         
         {/* Strike Header */}
-        <div className="w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
-          <div className="text-[8px] px-1 py-1 font-medium text-center" style={{ color: 'var(--options-chain-text-secondary)' }}>
+        <div className="w-16 sm:w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
+          <div className="text-[7px] sm:text-[8px] px-1 py-1 font-medium text-center" style={{ color: 'var(--options-chain-text-secondary)' }}>
             <div>Strike 🔽</div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export const OptionsChain = ({
         {/* Puts Header */}
         <div 
           ref={putsHeaderRef}
-          className="flex-1 overflow-x-auto scrollbar-hide" 
+          className="flex-1 overflow-x-auto scrollbar-hide min-w-0" 
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <PutsHeader view={view} />
@@ -165,7 +165,7 @@ export const OptionsChain = ({
           </div>
 
           {/* FIXED STRIKE COLUMN */}
-          <div className="w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
+          <div className="w-16 sm:w-20 flex-shrink-0 border-l border-r" style={{ backgroundColor: 'var(--options-chain-strike-bg)', borderColor: 'var(--options-chain-border)' }}>
             {optionsData.map((data, idx) => (
               <StrikeCell
                 key={idx}
@@ -203,7 +203,7 @@ export const OptionsChain = ({
 
 // CALLS HEADER COMPONENT
 const CallsHeader = ({ view }: { view: TableView }) => {
-  const headerClass = "text-[8px] px-1 py-1 font-medium text-right whitespace-nowrap min-w-[80px]"
+  const headerClass = "text-[7px] sm:text-[8px] px-1 py-1 font-medium text-right whitespace-nowrap min-w-[60px] sm:min-w-[80px]"
   
   if (view === "standard") {
     const headers = [
@@ -267,7 +267,7 @@ const CallsHeader = ({ view }: { view: TableView }) => {
 
 // PUTS HEADER COMPONENT
 const PutsHeader = ({ view }: { view: TableView }) => {
-  const headerClass = "text-gray-400 text-[8px] px-1 py-1 font-medium text-left whitespace-nowrap min-w-[80px]"
+  const headerClass = "text-gray-400 text-[7px] sm:text-[8px] px-1 py-1 font-medium text-left whitespace-nowrap min-w-[60px] sm:min-w-[80px]"
   
   if (view === "standard") {
     const headers = [
@@ -347,7 +347,7 @@ const CallsRow = ({
     isSelected ? "border-1" : ""
   }`
 
-  const cellClass = "px-1 text-right min-w-[80px] flex items-center justify-end text-[9px]"
+  const cellClass = "px-1 text-right min-w-[60px] sm:min-w-[80px] flex items-center justify-end text-[8px] sm:text-[9px]"
 
   return (
     <div
@@ -497,7 +497,7 @@ const PutsRow = ({
     isSelected ? "bg-green-900/20 border-green-500/30" : ""
   }`
 
-  const cellClass = "text-gray-800 px-1 text-left min-w-[80px] flex items-center text-[9px]"
+  const cellClass = "text-gray-800 px-1 text-left min-w-[60px] sm:min-w-[80px] flex items-center text-[8px] sm:text-[9px]"
 
   // Generate PUTS data (mirrored from CALLS)
   const putsDelta = -data.delta
@@ -661,7 +661,7 @@ const StrikeCell = ({
       }}
     >
       {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
-      <span className="text-[9px]" style={{ color: 'var(--text-primary)' }}>{strike}</span>
+      <span className="text-[8px] sm:text-[9px]" style={{ color: 'var(--text-primary)' }}>{strike}</span>
       {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
     </div>
   )

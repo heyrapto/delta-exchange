@@ -1,11 +1,21 @@
-import { BiSignal1 } from "react-icons/bi";
-import { CgArrowTopRight } from "react-icons/cg";
-import { IoGitNetworkSharp } from "react-icons/io5";
 import { useState, useEffect } from "react";
+import { CgArrowTopRight } from "react-icons/cg";
 import { FaSignal } from "react-icons/fa";
 
-export const Footer = () => {
-  const [connectionStatus, setConnectionStatus] = useState<"connected" | "connecting" | "disconnected">("connected");
+interface FooterProps {
+  variant?: "mobile" | "desktop" | "both";
+  position?: "fixed" | "absolute" | "relative" | "static";
+  className?: string;
+}
+
+export const Footer = ({
+  variant = "desktop",
+  position = "fixed",
+  className = "",
+}: FooterProps) => {
+  const [connectionStatus, setConnectionStatus] = useState<
+    "connected" | "connecting" | "disconnected"
+  >("connected");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(new Date());
   const [timeSinceUpdate, setTimeSinceUpdate] = useState<string>("just now");
 
@@ -34,22 +44,36 @@ export const Footer = () => {
     return () => clearInterval(interval);
   }, [connectionStatus]);
 
-  const statusColor = connectionStatus === "connected"
-    ? "text-green-500"
-    : connectionStatus === "connecting"
-    ? "text-yellow-400"
-    : "text-red-500";
+  const statusColor =
+    connectionStatus === "connected"
+      ? "text-green-500"
+      : connectionStatus === "connecting"
+      ? "text-yellow-400"
+      : "text-red-500";
+
+  // 👇 Handle visibility variant
+  const visibilityClasses =
+    variant === "mobile"
+      ? "flex md:hidden"
+      : variant === "desktop"
+      ? "hidden md:flex"
+      : "flex"; // both
+
+  // 👇 Base layout (now position is dynamic)
+  const baseClasses = `${position} bottom-0 left-0 right-0 mx-auto w-full xl:max-w-[120rem] items-center justify-between border-t border-gray-300 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-900`;
 
   return (
-    <footer className="fixed mx-auto w-full xl:max-w-[120rem] bottom-0 left-0 right-0 flex items-center justify-between border-t border-gray-300 px-4 py-2 text-sm text-gray-900">
-      <div className="flex items-center gap-2">
-      <FaSignal className={statusColor} />
-        <span className="capitalize">{connectionStatus}</span>
+    <footer className={`${baseClasses} ${visibilityClasses} ${className}`}>
+      <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+        <FaSignal className={`${statusColor} w-3 h-3 sm:w-4 sm:h-4`} />
+        <span className="capitalize text-[10px] sm:text-xs">{connectionStatus}</span>
         {connectionStatus === "connected" && lastUpdated && (
-          <span className="text-gray-900">• Last updated {timeSinceUpdate}</span>
+          <span className="text-gray-900 text-[9px] sm:text-xs hidden sm:inline">
+            • Last updated {timeSinceUpdate}
+          </span>
         )}
       </div>
-      <CgArrowTopRight className="text-black" size={20} />
+      <CgArrowTopRight className="text-black w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
     </footer>
   );
 };

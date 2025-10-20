@@ -87,16 +87,16 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
     }, [selectedContract, selectedDate])
 
     return (
-        <div className="relative w-full h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
+        <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
             {/* Top Navigation Bar */}
-            <div className="flex items-center justify-between px-3 py-2 border" style={{ borderColor: 'var(--trading-border)', backgroundColor: 'var(--trading-header-bg)' }}>
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-3 py-2 border gap-2 sm:gap-0  md:bg-[var(--trading-bg)] bg-gray-100/50" style={{ borderColor: 'var(--trading-border)'}}>
+                <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                     {/* Table/Chart Toggle */}
                     {viewTabs.map((tab) => (
                         <button
                             key={tab.value}
                             onClick={() => setViewMode(tab.value)}
-                            className={`px-3 py-1 rounded text-[11px] font-medium transition-colors cursor-pointer ${
+                            className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors cursor-pointer ${
                                 viewMode === tab.value
                                     ? "bg-green-500 text-black"
                                     : "bg-transparent text-gray-900"
@@ -111,7 +111,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                         <button
                             key={tab.value}
                             onClick={() => setSelectedContract(tab.value)}
-                            className="px-3 py-1 rounded text-[11px] font-medium transition-colors"
+                            className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors border"
                             style={{
                                 borderColor: selectedContract === tab.value ? 'var(--button-primary-bg)' : 'var(--form-input-border)',
                                 color: selectedContract === tab.value ? 'var(--text-primary)' : 'var(--text-secondary)'
@@ -122,25 +122,27 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2 relative">
+                <div className="md:flex hidden items-center gap-1 sm:gap-2 relative w-full sm:w-auto justify-between sm:justify-end">
                     <button
                         onClick={() => setShowResources(!showResources)}
-                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500": "border-gray-300"} relative`}
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500": "border-gray-300"} relative`}
                     >
-                        <SiStackblitz /> Resources
+                        <SiStackblitz className="w-3 h-3 sm:w-4 sm:h-4" /> 
+                        <span className="hidden sm:inline">Resources</span>
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
                     </button>
                     <button
                         onClick={() => setStrategyView(!strategyView)}
-                        className={`flex items-center gap-1 px-3 py-1 rounded text-[11px] ${
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] ${
                             strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
                         }`}
                     >
-                        Strategy Builder
-                        <div className={`w-8 h-4 rounded-full relative ${strategyView ? "bg-green-700" : "bg-gray-700"}`}>
+                        <span className="hidden sm:inline">Strategy Builder</span>
+                        <span className="sm:hidden">Strategy</span>
+                        <div className={`w-6 h-3 sm:w-8 sm:h-4 rounded-full relative ${strategyView ? "bg-green-700" : "bg-gray-700"}`}>
                             <div
-                                className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${
-                                    strategyView ? "right-4" : "right-0.5"
+                                className={`absolute top-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full transition-all ${
+                                    strategyView ? "right-3 sm:right-4" : "right-0.5"
                                 }`}
                             ></div>
                         </div>
@@ -158,13 +160,13 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
             </div>
 
             {/* Date Selection */}
-            <div className="flex justify-between items-center gap-2 px-3 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--trading-border)' }}>
-                <div className="">
+            <div className="md:flex hidden justify-between items-center gap-2 px-2 sm:px-3 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--trading-border)' }}>
+                <div className="flex gap-1 sm:gap-2">
                 {dates.map((date) => (
                     <button
                         key={date}
                         onClick={() => setSelectedDate(date)}
-                        className="px-3 py-1 rounded text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                        className="px-2 sm:px-3 py-1 rounded text-[9px] sm:text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer"
                         style={{
                             backgroundColor: selectedDate === date ? 'var(--button-primary-bg)' : 'transparent',
                             color: selectedDate === date ? 'var(--button-primary-text)' : 'var(--text-secondary)',
@@ -176,30 +178,32 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 ))}
                 </div>
 
-<button className="p-1 text-gray-400 hover:text-white">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+<button className="p-1 text-gray-400 hover:text-white flex-shrink-0">
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
                         </svg>
                     </button>
             </div>
 
             {/* Price Info Bar */}
-            <div className="px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)'}}>
-                <div className="flex items-center justify-between">
+            <div className="px-2 sm:px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)'}}>
+                <div className="flex flex-row items-center justify-between gap-2 sm:gap-4">
                     <div className="flex items-center gap-1">
-                        <span className="text-[16px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
+                        <span className="text-sm sm:text-[16px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <div className="text-center">
-                            <span className="text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>BTC</span>
-                            <span className="text-[10px] font-bold text-red-500">${btcPrice.toFixed(1)}</span>
+                            <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>BTC</span>
+                            <span className="text-[9px] sm:text-[10px] font-bold text-red-500">${btcPrice.toFixed(1)}</span>
                         </div>
-                        <div className="text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
-                            Time to Expiry <span style={{ color: 'var(--text-primary)' }}>{timeToExpiry}</span>
+                        <div className="text-[9px] sm:text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
+                            <span className="hidden sm:inline">Time to Expiry </span>
+                            <span className="sm:hidden">Expiry </span>
+                            <span style={{ color: 'var(--text-primary)' }}>{timeToExpiry}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <span className="text-[16px]" style={{ color: 'var(--text-secondary)' }}>Puts</span>
+                        <span className="text-sm sm:text-[16px]" style={{ color: 'var(--text-secondary)' }}>Puts</span>
                     </div>
                 </div>
             </div>
