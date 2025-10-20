@@ -141,7 +141,7 @@ export const ExchangePanel = () => {
 
                 {/* Conditional action buttons */}
                 {(activePanel === 5 || activePanel === 6) && (
-                    <div className="flex gap-4 items-center">
+                    <div className="md:flex hidden gap-4 items-center">
                         <button className="flex gap-1 items-center" style={{ color: 'var(--text-secondary)' }}>
                             <BiRefresh />
                             <span className="text-xs">Refresh</span>

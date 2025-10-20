@@ -11,6 +11,8 @@ interface OptionsChainProps {
   loading: boolean
 }
 
+const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b";
+
 export const OptionsChain = ({ 
   optionsData, 
   selectedStrike, 
@@ -343,12 +345,13 @@ const CallsRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-300 ${
-    isSelected ? "border-1" : ""
-  }`
-
-  const cellClass = "px-1 text-right min-w-[60px] sm:min-w-[80px] flex items-center justify-end text-[8px] sm:text-[9px]"
-
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+    isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  }`;
+  
+  const cellClass =
+    "px-1 text-right min-w-[60px] sm:min-w-[80px] flex items-center justify-end text-[8px] sm:text-[9px]";
+  
   return (
     <div
       className={rowClass}
@@ -493,12 +496,13 @@ const PutsRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `flex py-0.5 cursor-pointer border-b border-gray-300 hover:bg-[#ADFF2F] ${
-    isSelected ? "bg-green-900/20 border-green-500/30" : ""
-  }`
-
-  const cellClass = "text-gray-800 px-1 text-left min-w-[60px] sm:min-w-[80px] flex items-center text-[8px] sm:text-[9px]"
-
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+    isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  }`;
+  
+  const cellClass =
+    "text-gray-800 px-1 text-left min-w-[60px] sm:min-w-[80px] flex items-center text-[8px] sm:text-[9px]";
+  
   // Generate PUTS data (mirrored from CALLS)
   const putsDelta = -data.delta
   const putsBid = data.bid * 0.8
@@ -651,18 +655,32 @@ const StrikeCell = ({
 
   return (
     <div
-      className="text-center min-h-[30px] font-medium px-1 py-0.5 flex items-center justify-center gap-1 cursor-pointer border-b"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={onSelect}
-      style={{
-        borderColor: 'var(--options-chain-border)',
-        backgroundColor: isSelected ? 'var(--options-chain-selected-bg)' : isHovered ? 'var(--options-chain-row-hover)' : 'transparent'
-      }}
-    >
-      {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
-      <span className="text-[8px] sm:text-[9px]" style={{ color: 'var(--text-primary)' }}>{strike}</span>
-      {showStars && <span style={{ color: 'var(--button-primary-bg)' }}>★</span>}
-    </div>
+  className={`${ROW_HEIGHT_CLASS} text-center font-medium px-1 gap-1 cursor-pointer justify-center`}
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+  onClick={onSelect}
+  style={{
+    borderColor: "var(--options-chain-border)",
+    backgroundColor: isSelected
+      ? "var(--options-chain-selected-bg)"
+      : isHovered
+      ? "var(--options-chain-row-hover)"
+      : "transparent",
+  }}
+>
+  {showStars && (
+    <span style={{ color: "var(--button-primary-bg)", fontSize: "10px" }}>★</span>
+  )}
+  <span
+    className="text-[8px] sm:text-[9px]"
+    style={{ color: "var(--text-primary)" }}
+  >
+    {strike}
+  </span>
+  {showStars && (
+    <span style={{ color: "var(--button-primary-bg)", fontSize: "10px" }}>★</span>
+  )}
+</div>
+
   )
 }
