@@ -3,12 +3,10 @@
 import { useTradeStore } from "@/store/trade-store"
 import { useState, useEffect } from "react"
 
-// === Separate Component for Leverage Selector ===
 export const LeverageSelector = () => {
     const { leverage, setLeverage, setSetAsDefault } = useTradeStore()
     const [localLeverage, setLocalLeverage] = useState<number>(leverage)
   
-    // Keep local state synced with store (without feedback loop)
     useEffect(() => {
       setLocalLeverage(leverage)
     }, [leverage])
