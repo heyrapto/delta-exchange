@@ -55,7 +55,7 @@ export interface TradeState {
   setShowLeveragePanel: (show: boolean) => void
   setShowStopPriceDropdown: (show: boolean) => void
   setShowStopLimitDropdown: (show: boolean) => void
-  updateMarketData: (data: Partial<Pick<TradeState, 'currentPrice' | 'markPrice' | 'indexPrice' | 'lastPrice' | 'markIV' | 'volume24h' | 'openInterest'>>) => void
+  updateMarketData: (data: Partial<Pick<TradeState, 'currentPrice' | 'markPrice' | 'indexPrice' | 'lastPrice' | 'markIV' | 'volume24h' | 'openInterest' | 'availableMargin'>>) => void
   resetTrade: () => void
 }
 
