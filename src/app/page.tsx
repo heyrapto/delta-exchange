@@ -7,9 +7,11 @@ import { Header } from "@/components/layout/header"
 import { Banner } from "@/components/ui/banner"
 import { LoadingScreen } from "@/components/ui/loading-screen"
 import { BottomNavigation } from "@/components/layout/bottom-nav"
+import { MobileTradeView } from "@/components/exchange/mobile-trade-view"
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("chart")
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000)
@@ -22,9 +24,16 @@ export default function Home() {
     <div className="relative mx-auto w-full xl:max-w-[120rem] min-h-screen overflow-x-hidden" style={{ backgroundColor: 'var(--page-bg-color)' }}>
       <Banner />
       <Header />
-      <Exchange />
+      
+      {/* Conditional rendering based on active tab */}
+      {activeTab === "trade" ? (
+        <MobileTradeView />
+      ) : (
+        <Exchange />
+      )}
+      
       <Footer />
-      <BottomNavigation />
+      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   )
 }

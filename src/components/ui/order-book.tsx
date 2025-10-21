@@ -72,7 +72,7 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="relative w-full max-w-sm sm:max-w-md h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col border border-gray-300" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
+        <div className="relative w-full h-full flex flex-col md:border border-none border-gray-300" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
             {/* Header */}
             <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
                 <div className="flex items-center gap-1 sm:gap-2 mb-2">

@@ -7,13 +7,16 @@ import { IoBriefcaseOutline } from "react-icons/io5";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { LuChartCandlestick } from "react-icons/lu";
 
-export const BottomNavigation = () => {
-  const [activeTab, setActiveTab] = useState("chart");
+interface BottomNavigationProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
 
+export const BottomNavigation = ({ activeTab, setActiveTab }: BottomNavigationProps) => {
   const navItems = [
     // { id: "home", label: "Home", icon: <HiHome /> },
     // { id: "markets", label: "Markets", icon: <LuChartCandlestick /> },
-    { id: "trade", label: "Trade", href: "/trade", icon: <GiTrade /> },
+    { id: "trade", label: "Trade", icon: <GiTrade /> },
     { id: "chart", label: "Chart/ Book", icon: <MdShowChart /> },
     // { id: "portfolio", label: "Portfolio", icon: <IoBriefcaseOutline /> },
   ];
