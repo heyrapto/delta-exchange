@@ -8,14 +8,14 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { LuChartCandlestick } from "react-icons/lu";
 
 export const BottomNavigation = () => {
-  const [activeTab, setActiveTab] = useState("chart"); // default active tab
+  const [activeTab, setActiveTab] = useState("chart");
 
   const navItems = [
-    { id: "home", label: "Home", icon: <HiHome /> },
-    { id: "markets", label: "Markets", icon: <LuChartCandlestick /> },
-    { id: "trade", label: "Trade", icon: <GiTrade /> },
+    // { id: "home", label: "Home", icon: <HiHome /> },
+    // { id: "markets", label: "Markets", icon: <LuChartCandlestick /> },
+    { id: "trade", label: "Trade", href: "/trade", icon: <GiTrade /> },
     { id: "chart", label: "Chart/ Book", icon: <MdShowChart /> },
-    { id: "portfolio", label: "Portfolio", icon: <IoBriefcaseOutline /> },
+    // { id: "portfolio", label: "Portfolio", icon: <IoBriefcaseOutline /> },
   ];
 
   return (

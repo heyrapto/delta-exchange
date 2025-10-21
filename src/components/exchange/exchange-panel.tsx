@@ -115,7 +115,7 @@ export const ExchangePanel = () => {
     const handlePanelToggle = (id: number) => setActivePanel(id)
 
     return (
-        <div className="w-full flex flex-col min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] px-3 md:mt-0 mt-[10px]">
+        <div className="w-full md:flex hidden flex-col min-h-[300px] sm:min-h-[400px] lg:min-h-[500px] px-3 md:mt-0 mt-[10px]">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b py-2 border-gray-300 gap-2 sm:gap-0">
                 {/* Tabs */}
                 <div className="flex flex-wrap gap-2 sm:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide">

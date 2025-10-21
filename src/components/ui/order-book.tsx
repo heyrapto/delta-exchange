@@ -7,7 +7,6 @@ import { OrderBookRow, RecentTradeRow } from "../shared/order-book-card"
 
 type ViewMode = "all" | "buy" | "sell"
 
-// Main OrderBook Component
 export const OrderBook = () => {
     const [viewMode, setViewMode] = useState<ViewMode>("all")
     const [lotSize, setLotSize] = useState(0.1)
@@ -73,7 +72,7 @@ export const OrderBook = () => {
     const hoverStats = calculateHoverStats()
 
     return (
-        <div className="relative w-full max-w-sm sm:max-w-md h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
+        <div className="relative w-full max-w-sm sm:max-w-md h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col border border-gray-300" style={{ backgroundColor: 'var(--orderbook-bg)', color: 'var(--orderbook-text)' }}>
             {/* Header */}
             <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
                 <div className="flex items-center gap-1 sm:gap-2 mb-2">
