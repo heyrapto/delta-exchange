@@ -11,7 +11,7 @@ interface OptionsChainProps {
   loading: boolean
 }
 
-const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b";
+const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b border-gray-400/50";
 
 export const OptionsChain = ({ 
   optionsData, 
@@ -103,7 +103,7 @@ export const OptionsChain = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin"></div>
       </div>
     )
   }

@@ -2,36 +2,131 @@
 
 import { useState } from "react"
 import { BiChevronDown, BiChevronUp } from "react-icons/bi"
+import { useTradeStore } from "@/store/trade-store"
+import { ConfirmationModal, NotificationModal } from "./modals"
+import { marketDataService } from "@/services/market-data"
+import { useEffect } from "react"
+import { LeverageSelector } from "./leverage-selector"
 
 export const TradeCard = () => {
-    const [tradeType, setTradeType] = useState<"long" | "short">("short")
-    const [leverage, setLeverage] = useState(20)
-    const [showLeveragePanel, setShowLeveragePanel] = useState(false)
-    const [orderType, setOrderType] = useState<"limit" | "market" | "stopLimit">("limit")
-    const [stopPriceType, setStopPriceType] = useState<"mark" | "last" | "index">("mark")
-    const [showStopPriceDropdown, setShowStopPriceDropdown] = useState(false)
-    const [setAsDefault, setSetAsDefault] = useState(false)
-    const [quantity, setQuantity] = useState("")
-    const [stopPrice, setStopPrice] = useState("")
-    const [limitPrice, setLimitPrice] = useState("")
-    const [quantityPercent, setQuantityPercent] = useState(0)
-    const [showStopLimitDropdown, setShowStopLimitDropdown] = useState(false)
-    const [stopLimitType, setStopLimitType] = useState<"stopLimit" | "takeProfitLimit">("stopLimit")
-    const [reduceOnly, setReduceOnly] = useState(false)
-    const [maker, setMaker] = useState(false)
+    const {
+        tradeType,
+        leverage,
+        orderType,
+        stopPriceType,
+        stopLimitType,
+        quantity,
+        stopPrice,
+        limitPrice,
+        quantityPercent,
+        reduceOnly,
+        maker,
+        setAsDefault,
+        showLeveragePanel,
+        showStopPriceDropdown,
+        showStopLimitDropdown,
+        currentPrice,
+        markPrice,
+        indexPrice,
+        lastPrice,
+        markIV,
+        volume24h,
+        openInterest,
+        fundsRequired,
+        availableMargin,
+        maxPosition,
+        setTradeType,
+        setLeverage,
+        setOrderType,
+        setStopPriceType,
+        setStopLimitType,
+        setQuantity,
+        setStopPrice,
+        setLimitPrice,
+        setQuantityPercent,
+        setReduceOnly,
+        setMaker,
+        setSetAsDefault,
+        setShowLeveragePanel,
+        setShowStopPriceDropdown,
+        setShowStopLimitDropdown
+    } = useTradeStore()
+
+    // Modal states
+    const [showConfirmation, setShowConfirmation] = useState(false)
+    const [showNotification, setShowNotification] = useState(false)
+    const [showLeverageModal, setShowLeverageModal] = useState(false)
+    const [notificationData, setNotificationData] = useState({
+        title: '',
+        message: '',
+        type: 'info' as 'success' | 'error' | 'info' | 'warning'
+    })
 
     const leverageOptions = [1, 2, 5, 10, 20]
-    const maxPosition = 199999.9
+
+    // Live calculations
+    const getCurrentPrice = () => {
+        switch (stopPriceType) {
+            case 'mark': return markPrice
+            case 'last': return lastPrice
+            case 'index': return indexPrice
+            default: return currentPrice
+        }
+    }
+
+    const getPriceDisplay = () => {
+        const price = getCurrentPrice()
+        return `$${price.toFixed(1)}`
+    }
+
+    const getDeltaValue = () => {
+        const delta = tradeType === 'long' ? -0.44 : 0.44
+        return delta.toFixed(2)
+    }
+
+    const getMarkIVDisplay = () => {
+        const iv = tradeType === 'long' ? markIV : markIV - 0.1
+        return `${iv.toFixed(1)}%`
+    }
+
+    const getVolumeDisplay = () => {
+        return `$${(volume24h / 1000).toFixed(2)}K`
+    }
+
+    const getOIDisplay = () => {
+        return `$${(openInterest / 1000).toFixed(2)}K`
+    }
+
+    const getFundsRequiredDisplay = () => {
+        return `~${fundsRequired.toFixed(2)} USD`
+    }
+
+    const getAvailableMarginDisplay = () => {
+        return `${availableMargin.toFixed(2)} USD`
+    }
+
+    const getMaxPositionDisplay = () => {
+        return `${(maxPosition / leverage).toLocaleString()} USD`
+    }
 
     const headerStats = [
-        { label: "Delta", value: "-0.44", icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--warning-color)' }} /> },
-        { label: "Lot Size", value: "0.001 BTC", icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />, center: true },
+        { 
+            label: "Delta", 
+            value: getDeltaValue(), 
+            icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--warning-color)' }} /> 
+        },
+        { 
+            label: "Lot Size", 
+            value: "0.001 BTC", 
+            icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />, 
+            center: true 
+        },
     ]
 
     const midStats = [
-        { label: "Mark IV", value: tradeType === "long" ? "42.5%" : "42.4%" },
-        { label: "24h Vol.", value: "$422.27K" },
-        { label: "OI", value: "$196.56K" },
+        { label: "Mark IV", value: getMarkIVDisplay() },
+        { label: "24h Vol.", value: getVolumeDisplay() },
+        { label: "OI", value: getOIDisplay() },
     ]
 
     const tradeButtons = [
@@ -63,8 +158,71 @@ export const TradeCard = () => {
         { label: "% Fees", isDotted: true, condition: true }
     ]
 
-    const handleLeverageChange = (value: number) => setLeverage(value)
-    const handleQuantityPercentChange = (percent: number) => setQuantityPercent(percent)
+    // Helper function for numeric validation
+    const isValidNumericInput = (value: string): boolean => {
+        const numericRegex = /^[0-9]*\.?[0-9]*$/
+        return numericRegex.test(value) || value === ''
+    }
+
+    // Handler functions
+    const handleLeverageChange = (value: number) => {
+        setLeverage(value)
+        // calculateFundsRequired() is already called in setLeverage
+    }
+
+    const handleQuantityPercentChange = (percent: number) => {
+        setQuantityPercent(percent)
+    }
+
+    const handleQuantityChange = (value: string) => {
+        if (isValidNumericInput(value)) {
+            setQuantity(value)
+            // calculateFundsRequired() is already called in setQuantity
+        }
+    }
+
+    const handleTradeSubmit = () => {
+        if (!quantity || parseFloat(quantity) <= 0) {
+            setNotificationData({
+                title: 'Invalid Quantity',
+                message: 'Please enter a valid quantity',
+                type: 'error'
+            })
+            setShowNotification(true)
+            return
+        }
+
+        if (fundsRequired > availableMargin) {
+            setNotificationData({
+                title: 'Insufficient Margin',
+                message: `Required: ${getFundsRequiredDisplay()}, Available: ${getAvailableMarginDisplay()}`,
+                type: 'warning'
+            })
+            setShowNotification(true)
+            return
+        }
+
+        // Execute order through demo service
+        marketDataService.executeOrder(tradeType, parseFloat(quantity), leverage)
+        
+        setNotificationData({
+            title: 'Order Placed',
+            message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots at ${leverage}x leverage`,
+            type: 'success'
+        })
+        setShowNotification(true)
+    }
+
+
+    // Initialize demo data and start live updates
+    useEffect(() => {
+        marketDataService.resetDemoData()
+        marketDataService.startLiveUpdates()
+        
+        return () => {
+            marketDataService.stopLiveUpdates()
+        }
+    }, [])
 
     return (
         <div className="w-full h-full overflow-y-auto border border-gray-300" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
@@ -134,99 +292,29 @@ export const TradeCard = () => {
                 </div>
 
                 {/* LEVERAGE PANEL */}
-                <div className="mb-3 bg-gray-100/50 p-3">
-                    <div
-                        onClick={() => setShowLeveragePanel(!showLeveragePanel)}
-                        className="flex items-center justify-between py-2 cursor-pointer"
-                    >
-                        <div className="flex gap-2 items-center">
-                            <span className="text-gray-900 text-[11px]">Leverage</span>
-                            <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {showLeveragePanel ? (
-                                <BiChevronUp className="w-3 h-3 text-gray-400" />
-                            ) : (
-                                <BiChevronDown className="w-3 h-3 text-gray-400" />
-                            )}
-                        </div>
-                    </div>
+<div className="mb-3 bg-gray-100/50 p-3">
+  <div
+    onClick={() => setShowLeveragePanel(!showLeveragePanel)}
+    className="flex items-center justify-between py-2 cursor-pointer"
+  >
+    <div className="flex gap-2 items-center">
+      <span className="text-gray-900 text-[11px]">Leverage</span>
+      <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
+    </div>
+    <div className="flex items-center gap-2">
+      {showLeveragePanel ? (
+        <BiChevronUp className="w-3 h-3 text-gray-400" />
+      ) : (
+        <BiChevronDown className="w-3 h-3 text-gray-400" />
+      )}
+    </div>
+  </div>
 
-                    {showLeveragePanel && (
-                        <div className="bg-transparent rounded p-3 space-y-3 relative">
-                            {/* Editable Leverage Input */}
-                            <div className="relative border border-[#ADFF2F] rounded px-3 py-2 text-right">
-                                <input
-                                    type="number"
-                                    value={leverage}
-                                    onChange={(e) => {
-                                        const val = Number(e.target.value)
-                                        if (val >= 1 && val <= 20) setLeverage(val)
-                                    }}
-                                    className="bg-transparent w-full text-right text-[20px] font-semibold outline-none text-black pr-5"
-                                />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-black text-[20px] font-semibold">
-                                    x
-                                </span>
-                            </div>
+  {showLeveragePanel && (
+    <LeverageSelector />
+  )}
+</div>
 
-                            {/* Slider */}
-                            <div className="relative">
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="20"
-                                    step="1"
-                                    value={leverage}
-                                    onChange={(e) => handleLeverageChange(Number(e.target.value))}
-                                    className="w-full h-[4px] rounded-lg appearance-none cursor-pointer bg-gray-300"
-                                    style={{
-                                        background: `linear-gradient(to right, #ADFF2F 0%, #ADFF2F ${((leverage - 1) / 19) * 100
-                                            }%, #E5E7EB ${((leverage - 1) / 19) * 100}%, #E5E7EB 100%)`,
-                                    }}
-                                />
-
-                                {/* Tick Labels */}
-                                <div className="flex justify-between mt-1 text-[11px] text-gray-500 font-medium">
-                                    {leverageOptions.map((opt) => (
-                                        <button
-                                            key={opt}
-                                            onClick={() => handleLeverageChange(opt)}
-                                            className={`transition ${leverage === opt ? 'text-black font-semibold' : 'hover:text-gray-700'
-                                                }`}
-                                        >
-                                            {opt}x
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Checkbox */}
-                            <label className="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={setAsDefault}
-                                    onChange={(e) => setSetAsDefault(e.target.checked)}
-                                    className="w-3 h-3 rounded border-gray-600 bg-transparent"
-                                />
-                                Set {leverage}x as default leverage for all BTC options
-                            </label>
-
-                            {/* Max Position */}
-                            <div className="flex justify-between text-[10px]">
-                                <span className="text-gray-400 border-b border-dotted border-gray-600">
-                                    Max position at {leverage}x
-                                </span>
-                                <span className="text-black font-medium">{maxPosition.toLocaleString()} USD</span>
-                            </div>
-
-                            {/* CTA Button */}
-                            <button className="w-full bg-[#ADFF2F] text-black py-2 rounded font-medium transition-colors text-[11px] hover:bg-lime-400">
-                                Set to {leverage}x
-                            </button>
-                        </div>
-                    )}
-                </div>
 
                 {/* ORDER TABS */}
                 <div className="flex gap-3 mb-3 border-b border-gray-300 relative">
@@ -306,7 +394,12 @@ export const TradeCard = () => {
                                 <input
                                     type="text"
                                     value={stopPrice}
-                                    onChange={(e) => setStopPrice(e.target.value)}
+                                    onChange={(e) => {
+                                        const value = e.target.value
+                                        if (isValidNumericInput(value)) {
+                                            setStopPrice(value)
+                                        }
+                                    }}
                                     className="bg-transparent text-[11px] outline-none text-black flex-1"
                                     placeholder="0.00"
                                 />
@@ -332,7 +425,12 @@ export const TradeCard = () => {
                             <input
                                 type="text"
                                 value={limitPrice}
-                                onChange={(e) => setLimitPrice(e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value
+                                    if (isValidNumericInput(value)) {
+                                        setLimitPrice(value)
+                                    }
+                                }}
                                 placeholder={tradeType === "long" ? "Best Offer" : "Best Bid"}
                                 className="bg-transparent outline-none text-green-500 text-[11px] flex-1 placeholder-gray-500/60"
                             />
@@ -349,7 +447,7 @@ export const TradeCard = () => {
                         <input
                             type="text"
                             value={quantity}
-                            onChange={(e) => setQuantity(e.target.value)}
+                            onChange={(e) => handleQuantityChange(e.target.value)}
                             placeholder="1 Lot = 0.001 BTC"
                             className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
@@ -362,7 +460,7 @@ export const TradeCard = () => {
                             <button
                                 key={percent}
                                 onClick={() => handleQuantityPercentChange(percent)}
-                                className="hover:text-gray-300"
+                                className={`hover:text-gray-300 ${quantityPercent === percent ? 'text-green-500 font-medium' : ''}`}
                             >
                                 {percent}%
                             </button>
@@ -391,17 +489,20 @@ export const TradeCard = () => {
                                 <span className="text-green-500 text-[8px]">!</span>
                             </div>
                         </span>
-                        <span className="text-black">~0.00 USD</span>
+                        <span className="text-black">{getFundsRequiredDisplay()}</span>
                     </div>
                     <div className="flex items-center justify-between text-[10px]">
                         <span className="text-gray-400">Available Margin</span>
-                        <span className="text-black">0 USD</span>
+                        <span className="text-black">{getAvailableMarginDisplay()}</span>
                     </div>
                 </div>
 
-                {/* GET VERIFIED BUTTON */}
-                <button className="w-full bg-[#ADFF2F] hover:bg-green-600 text-black cursor-pointer py-2.5 rounded font-medium mb-3 transition-colors text-[11px]">
-                    Get Verified To Trade
+                {/* TRADE BUTTON */}
+                <button 
+                    onClick={handleTradeSubmit}
+                    className="w-full bg-[#ADFF2F] hover:bg-green-600 text-black cursor-pointer py-2.5 rounded font-medium mb-3 transition-colors text-[11px]"
+                >
+                    {tradeType === 'long' ? 'Buy' : 'Sell'} {quantity || '0'} Lots
                 </button>
 
                 {/* CHECKBOXES */}
@@ -455,6 +556,25 @@ export const TradeCard = () => {
                     <span className="text-green-500 text-base">→</span>
                 </div>
             </div>
+
+            {/* Modals */}
+            <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={() => {}}
+                title="Confirm Trade"
+                message="Are you sure you want to place this trade?"
+                type="warning"
+            />
+
+            <NotificationModal
+                isOpen={showNotification}
+                onClose={() => setShowNotification(false)}
+                title={notificationData.title}
+                message={notificationData.message}
+                type={notificationData.type}
+            />
+
         </div>
     )
 }
