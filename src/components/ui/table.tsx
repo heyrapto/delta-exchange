@@ -15,7 +15,7 @@ export const OptionsTableRow = ({
   const showStars = isSelected || isHovered
 
   const rowClass = `grid text-[9px] py-0.5 cursor-pointer border-b border-gray-800/50 hover:bg-gray-800/50 ${
-    isSelected ? "bg-orange-900/20 border-orange-500/30" : ""
+    isSelected ? "bg-green-900/20 border-green-500/30" : ""
   }`
 
   // Generate PUTS data (mirrored from CALLS)

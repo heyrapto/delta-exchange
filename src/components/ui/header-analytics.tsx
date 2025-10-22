@@ -114,7 +114,7 @@ export const HeaderAnalytics = () => {
 
                             <div className="flex justify-between items-center py-2">
                                 <span className="text-gray-400">Underlying Index</span>
-                                <span className="text-orange-500">.DEXBTUSD</span>
+                                <span className="text-green-500">.DEXBTUSD</span>
                             </div>
 
                             <div className="flex justify-between items-start py-2">
@@ -132,7 +132,7 @@ export const HeaderAnalytics = () => {
                         </div>
 
                         <div className="mt-6 pt-4 border-t border-gray-800">
-                            <button className="flex items-center justify-center gap-2 w-full text-orange-500 hover:text-orange-400 transition-colors text-sm">
+                            <button className="flex items-center justify-center gap-2 w-full text-green-500 hover:text-green-400 transition-colors text-sm">
                                 See full contract specifications
                                 <HiOutlineExternalLink className="w-4 h-4" />
                             </button>
@@ -208,7 +208,7 @@ export const HeaderAnalytics = () => {
 
                     {/* Go to Options Chain Link */}
                     <div className="flex justify-center pt-4">
-                        <button className="flex items-center gap-2 text-orange-500 hover:text-orange-400 transition-colors text-sm">
+                        <button className="flex items-center gap-2 text-green-500 hover:text-green-400 transition-colors text-sm">
                             Go to Options Chain
                             <span className="text-lg">›</span>
                         </button>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTradeStore } from "@/store/trade-store"
 import { BiDownload, BiRefresh } from "react-icons/bi"
 
 export const ExchangePanel = () => {
@@ -35,10 +36,53 @@ export const ExchangePanel = () => {
       ]
       
 
+    const { openOrders, cancelOrder } = useTradeStore()
+
+    const renderOpenOrders = () => (
+        <div className="p-3">
+            {openOrders.length === 0 ? (
+                <EmptyPanelState title="Open Orders" />
+            ) : (
+                <table className="w-full text-xs">
+                    <thead>
+                        <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                            <th className="text-left px-2 py-1">Time</th>
+                            <th className="text-left px-2 py-1">Side</th>
+                            <th className="text-left px-2 py-1">Type</th>
+                            <th className="text-left px-2 py-1">Price</th>
+                            <th className="text-left px-2 py-1">Qty</th>
+                            <th className="text-left px-2 py-1">Lev</th>
+                            <th className="text-left px-2 py-1">Status</th>
+                            <th className="text-left px-2 py-1">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {openOrders.map(o => (
+                            <tr key={o.id} className="border-b border-gray-200">
+                                <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
+                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? 'var(--text-success)' : 'var(--text-danger)' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                <td className="px-2 py-2">{o.orderType}</td>
+                                <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
+                                <td className="px-2 py-2">{o.quantity}</td>
+                                <td className="px-2 py-2">{o.leverage}x</td>
+                                <td className="px-2 py-2 capitalize">{o.status}</td>
+                                <td className="px-2 py-2">
+                                    {o.status === 'open' && (
+                                        <button className="text-[11px] underline" onClick={() => cancelOrder(o.id)}>Cancel</button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    )
+
     const renderContent = () => {
         switch (activePanel) {
             case 0: return <EmptyPanelState title="Positions" />
-            case 1: return <EmptyPanelState title="Open Orders" />
+            case 1: return renderOpenOrders()
             case 2: return <EmptyPanelState title="Stop Orders" />
             case 3: return <EmptyPanelState title="Tracker Assets" />
             case 4:

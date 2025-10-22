@@ -371,7 +371,7 @@ const CallsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${data.mark.toFixed(1)}</div>
+              <div className="text-black">${data.mark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((data.mark / data.mark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -416,7 +416,7 @@ const CallsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${data.mark.toFixed(1)}</div>
+              <div className="text-black">${data.mark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((data.mark / data.mark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -464,7 +464,7 @@ const CallsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${data.mark.toFixed(1)}</div>
+              <div className="text-black">${data.mark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((data.mark / data.mark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -542,7 +542,7 @@ const PutsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${putsMark.toFixed(1)}</div>
+              <div className="text-black">${putsMark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((putsMark / putsMark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -582,7 +582,7 @@ const PutsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${putsMark.toFixed(1)}</div>
+              <div className="text-black">${putsMark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((putsMark / putsMark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -622,7 +622,7 @@ const PutsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-white">${putsMark.toFixed(1)}</div>
+              <div className="text-black">${putsMark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((putsMark / putsMark) * 100).toFixed(1)}%</div>
             </div>
           </div>

@@ -34,6 +34,18 @@ export interface TradeState {
   availableMargin: number
   maxPosition: number
   
+  // Orders (demo)
+  openOrders: Array<{
+    id: string
+    side: 'long' | 'short'
+    orderType: 'limit' | 'market' | 'stopLimit'
+    price?: number
+    quantity: number
+    leverage: number
+    status: 'open' | 'filled' | 'cancelled'
+    time: number
+  }>
+  
   // UI State
   showLeveragePanel: boolean
   showStopPriceDropdown: boolean
@@ -57,6 +69,8 @@ export interface TradeState {
   setShowStopLimitDropdown: (show: boolean) => void
   updateMarketData: (data: Partial<Pick<TradeState, 'currentPrice' | 'markPrice' | 'indexPrice' | 'lastPrice' | 'markIV' | 'volume24h' | 'openInterest' | 'availableMargin'>>) => void
   resetTrade: () => void
+  placeOrder: (order: { side: 'long' | 'short'; orderType: 'limit' | 'market' | 'stopLimit'; price?: number; quantity: number; }) => void
+  cancelOrder: (id: string) => void
 }
 
 const initialMarketData = {
@@ -89,6 +103,7 @@ export const useTradeStore = create<TradeState>()(
       showStopLimitDropdown: false,
       availableMargin: 0,
       maxPosition: 199999.9,
+      openOrders: [],
       ...initialMarketData,
       fundsRequired: 0,
 
@@ -140,6 +155,28 @@ export const useTradeStore = create<TradeState>()(
         const qty = parseFloat(quantity) || 0
         const funds = (qty * currentPrice) / leverage
         set({ fundsRequired: funds })
+      },
+      
+      placeOrder: ({ side, orderType, price, quantity }) => {
+        const { leverage, openOrders } = get()
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`
+        const qtyNum = Number(quantity) || 0
+        const newOrder = {
+          id,
+          side,
+          orderType,
+          price,
+          quantity: qtyNum,
+          leverage,
+          status: 'open' as const,
+          time: Date.now(),
+        }
+        set({ openOrders: [newOrder, ...openOrders] })
+      },
+      
+      cancelOrder: (id: string) => {
+        const { openOrders } = get()
+        set({ openOrders: openOrders.map((o: { id: string; status: 'open' | 'filled' | 'cancelled'; }) => o.id === id ? { ...o, status: 'cancelled' } : o) })
       },
       
       resetTrade: () => set({
