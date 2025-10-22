@@ -80,7 +80,7 @@ export interface TradeState {
 const initialMarketData = {
   currentPrice: 108068.0,  
   markPrice: 108068.0,
-  indexPrice: 5380.0,           
+  indexPrice: 108000.0,  // Fixed: was 5380.0, now matches BTC price range          
   lastPrice: 108068.0,          
   markIV: 42.5,                
   volume24h: 30000000000,      

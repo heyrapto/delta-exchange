@@ -14,37 +14,13 @@ export const OrderBook = () => {
   const [hoveredData, setHoveredData] = useState<{ price: number; size: number } | null>(null)
   const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null)
 
-  // 🔥 Dynamic states
-  const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>([
-    { price: 6041.0, size: 1.293 },
-    { price: 5972.0, size: 1.189 },
-    { price: 5889.0, size: 2.098 },
-    { price: 5789.0, size: 2.557 },
-    { price: 5711.0, size: 1.991 },
-    { price: 5663.0, size: 1.55 },
-    { price: 5631.0, size: 1.546 },
-  ])
-
-  const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>([
-    { price: 5532.0, size: 2.314 },
-    { price: 5503.0, size: 2.32 },
-    { price: 5461.0, size: 2.981 },
-    { price: 5390.0, size: 3.829 },
-    { price: 5301.0, size: 3.141 },
-    { price: 5227.0, size: 1.779 },
-    { price: 5165.0, size: 1.934 },
-    { price: 5092.0, size: 2.102 },
-  ])
-
-  const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([
-    { price: 5390.0, size: 0.025, time: "23:01:24", type: "sell" },
-    { price: 5718.0, size: 0.035, time: "20:26:01", type: "sell" },
-    { price: 5750.0, size: 0.001, time: "18:14:19", type: "sell" },
-    { price: 5886.0, size: 0.001, time: "17:53:24", type: "sell" },
-  ])
+  // 🔥 Dynamic states - will be generated from current price
+  const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>([])
+  const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>([])
+  const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([])
 
   const store = useTradeStore()
-  const [currentPrice, setCurrentPrice] = useState(store.currentPrice)
+  const currentPrice = store.currentPrice
   const [spread, setSpread] = useState(99)
   const [spreadPercent, setSpreadPercent] = useState(0.09)
 
@@ -67,52 +43,38 @@ export const OrderBook = () => {
 
   const hoverStats = calculateHoverStats()
 
-  // 🔄 Simulate live BTC price updates
+
+  // 🔄 Generate orderbook around current price
   useEffect(() => {
-    setCurrentPrice(store.currentPrice)
+    const basePrice = store.currentPrice
+    const spread = basePrice * 0.0001 // 0.01% spread for realistic trading
+    
+    // Generate sell orders above current price
+    const newSellOrders = Array.from({ length: 7 }, (_, i) => ({
+      price: basePrice + spread + (i * spread * 10),
+      size: 1.2 + Math.random() * 1.5
+    }))
+    
+    // Generate buy orders below current price  
+    const newBuyOrders = Array.from({ length: 8 }, (_, i) => ({
+      price: basePrice - spread - (i * spread * 10),
+      size: 1.5 + Math.random() * 2.0
+    }))
+    
+    // Generate recent trades around current price
+    const newRecentTrades = Array.from({ length: 4 }, (_, i) => ({
+      price: basePrice + (Math.random() - 0.5) * spread * 20,
+      size: 0.001 + Math.random() * 0.05,
+      time: new Date(Date.now() - i * 60000).toLocaleTimeString("en-US", { hour12: false }),
+      type: Math.random() > 0.5 ? "buy" : "sell" as "buy" | "sell"
+    }))
+    
+    setSellOrders(newSellOrders)
+    setBuyOrders(newBuyOrders)
+    setRecentTrades(newRecentTrades)
+    setSpread(spread)
+    setSpreadPercent((spread / basePrice) * 100)
   }, [store.currentPrice])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPrice(prev => {
-        const next = prev + (Math.random() - 0.5) * 10 // +/- $5 random movement
-        return Math.max(1000, Math.min(70000, next)) // safety bound
-      })
-
-      setSpread(prev => prev + (Math.random() - 0.5) * 2)
-      setSpreadPercent(prev => Math.max(0.01, (spread / currentPrice) * 100))
-
-      // Randomly tweak orderbook
-      setSellOrders(prev =>
-        prev.map(order => ({
-          ...order,
-          price: order.price + (Math.random() - 0.5) * 5,
-          size: Math.max(0.5, order.size + (Math.random() - 0.5) * 0.3),
-        }))
-      )
-
-      setBuyOrders(prev =>
-        prev.map(order => ({
-          ...order,
-          price: order.price + (Math.random() - 0.5) * 5,
-          size: Math.max(0.5, order.size + (Math.random() - 0.5) * 0.3),
-        }))
-      )
-
-      // Add random recent trade
-      const now = new Date()
-      const newTrade: RecentTrade = {
-        price: currentPrice + (Math.random() - 0.5) * 20,
-        size: parseFloat((Math.random() * 0.05).toFixed(3)),
-        time: now.toLocaleTimeString("en-US", { hour12: false }),
-        type: Math.random() > 0.5 ? "buy" : "sell",
-      }
-
-      setRecentTrades(prev => [newTrade, ...prev.slice(0, 9)]) // keep last 10
-    }, 1500)
-
-    return () => clearInterval(interval)
-  }, [currentPrice, spread])
 
   const viewModeIcons = [
     { mode: "sell" as ViewMode, icon: <BiTrendingDown />, color: "text-red-400" },
@@ -183,7 +145,7 @@ export const OrderBook = () => {
                 </button>
               ))}
             </div>
-            <button className="flex items-center gap-1 text-[9px] sm:text-[10px] text-black">
+            <button className="flex items-center gap-1 text-[9px] sm:text-[10px] text-black cursor-pointer">
               {lotSize}
               <BiChevronDown className="w-2 h-2 sm:w-3 sm:h-3" />
             </button>

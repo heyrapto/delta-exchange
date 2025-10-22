@@ -33,32 +33,24 @@ export class MarketDataService {
   private updateMarketData() {
     const store = useTradeStore.getState()
     
-    // Simulate price fluctuations
-    const basePrice = 5390
-    const fluctuation = (Math.random() - 0.5) * 20 // ±10 price fluctuation
-    const newPrice = Math.max(basePrice + fluctuation, 5000) // Minimum price floor
-    
+    // Only update non-price data to avoid overriding the correct BTC/ETH prices
     // Simulate IV changes
     const baseIV = 42.5
     const ivFluctuation = (Math.random() - 0.5) * 2 // ±1 IV fluctuation
     const newIV = Math.max(baseIV + ivFluctuation, 30) // Minimum IV floor
     
     // Simulate volume changes
-    const baseVolume = 422270
-    const volumeFluctuation = (Math.random() - 0.5) * 50000 // ±25K volume fluctuation
-    const newVolume = Math.max(baseVolume + volumeFluctuation, 300000)
+    const baseVolume = 30000000000
+    const volumeFluctuation = (Math.random() - 0.5) * 1000000000 // ±500M volume fluctuation
+    const newVolume = Math.max(baseVolume + volumeFluctuation, 25000000000)
     
     // Simulate OI changes
-    const baseOI = 196560
-    const oiFluctuation = (Math.random() - 0.5) * 20000 // ±10K OI fluctuation
-    const newOI = Math.max(baseOI + oiFluctuation, 150000)
+    const baseOI = 33100000000
+    const oiFluctuation = (Math.random() - 0.5) * 1000000000 // ±500M OI fluctuation
+    const newOI = Math.max(baseOI + oiFluctuation, 30000000000)
     
-    // Update store with new data
+    // Update store with only non-price data
     store.updateMarketData({
-      currentPrice: newPrice,
-      markPrice: newPrice - (Math.random() * 5), // Mark price slightly below current
-      indexPrice: newPrice - (Math.random() * 10), // Index price below mark
-      lastPrice: newPrice,
       markIV: newIV,
       volume24h: newVolume,
       openInterest: newOI,
@@ -81,14 +73,11 @@ export class MarketDataService {
     }, 1000)
   }
 
-  // Reset demo data
+  // Reset demo data - use current store values, don't override
   resetDemoData() {
     const store = useTradeStore.getState()
+    // Don't reset price - keep current values from store
     store.updateMarketData({
-      currentPrice: 5390.0,
-      markPrice: 5385.0,
-      indexPrice: 5380.0,
-      lastPrice: 5390.0,
       markIV: 42.5,
       volume24h: 422270,
       openInterest: 196560,
