@@ -3,21 +3,21 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BiChevronDown, BiNotification, BiSearch } from "react-icons/bi";
+import { BiChevronDown, BiSearch } from "react-icons/bi";
 import { Button } from "../ui/button";
 import { AccountMargin } from "../ui/account-margin";
 import { Wallet } from "../ui/wallet";
-import { GiPositionMarker } from "react-icons/gi";
-import { CgProfile } from "react-icons/cg";
 import { FcSettings } from "react-icons/fc";
 import { BsBox } from "react-icons/bs";
+import { GrNotification } from "react-icons/gr";
 import { navItems } from "@/consants";
 import { AccountDropdown } from "../dropdowns/account";
-import { GrNotification } from "react-icons/gr";
+import { NotificationPanel } from "../panels/notification-panel";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -44,10 +44,8 @@ export const Header = () => {
       <div className="md:flex hidden flex-nowrap items-center justify-between px-4 py-2 gap-3 lg:gap-6">
         {/* Left section */}
         <div className="flex flex-wrap items-center gap-3 min-w-0">
-          {/* Logo */}
           <Image src="/logo.svg" width={100} height={30} alt="Logo" />
 
-          {/* Nav */}
           <ul
             ref={dropdownRef}
             className="xl:flex hidden flex-wrap items-center gap-4 shrink-0 text-sm relative"
@@ -60,8 +58,8 @@ export const Header = () => {
                 onClick={() =>
                   item.dropdown
                     ? setActiveDropdown(
-                      activeDropdown === index ? null : index
-                    )
+                        activeDropdown === index ? null : index
+                      )
                     : null
                 }
               >
@@ -81,7 +79,6 @@ export const Header = () => {
                   {item.dropdown && <BiChevronDown className="inline" />}
                 </Link>
 
-                {/* Dropdown */}
                 {item.dropdown && activeDropdown === index && (
                   <ul
                     className="absolute top-full left-0 mt-2 bg-white shadow-lg border border-gray-200 rounded-md min-w-[150px] z-50 overflow-hidden"
@@ -101,7 +98,6 @@ export const Header = () => {
             ))}
           </ul>
 
-          {/* Search */}
           <div className="relative flex-shrink">
             <BiSearch
               className="absolute top-1/2 left-2 transform -translate-y-1/2"
@@ -126,17 +122,25 @@ export const Header = () => {
 
           <AccountMargin />
           <Wallet balance="100" />
-
-          <div className="flex gap-4 flex-wrap justify-end items-center">
-            {/* <GiPositionMarker size={20} style={{ color: "var(--text-muted)" }} /> */}
-            <AccountDropdown /> 
-            <GrNotification size={20} />
-            <FcSettings size={20} style={{ color: "var(--text-muted)" }} />
-            <BsBox size={20} style={{ color: "var(--text-muted)" }} />
-          </div>
-
+        <div className="flex gap-4 items-center">
+          <AccountDropdown />
+          <GrNotification
+            size={20}
+            className="cursor-pointer"
+            style={{ color: "var(--text-muted)" }}
+            onClick={() => setNotifOpen(true)}
+          />
+          <FcSettings size={20} style={{ color: "var(--text-muted)" }} />
+          <BsBox size={20} style={{ color: "var(--text-muted)" }} />
+        </div>
         </div>
       </div>
+
+      {/* ✅ Add this */}
+      <NotificationPanel
+        isOpen={notifOpen}
+        onClose={() => setNotifOpen(false)}
+      />
     </header>
   );
 };
