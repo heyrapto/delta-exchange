@@ -6,6 +6,7 @@ import { SiStackblitz } from "react-icons/si"
 import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
 import { OptionsChain } from "./options-chain"
+import { useTradeStore } from "@/store/trade-store"
 
 interface MainExchangeProps {
     strategyView: boolean
@@ -13,9 +14,10 @@ interface MainExchangeProps {
 }
 
 export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps) => {
+    const { updateMarketData, setSelectedContract } = useTradeStore()
     const [viewMode, setViewMode] = useState<ViewMode>("table")
     const [tableView, setTableView] = useState<TableView>("standard")
-    const [selectedContract, setSelectedContract] = useState("BTC")
+    const [selectedContract, setLocalSelectedContract] = useState("BTC")
     const [selectedDate, setSelectedDate] = useState("28 Nov 25")
     const [selectedStrike, setSelectedStrike] = useState(102000)
     const [btcPrice, setBtcPrice] = useState(106849.3)
@@ -80,7 +82,11 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
         
         // Real-time price updates
         const priceInterval = setInterval(() => {
-            setBtcPrice(prev => prev + (Math.random() - 0.5) * 100)
+            setBtcPrice(prev => {
+                const next = prev + (Math.random() - 0.5) * 100
+                updateMarketData({ currentPrice: next, lastPrice: next, markPrice: next })
+                return next
+            })
         }, 5000)
 
         return () => clearInterval(priceInterval)
@@ -110,11 +116,18 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                     {contractTabs.map((tab) => (
                         <button
                             key={tab.value}
-                            onClick={() => setSelectedContract(tab.value)}
+                            onClick={() => {
+                                setLocalSelectedContract(tab.value)
+                                setSelectedContract(tab.value as 'BTC' | 'ETH')
+                                // Snap price for ETH/BTC demo
+                                const snap = tab.value === 'BTC' ? 108068.0 : 3120.0
+                                setBtcPrice(snap)
+                                updateMarketData({ currentPrice: snap, lastPrice: snap, markPrice: snap })
+                            }}
                             className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors border"
                             style={{
-                                borderColor: selectedContract === tab.value ? 'var(--button-primary-bg)' : 'var(--form-input-border)',
-                                color: selectedContract === tab.value ? 'var(--text-primary)' : 'var(--text-secondary)'
+                                borderColor: (selectedContract === tab.value) ? 'var(--button-primary-bg)' : 'var(--form-input-border)',
+                                color: (selectedContract === tab.value) ? 'var(--text-primary)' : 'var(--text-secondary)'
                             }}
                         >
                             {tab.label}

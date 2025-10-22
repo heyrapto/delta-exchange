@@ -134,8 +134,8 @@ export const Header = () => {
             style={{ color: "var(--text-muted)" }}
             onClick={() => setNotifOpen(true)}
           />
-          <FcSettings size={20} style={{ color: "var(--text-muted)" }} onClick={() => setSettingsOpen(true)} />
-          <BsBox size={20} style={{ color: "var(--text-muted)" }} onClick={() => setMoreOpen(true)} />
+          <FcSettings className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setSettingsOpen(true)} />
+          <BsBox className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setMoreOpen(true)} />
         </div>
         </div>
       </div>

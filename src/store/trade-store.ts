@@ -34,6 +34,9 @@ export interface TradeState {
   availableMargin: number
   maxPosition: number
   
+  // Instrument selection
+  selectedContract: 'BTC' | 'ETH'
+  
   // Orders (demo)
   openOrders: Array<{
     id: string
@@ -71,16 +74,17 @@ export interface TradeState {
   resetTrade: () => void
   placeOrder: (order: { side: 'long' | 'short'; orderType: 'limit' | 'market' | 'stopLimit'; price?: number; quantity: number; }) => void
   cancelOrder: (id: string) => void
+  setSelectedContract: (symbol: 'BTC' | 'ETH') => void
 }
 
 const initialMarketData = {
-  currentPrice: 5390.0,
-  markPrice: 5385.0,
-  indexPrice: 5380.0,
-  lastPrice: 5390.0,
-  markIV: 42.5,
-  volume24h: 422270,
-  openInterest: 196560,
+  currentPrice: 108068.0,  
+  markPrice: 108068.0,
+  indexPrice: 5380.0,           
+  lastPrice: 108068.0,          
+  markIV: 42.5,                
+  volume24h: 30000000000,      
+  openInterest: 33100000000   
 }
 
 export const useTradeStore = create<TradeState>()(
@@ -104,6 +108,7 @@ export const useTradeStore = create<TradeState>()(
       availableMargin: 0,
       maxPosition: 199999.9,
       openOrders: [],
+      selectedContract: 'BTC',
       ...initialMarketData,
       fundsRequired: 0,
 
@@ -156,6 +161,8 @@ export const useTradeStore = create<TradeState>()(
         const funds = (qty * currentPrice) / leverage
         set({ fundsRequired: funds })
       },
+      
+      setSelectedContract: (symbol: 'BTC' | 'ETH') => set({ selectedContract: symbol }),
       
       placeOrder: ({ side, orderType, price, quantity }) => {
         const { leverage, openOrders } = get()
