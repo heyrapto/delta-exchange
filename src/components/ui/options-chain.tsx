@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { OptionData, TableView } from "@/types"
+import { useStrategyStore } from "@/store/strategy-store"
 
 interface OptionsChainProps {
   optionsData: OptionData[]
@@ -9,6 +10,7 @@ interface OptionsChainProps {
   onStrikeSelect: (strike: number) => void
   view: TableView
   loading: boolean
+  isStrategyBuilderActive: boolean
 }
 
 const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b border-gray-400/50";
@@ -18,13 +20,39 @@ export const OptionsChain = ({
   selectedStrike, 
   onStrikeSelect, 
   view, 
-  loading 
+  loading,
+  isStrategyBuilderActive
 }: OptionsChainProps) => {
   const mainScrollRef = useRef<HTMLDivElement>(null)
   const callsScrollRef = useRef<HTMLDivElement>(null)
   const putsScrollRef = useRef<HTMLDivElement>(null)
   const callsHeaderRef = useRef<HTMLDivElement>(null)
   const putsHeaderRef = useRef<HTMLDivElement>(null)
+  
+  // Strategy store
+  const { addOrderToStrategy, selectedOrders } = useStrategyStore()
+  
+  // Check if an order is already selected
+  const isOrderSelected = (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => {
+    return selectedOrders.some(order => 
+      order.type === type && order.side === side && order.strike === strike
+    )
+  }
+  
+  // Handle Buy/Sell button clicks
+  const handleOrderClick = (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => {
+    if (isStrategyBuilderActive) {
+      addOrderToStrategy({
+        type,
+        side,
+        strike,
+        price,
+        quantity: 1,
+        contract: `${type === 'call' ? 'C' : 'P'}-ETH-${strike}-231025`,
+        leverage: 100
+      })
+    }
+  }
 
   // Handle main container scroll - sync everything
   const handleMainScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -161,6 +189,9 @@ export const OptionsChain = ({
                   isSelected={data.strike === selectedStrike}
                   view={view}
                   onSelect={() => onStrikeSelect(data.strike)}
+                  isStrategyBuilderActive={isStrategyBuilderActive}
+                  onOrderClick={handleOrderClick}
+                  isOrderSelected={isOrderSelected}
                 />
               ))}
             </div>
@@ -193,6 +224,9 @@ export const OptionsChain = ({
                   isSelected={data.strike === selectedStrike}
                   view={view}
                   onSelect={() => onStrikeSelect(data.strike)}
+                  isStrategyBuilderActive={isStrategyBuilderActive}
+                  onOrderClick={handleOrderClick}
+                  isOrderSelected={isOrderSelected}
                 />
               ))}
             </div>
@@ -336,17 +370,27 @@ const CallsRow = ({
   data, 
   isSelected, 
   view, 
-  onSelect 
+  onSelect,
+  isStrategyBuilderActive,
+  onOrderClick,
+  isOrderSelected
 }: { 
   data: OptionData
   isSelected: boolean
   view: TableView
   onSelect: () => void
+  isStrategyBuilderActive: boolean
+  onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
+  isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  } ${
+    isOrderSelected('call', 'buy', data.strike) || isOrderSelected('call', 'sell', data.strike) 
+      ? "bg-blue-900/20 border-blue-500/30" 
+      : ""
   }`;
   
   const cellClass =
@@ -478,6 +522,38 @@ const CallsRow = ({
           <div className={cellClass}>${data.oi.toFixed(2)}K</div>
         </>
       )}
+
+      {/* Buy/Sell Buttons for Strategy Builder */}
+      {isStrategyBuilderActive && (
+        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/80 opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('call', 'buy', data.strike, data.mark)
+            }}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              isOrderSelected('call', 'buy', data.strike) 
+                ? 'bg-green-600 text-white' 
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            Buy
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('call', 'sell', data.strike, data.mark)
+            }}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              isOrderSelected('call', 'sell', data.strike) 
+                ? 'bg-red-600 text-white' 
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+          >
+            Sell
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -487,17 +563,27 @@ const PutsRow = ({
   data, 
   isSelected, 
   view, 
-  onSelect 
+  onSelect,
+  isStrategyBuilderActive,
+  onOrderClick,
+  isOrderSelected
 }: { 
   data: OptionData
   isSelected: boolean
   view: TableView
   onSelect: () => void
+  isStrategyBuilderActive: boolean
+  onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
+  isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
 }) => {
   const [isHovered, setIsHovered] = useState(false)
 
-  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  } ${
+    isOrderSelected('put', 'buy', data.strike) || isOrderSelected('put', 'sell', data.strike) 
+      ? "bg-blue-900/20 border-blue-500/30" 
+      : ""
   }`;
   
   const cellClass =
@@ -635,6 +721,38 @@ const PutsRow = ({
           <div className={cellClass}>{data.askQty.toFixed(3)}</div>
           <div className={cellClass}>${data.oi.toFixed(2)}K</div>
         </>
+      )}
+
+      {/* Buy/Sell Buttons for Strategy Builder */}
+      {isStrategyBuilderActive && (
+        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/80 opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('put', 'buy', data.strike, data.mark)
+            }}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              isOrderSelected('put', 'buy', data.strike) 
+                ? 'bg-green-600 text-white' 
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            Buy
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('put', 'sell', data.strike, data.mark)
+            }}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+              isOrderSelected('put', 'sell', data.strike) 
+                ? 'bg-red-600 text-white' 
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+          >
+            Sell
+          </button>
+        </div>
       )}
     </div>
   )
