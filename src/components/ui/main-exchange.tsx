@@ -14,17 +14,18 @@ interface MainExchangeProps {
 }
 
 export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps) => {
-    const { updateMarketData, setSelectedContract } = useTradeStore()
+    const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
     const [viewMode, setViewMode] = useState<ViewMode>("table")
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
     const [selectedDate, setSelectedDate] = useState("28 Nov 25")
     const [selectedStrike, setSelectedStrike] = useState(102000)
-    const [btcPrice, setBtcPrice] = useState(106849.3)
     const [timeToExpiry, setTimeToExpiry] = useState("41d:12h:50m")
     const [showResources, setShowResources] = useState(false)
+    const [showGridDropdown, setShowGridDropdown] = useState(false)
     const [optionsData, setOptionsData] = useState<OptionData[]>([])
     const [loading, setLoading] = useState(true)
+    const gridDropdownRef = useRef<HTMLDivElement>(null)
 
     const dates = [
         "18 Oct 25", "19 Oct 25", "20 Oct 25", "24 Oct 25",
@@ -41,14 +42,31 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
         { value: "ETH", label: "ETH" },
     ]
 
-    // Fetch real options data
+    // Initialize prices and fetch options data
     useEffect(() => {
+        // Set initial BTC price to ensure it's correct from the start
+        if (selectedContract === 'BTC') {
+            updateMarketData({ 
+                currentPrice: 108068.0, 
+                markPrice: 108068.0, 
+                lastPrice: 108068.0,
+                indexPrice: 108000.0
+            })
+        } else if (selectedContract === 'ETH') {
+            updateMarketData({ 
+                currentPrice: 3120.0, 
+                markPrice: 3120.0, 
+                lastPrice: 3120.0,
+                indexPrice: 3100.0
+            })
+        }
+
         const fetchOptionsData = async () => {
             setLoading(true)
             try {
                 const mockData: OptionData[] = Array.from({ length: 20 }, (_, i) => {
                     const strike = 96000 + (i * 1000)
-                    const isITM = strike < btcPrice
+                    const isITM = strike < currentPrice
                     
                     return {
                         strike,
@@ -79,18 +97,18 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
         }
 
         fetchOptionsData()
-        
-        // Real-time price updates
-        const priceInterval = setInterval(() => {
-            setBtcPrice(prev => {
-                const next = prev + (Math.random() - 0.5) * 100
-                updateMarketData({ currentPrice: next, lastPrice: next, markPrice: next })
-                return next
-            })
-        }, 5000)
+    }, [selectedContract, selectedDate, updateMarketData])
 
-        return () => clearInterval(priceInterval)
-    }, [selectedContract, selectedDate])
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (gridDropdownRef.current && !gridDropdownRef.current.contains(e.target as Node)) {
+                setShowGridDropdown(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [])
 
     return (
         <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
@@ -121,7 +139,6 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                                 setSelectedContract(tab.value as 'BTC' | 'ETH')
                                 // Snap price for ETH/BTC demo
                                 const snap = tab.value === 'BTC' ? 108068.0 : 3120.0
-                                setBtcPrice(snap)
                                 updateMarketData({ currentPrice: snap, lastPrice: snap, markPrice: snap })
                             }}
                             className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors border cursor-pointer ${selectedContract === tab.value ? "bg-green-500 text-white" : "bg-transparent text-gray-900"}`}
@@ -187,11 +204,115 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 ))}
                 </div>
 
-                <button className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer">
+                <div className="relative">
+                    <button 
+                        onClick={() => setShowGridDropdown(!showGridDropdown)}
+                        className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer"
+                    >
                         <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
                         </svg>
                     </button>
+                    
+                    {showGridDropdown && (
+                        <div className="absolute top-10 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-[999999] min-w-[280px]" ref={gridDropdownRef}>
+                            <div className="p-3">
+                                <div className="text-xs font-medium text-gray-300 mb-3">Column Settings</div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {/* Left Column */}
+                                    <div className="space-y-1">
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>OI</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Bid/ Ask</span>
+                                        </label>
+                                        <div className="ml-4 space-y-1">
+                                            <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded bg-gray-700">
+                                                <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                                <span className="text-xs">⚫</span>
+                                                <span>Qty</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded bg-gray-700">
+                                                <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                                <span className="text-xs">⚫</span>
+                                                <span>Mark</span>
+                                            </label>
+                                        </div>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Delta</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Volume</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>6H OI Chg.</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>POS</span>
+                                        </label>
+                                    </div>
+                                    
+                                    {/* Right Column */}
+                                    <div className="space-y-1">
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Gamma</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Vega</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Theta</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>24hr Chg.</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Last</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Open</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>High</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
+                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
+                                            <span className="text-xs">⚫</span>
+                                            <span>Low</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Price Info Bar */}
@@ -202,8 +323,8 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                     </div>
                     <div className="flex items-center gap-2 sm:gap-4">
                         <div className="text-center">
-                            <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>BTC</span>
-                            <span className="text-[9px] sm:text-[10px] font-bold text-red-500">${btcPrice.toFixed(1)}</span>
+                            <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>{selectedContract}</span>
+                            <span className="text-[9px] sm:text-[10px] font-bold text-red-500">${currentPrice.toFixed(1)}</span>
                         </div>
                         <div className="text-[9px] sm:text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
                             <span className="hidden sm:inline">Time to Expiry </span>

@@ -410,7 +410,7 @@ export const TradeCard = () => {
                                     placeholder="0.00"
                                 />
                                 <span className="text-gray-400 ml-1 text-[10px]">USD</span>
-                                <BiChevronUp className="w-3 h-3 text-gray-400 ml-1" />
+                                <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
                             </div>
                         </div>
                     </div>
@@ -441,7 +441,7 @@ export const TradeCard = () => {
                                 className="bg-transparent outline-none text-green-500 text-[11px] flex-1 placeholder-gray-500/60"
                             />
                             <span className="text-gray-400 ml-1 text-[10px]">USD</span>
-                            <BiChevronUp className="w-3 h-3 text-gray-400 ml-1" />
+                            <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
                         </div>
                     </div>
                 )}
@@ -458,7 +458,7 @@ export const TradeCard = () => {
                             className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
                         <span className="text-gray-400 ml-1 text-[10px]">Lot</span>
-                        <BiChevronDown className="w-3 h-3 text-gray-400 ml-1" />
+                        <BiChevronDown className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
                     </div>
 
                     <div className="flex gap-3 text-[10px] text-gray-500 mb-2">
