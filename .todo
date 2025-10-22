@@ -1,2 +1,4 @@
 1. Once order is placed it should show in the open order in the exchange panel
-2. 
+2. The prices in the order-book component do not update once toggled from btc to eth
+3. The prices on the order book do not match what is displayed on the chart/atleast show original data i.e btc is currently over 125k+ but on the price in the order-book.tsx it says $5396.6
+4. The exchange panel should be functional and update based on everything.. i.e positions, order history, fills, etc.. and please maintain our ui patterns and color scheme, the risk and margin too also doesn't correlate so please we need functionalities
