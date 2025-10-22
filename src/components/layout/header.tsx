@@ -15,6 +15,7 @@ import { AccountDropdown } from "../dropdowns/account";
 import { NotificationPanel } from "../panels/notification-panel";
 import { SettingsPanel } from "../panels/settings-panel";
 import { MorePanel } from "../panels/more-panel";
+import { useToast } from "../ui/toast";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -22,6 +23,7 @@ export const Header = () => {
   const [notifOpen, setNotifOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const { showToast, ToastContainer } = useToast();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -149,7 +151,7 @@ export const Header = () => {
 
         {/* Right section */}
         <div className="flex flex-wrap items-center gap-2 lg:gap-3 justify-end">
-          <Button variant="primary">Add Bank</Button>
+          <Button variant="primary" onClick={() => showToast("Coming soon", "info")}>Add Bank</Button>
 
           <AccountMargin />
           <Wallet balance="0.00" />
@@ -174,6 +176,7 @@ export const Header = () => {
       />
       <SettingsPanel isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <MorePanel isOpen={moreOpen} onClose={() => setMoreOpen(false)} />
+      <ToastContainer />
     </header>
   );
 };

@@ -36,7 +36,7 @@ export const ExchangePanel = () => {
       ]
       
 
-    const { openOrders, cancelOrder } = useTradeStore()
+    const { openOrders, orderHistory, cancelOrder } = useTradeStore()
 
     const renderOpenOrders = () => (
         <div className="p-3">
@@ -60,7 +60,7 @@ export const ExchangePanel = () => {
                         {openOrders.map(o => (
                             <tr key={o.id} className="border-b border-gray-200">
                                 <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
-                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? 'var(--text-success)' : 'var(--text-danger)' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
                                 <td className="px-2 py-2">{o.orderType}</td>
                                 <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
                                 <td className="px-2 py-2">{o.quantity}</td>
@@ -71,6 +71,41 @@ export const ExchangePanel = () => {
                                         <button className="text-[11px] underline" onClick={() => cancelOrder(o.id)}>Cancel</button>
                                     )}
                                 </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
+    )
+
+    const renderOrderHistory = () => (
+        <div className="p-3">
+            {orderHistory.length === 0 ? (
+                <EmptyPanelState title="Order History" />
+            ) : (
+                <table className="w-full text-xs">
+                    <thead>
+                        <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                            <th className="text-left px-2 py-1">Time</th>
+                            <th className="text-left px-2 py-1">Side</th>
+                            <th className="text-left px-2 py-1">Type</th>
+                            <th className="text-left px-2 py-1">Price</th>
+                            <th className="text-left px-2 py-1">Qty</th>
+                            <th className="text-left px-2 py-1">Lev</th>
+                            <th className="text-left px-2 py-1">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orderHistory.map(o => (
+                            <tr key={o.id} className="border-b border-gray-200">
+                                <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
+                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                <td className="px-2 py-2">{o.orderType}</td>
+                                <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
+                                <td className="px-2 py-2">{o.quantity}</td>
+                                <td className="px-2 py-2">{o.leverage}x</td>
+                                <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -141,7 +176,7 @@ export const ExchangePanel = () => {
                   )
                   
             case 5: return <EmptyPanelState title="Fills" />
-            case 6: return <EmptyPanelState title="Order History" />
+            case 6: return renderOrderHistory()
             default: return null
         }
     }

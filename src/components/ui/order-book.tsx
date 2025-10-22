@@ -11,6 +11,7 @@ type ViewMode = "all" | "buy" | "sell"
 export const OrderBook = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("all")
   const [lotSize, setLotSize] = useState(0.1)
+  const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
   const [hoveredData, setHoveredData] = useState<{ price: number; size: number } | null>(null)
   const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null)
 
@@ -145,10 +146,32 @@ export const OrderBook = () => {
                 </button>
               ))}
             </div>
-            <button className="flex items-center gap-1 text-[9px] sm:text-[10px] text-black cursor-pointer">
-              {lotSize}
-              <BiChevronDown className="w-2 h-2 sm:w-3 sm:h-3" />
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowLotSizeDropdown(!showLotSizeDropdown)}
+                className="flex items-center gap-1 text-[9px] sm:text-[10px] text-black cursor-pointer"
+              >
+                {lotSize}
+                <BiChevronDown className="w-2 h-2 sm:w-3 sm:h-3" />
+              </button>
+              
+              {showLotSizeDropdown && (
+                <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
+                  {[0.1, 0.5, 1.0, 2.0, 5.0].map((size) => (
+                    <div
+                      key={size}
+                      onClick={() => {
+                        setLotSize(size)
+                        setShowLotSizeDropdown(false)
+                      }}
+                      className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
+                    >
+                      {size}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

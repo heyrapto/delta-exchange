@@ -48,6 +48,17 @@ export interface TradeState {
     status: 'open' | 'filled' | 'cancelled'
     time: number
   }>
+  orderHistory: Array<{
+    id: string
+    side: 'long' | 'short'
+    orderType: 'limit' | 'market' | 'stopLimit'
+    price?: number
+    quantity: number
+    leverage: number
+    status: 'filled' | 'cancelled'
+    time: number
+    filledPrice?: number
+  }>
   
   // UI State
   showLeveragePanel: boolean
@@ -74,6 +85,7 @@ export interface TradeState {
   resetTrade: () => void
   placeOrder: (order: { side: 'long' | 'short'; orderType: 'limit' | 'market' | 'stopLimit'; price?: number; quantity: number; }) => void
   cancelOrder: (id: string) => void
+  fillOrder: (id: string, filledPrice: number) => void
   setSelectedContract: (symbol: 'BTC' | 'ETH') => void
 }
 
@@ -108,6 +120,7 @@ export const useTradeStore = create<TradeState>()(
       availableMargin: 0,
       maxPosition: 199999.9,
       openOrders: [],
+      orderHistory: [],
       selectedContract: 'BTC',
       ...initialMarketData,
       fundsRequired: 0,
@@ -182,8 +195,27 @@ export const useTradeStore = create<TradeState>()(
       },
       
       cancelOrder: (id: string) => {
-        const { openOrders } = get()
-        set({ openOrders: openOrders.map((o: { id: string; status: 'open' | 'filled' | 'cancelled'; }) => o.id === id ? { ...o, status: 'cancelled' } : o) })
+        const { openOrders, orderHistory } = get()
+        const order = openOrders.find((o: any) => o.id === id)
+        if (order) {
+          const cancelledOrder = { ...order, status: 'cancelled' as const }
+          set({ 
+            openOrders: openOrders.filter((o: any) => o.id !== id),
+            orderHistory: [cancelledOrder, ...orderHistory]
+          })
+        }
+      },
+      
+      fillOrder: (id: string, filledPrice: number) => {
+        const { openOrders, orderHistory } = get()
+        const order = openOrders.find((o: any) => o.id === id)
+        if (order) {
+          const filledOrder = { ...order, status: 'filled' as const, filledPrice }
+          set({ 
+            openOrders: openOrders.filter((o: any) => o.id !== id),
+            orderHistory: [filledOrder, ...orderHistory]
+          })
+        }
       },
       
       resetTrade: () => set({
