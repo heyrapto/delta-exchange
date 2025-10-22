@@ -74,13 +74,13 @@ export interface TradeState {
 }
 
 const initialMarketData = {
-  currentPrice: 5390.0,
-  markPrice: 5385.0,
-  indexPrice: 5380.0,
-  lastPrice: 5390.0,
-  markIV: 42.5,
-  volume24h: 422270,
-  openInterest: 196560,
+  currentPrice: 108068.0,  
+  markPrice: 108068.0,
+  indexPrice: 5380.0,           
+  lastPrice: 108068.0,          
+  markIV: 42.5,                
+  volume24h: 30000000000,      
+  openInterest: 33100000000   
 }
 
 export const useTradeStore = create<TradeState>()(
