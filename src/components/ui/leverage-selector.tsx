@@ -10,7 +10,7 @@ export const LeverageSelector = () => {
         setSetAsDefault,
     } = useTradeStore()
 
-    const leverageOptions = [1, 2, 5, 10, 20]
+    const leverageOptions = [1, 5, 10, 15, 20]
 
     const isValidNumericInput = (value: string): boolean => {
         const numericRegex = /^[0-9]*\.?[0-9]*$/
