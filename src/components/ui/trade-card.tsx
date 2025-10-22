@@ -202,8 +202,14 @@ export const TradeCard = () => {
             return
         }
 
-        // Execute order through demo service
+        // Execute order through demo service and push to open orders
         marketDataService.executeOrder(tradeType, parseFloat(quantity), leverage)
+        useTradeStore.getState().placeOrder({
+            side: tradeType,
+            orderType,
+            price: limitPrice ? Number(limitPrice) : undefined,
+            quantity: Number(quantity)
+        })
         
         setNotificationData({
             title: 'Order Placed',

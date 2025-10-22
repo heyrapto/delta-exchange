@@ -13,11 +13,15 @@ import { GrNotification } from "react-icons/gr";
 import { navItems } from "@/consants";
 import { AccountDropdown } from "../dropdowns/account";
 import { NotificationPanel } from "../panels/notification-panel";
+import { SettingsPanel } from "../panels/settings-panel";
+import { MorePanel } from "../panels/more-panel";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLUListElement | null>(null);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -130,17 +134,19 @@ export const Header = () => {
             style={{ color: "var(--text-muted)" }}
             onClick={() => setNotifOpen(true)}
           />
-          <FcSettings size={20} style={{ color: "var(--text-muted)" }} />
-          <BsBox size={20} style={{ color: "var(--text-muted)" }} />
+          <FcSettings size={20} style={{ color: "var(--text-muted)" }} onClick={() => setSettingsOpen(true)} />
+          <BsBox size={20} style={{ color: "var(--text-muted)" }} onClick={() => setMoreOpen(true)} />
         </div>
         </div>
       </div>
 
-      {/* ✅ Add this */}
+      {/* Panels */}
       <NotificationPanel
         isOpen={notifOpen}
         onClose={() => setNotifOpen(false)}
       />
+      <SettingsPanel isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <MorePanel isOpen={moreOpen} onClose={() => setMoreOpen(false)} />
     </header>
   );
 };

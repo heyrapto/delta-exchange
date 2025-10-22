@@ -2,6 +2,7 @@
 
 import { OrderBookEntry, RecentTrade } from "@/types"
 import { useEffect, useState } from "react"
+import { useTradeStore } from "@/store/trade-store"
 import { BiChart, BiChevronDown, BiStar, BiTrendingDown, BiTrendingUp } from "react-icons/bi"
 import { OrderBookRow, RecentTradeRow } from "../shared/order-book-card"
 
@@ -42,7 +43,8 @@ export const OrderBook = () => {
     { price: 5886.0, size: 0.001, time: "17:53:24", type: "sell" },
   ])
 
-  const [currentPrice, setCurrentPrice] = useState(5390.0)
+  const store = useTradeStore()
+  const [currentPrice, setCurrentPrice] = useState(store.currentPrice)
   const [spread, setSpread] = useState(99)
   const [spreadPercent, setSpreadPercent] = useState(0.09)
 
@@ -66,6 +68,10 @@ export const OrderBook = () => {
   const hoverStats = calculateHoverStats()
 
   // 🔄 Simulate live BTC price updates
+  useEffect(() => {
+    setCurrentPrice(store.currentPrice)
+  }, [store.currentPrice])
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPrice(prev => {
