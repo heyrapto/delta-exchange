@@ -25,7 +25,6 @@ export default function Home() {
       <Banner />
       <Header />
       
-      {/* Conditional rendering based on active tab */}
       {activeTab === "trade" ? (
         <MobileTradeView />
       ) : (

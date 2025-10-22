@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Dark Theme Colors - Based on Delta Exchange */
-  
   /* Page Background */
   --page-bg-color: #1a1d25;
   --page-bg-secondary: #23262f;

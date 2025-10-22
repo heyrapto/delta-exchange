@@ -92,7 +92,7 @@ export class MarketDataService {
       markIV: 42.5,
       volume24h: 422270,
       openInterest: 196560,
-      availableMargin: 10000, // Demo available margin
+      availableMargin: 10000,
     })
   }
 }

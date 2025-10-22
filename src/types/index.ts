@@ -34,4 +34,3 @@ export type RecentTrade = {
     time: string
     type: "buy" | "sell"
 }
-

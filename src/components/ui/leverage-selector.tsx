@@ -13,7 +13,7 @@ export const LeverageSelector = () => {
   
     const handleChange = (val: number) => {
       setLocalLeverage(val)
-      setLeverage(val) // updates store once
+      setLeverage(val) 
     }
   
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
