@@ -55,7 +55,7 @@ export const TradingViewChart = ({ symbol }: { symbol: string }) => {
         <div className="relative h-full w-full">
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#1a1d25]/80 z-10">
-                    <div className="w-8 h-8 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin"></div>
                 </div>
             )}
             <div className="h-full w-full" ref={containerRef}></div>
