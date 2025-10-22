@@ -388,8 +388,10 @@ const CallsRow = ({
   const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
   } ${
-    isOrderSelected('call', 'buy', data.strike) || isOrderSelected('call', 'sell', data.strike) 
-      ? "bg-blue-900/20 border-blue-500/30" 
+    isOrderSelected('call', 'buy', data.strike) 
+      ? "bg-green-100/30 border-green-400/50" 
+      : isOrderSelected('call', 'sell', data.strike)
+      ? "bg-red-100/30 border-red-400/50"
       : ""
   }`;
   
@@ -525,13 +527,15 @@ const CallsRow = ({
 
       {/* Buy/Sell Buttons for Strategy Builder */}
       {isStrategyBuilderActive && (
-        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/80 opacity-0 hover:opacity-100 transition-opacity">
+        <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
           <button
             onClick={(e) => {
               e.stopPropagation()
               onOrderClick('call', 'buy', data.strike, data.mark)
             }}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
               isOrderSelected('call', 'buy', data.strike) 
                 ? 'bg-green-600 text-white' 
                 : 'bg-green-500 hover:bg-green-600 text-white'
@@ -544,7 +548,7 @@ const CallsRow = ({
               e.stopPropagation()
               onOrderClick('call', 'sell', data.strike, data.mark)
             }}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
               isOrderSelected('call', 'sell', data.strike) 
                 ? 'bg-red-600 text-white' 
                 : 'bg-red-500 hover:bg-red-600 text-white'
@@ -581,8 +585,10 @@ const PutsRow = ({
   const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
   } ${
-    isOrderSelected('put', 'buy', data.strike) || isOrderSelected('put', 'sell', data.strike) 
-      ? "bg-blue-900/20 border-blue-500/30" 
+    isOrderSelected('put', 'buy', data.strike) 
+      ? "bg-green-100/30 border-green-400/50" 
+      : isOrderSelected('put', 'sell', data.strike)
+      ? "bg-red-100/30 border-red-400/50"
       : ""
   }`;
   
@@ -725,13 +731,15 @@ const PutsRow = ({
 
       {/* Buy/Sell Buttons for Strategy Builder */}
       {isStrategyBuilderActive && (
-        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/80 opacity-0 hover:opacity-100 transition-opacity">
+        <div className={`absolute left-2 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
           <button
             onClick={(e) => {
               e.stopPropagation()
               onOrderClick('put', 'buy', data.strike, data.mark)
             }}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
               isOrderSelected('put', 'buy', data.strike) 
                 ? 'bg-green-600 text-white' 
                 : 'bg-green-500 hover:bg-green-600 text-white'
@@ -744,7 +752,7 @@ const PutsRow = ({
               e.stopPropagation()
               onOrderClick('put', 'sell', data.strike, data.mark)
             }}
-            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
               isOrderSelected('put', 'sell', data.strike) 
                 ? 'bg-red-600 text-white' 
                 : 'bg-red-500 hover:bg-red-600 text-white'

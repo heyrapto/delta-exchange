@@ -1,29 +1,3 @@
-1. Toggle-based Behavior (see first image attached for reference)
+1. Color indicator for the ones selled in the table should be loght red while the but should be light green
 
-When the “Strategy Builder” toggle is active (from @main-exchange.tsx header), each put/call option row in the options table should display Buy and Sell buttons on hover.
-
-When the toggle is off, the table should display as normal — no buy/sell actions visible.
-
-2. Trade Selection Logic
-
-When a user clicks Buy or Sell, store that selection (including whether it was a Put or Call) in the Strategy Builder state.
-
-Reflect the active selections visually in the options table — for example, a highlighted state for rows that have been added to the strategy(see reference in the second image attached).
-
-3. Strategy Builder Card UI (@strategy-builder.tsx)
-
-Display all selected Buy/Sell orders as cards inside the Strategy Builder panel (see the third image for layout reference).
-
-Each card should contain everything just like you see in the third image
-
-4. General Requirements
-
-Ensure tight integration between @main-exchange.tsx, the options table, and @strategy-builder.tsx.
-
-Use clean, modular React state management (Zustand preferred if store already exists).
-
-Follow the existing design system and color theme.
-
-Keep all hover and click transitions smooth and consistent with the rest of the UI.
-
-Execute this with production-level precision — code should be senior-level, consistent, and maintainable.
+2. The buy/sell should show for each one only when it is hovered!!! whether on the call or puts row (both have seperate and it should'nt scroll with the rows/table)

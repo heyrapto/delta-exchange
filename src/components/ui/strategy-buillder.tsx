@@ -1,10 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { useStrategyStore } from "@/store/strategy-store"
+import { useTradeStore } from "@/store/trade-store"
 import { BiTrash } from "react-icons/bi"
+import { AnalyzePayoff } from "./analyze-payoff"
 
 export const StrategyBuilder = () => {
   const { selectedOrders, removeOrderFromStrategy, clearStrategy } = useStrategyStore()
+  const { placeOrder } = useTradeStore()
+  const [showAnalyzePayoff, setShowAnalyzePayoff] = useState(false)
 
   const getOrderColor = (side: 'buy' | 'sell') => {
     return side === 'buy' ? 'text-green-400' : 'text-red-400'
@@ -22,6 +27,28 @@ export const StrategyBuilder = () => {
     return selectedOrders.reduce((total, order) => {
       return total + (order.price * order.quantity)
     }, 0)
+  }
+
+  const handlePlaceOrder = () => {
+    // Convert strategy orders to trade orders
+    selectedOrders.forEach(order => {
+      placeOrder({
+        side: order.side === 'buy' ? 'long' : 'short',
+        orderType: 'market',
+        price: order.price,
+        quantity: order.quantity
+      })
+    })
+    
+    // Clear strategy after placing orders
+    clearStrategy()
+    
+    // Show success message (you could add a toast here)
+    console.log('Orders placed successfully!')
+  }
+
+  if (showAnalyzePayoff) {
+    return <AnalyzePayoff onBack={() => setShowAnalyzePayoff(false)} />
   }
 
   if (selectedOrders.length === 0) {
@@ -53,11 +80,18 @@ export const StrategyBuilder = () => {
           </button>
           <span className="text-sm">ETH Contracts</span>
         </div>
+        <button 
+          onClick={clearStrategy}
+          className="text-sm px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200"
+          style={{ borderColor: 'var(--trading-border)' }}
+        >
+          Clear All
+        </button>
       </div>
 
       {/* Orders List */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-3">
+        <div className="space-y-2">
           {selectedOrders.map((order) => (
             <div key={order.id} className="flex items-center gap-3 p-3 border rounded" style={{ borderColor: 'var(--trading-border)' }}>
               {/* Buy/Sell Indicator */}
@@ -67,32 +101,47 @@ export const StrategyBuilder = () => {
 
               {/* Contract Info */}
               <div className="flex-1">
-                <div className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                <div className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
                   {order.contract}
                 </div>
-                <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  {order.type === 'call' ? 'Call' : 'Put'} • Strike: ${order.strike.toLocaleString()}
-                </div>
+                {order.leverage && (
+                  <div className="text-xs bg-gray-200 px-1 py-0.5 rounded inline-block" style={{ color: 'var(--text-secondary)' }}>
+                    {order.leverage}x
+                  </div>
+                )}
               </div>
 
               {/* Price */}
-              <div className="text-right">
-                <div className="flex items-center gap-1">
-                  <button className="w-6 h-6 rounded bg-orange-500 text-white text-xs flex items-center justify-center">
-                    M
-                  </button>
-                  <span className="text-sm">Market Price</span>
-                </div>
+              <div className="flex items-center gap-1">
+                <button className="w-6 h-6 rounded bg-orange-500 text-white text-xs flex items-center justify-center">
+                  M
+                </button>
+                <span className="text-sm">Market Price</span>
               </div>
 
-              {/* Quantity */}
-              <div className="text-right">
-                <div className="flex items-center gap-1">
-                  <span className="text-sm">1 Lot</span>
-                  <button className="text-gray-400">
-                    <BiTrash className="w-4 h-4" />
-                  </button>
+              {/* Quantity with Dropdown */}
+              <div className="flex items-center gap-1">
+                <div className="relative">
+                  <select 
+                    className="text-sm bg-transparent border rounded px-2 py-1"
+                    style={{ borderColor: 'var(--trading-border)' }}
+                    value="lot"
+                    onChange={(e) => {
+                      // Handle lot type change
+                      console.log('Lot type changed to:', e.target.value)
+                    }}
+                  >
+                    <option value="lot">1 Lot</option>
+                    <option value="usd">USD</option>
+                    <option value="eth">ETH</option>
+                  </select>
                 </div>
+                <button 
+                  onClick={() => removeOrderFromStrategy(order.id)}
+                  className="text-gray-400 hover:text-red-400"
+                >
+                  <BiTrash className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
@@ -120,18 +169,19 @@ export const StrategyBuilder = () => {
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <button className="flex-1 flex items-center justify-center gap-2 py-3 border rounded" style={{ borderColor: 'var(--trading-border)' }}>
+          <button 
+            onClick={() => setShowAnalyzePayoff(true)}
+            className="flex-1 flex items-center justify-center gap-2 py-3 border rounded hover:bg-gray-50" 
+            style={{ borderColor: 'var(--trading-border)' }}
+          >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
             </svg>
             <span>Analyse Payoff</span>
           </button>
           <button 
-            className="flex-1 bg-orange-500 text-white py-3 rounded font-medium"
-            onClick={() => {
-              // Place order logic here
-              console.log('Placing order with:', selectedOrders)
-            }}
+            className="flex-1 bg-orange-500 text-white py-3 rounded font-medium hover:bg-orange-600 transition-colors"
+            onClick={handlePlaceOrder}
           >
             Place Order
           </button>
