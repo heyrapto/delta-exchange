@@ -84,19 +84,46 @@ export const Header = () => {
                 </Link>
 
                 {item.dropdown && activeDropdown === index && (
-                  <ul
-                    className="absolute top-full left-0 mt-2 bg-white shadow-lg border border-gray-200 rounded-md min-w-[150px] z-50 overflow-hidden"
-                    style={{ color: "var(--text-primary)" }}
+                  <div
+                    className="absolute top-full left-0 mt-2 shadow-2xl rounded-md min-w-[320px] z-50 overflow-hidden py-4 bg-white border border-gray-300 text-black"
                   >
                     {item.dropdown.map((sub, subIndex) => (
-                      <li
-                        key={subIndex}
-                        className="px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
-                      >
-                        <Link href={sub.href}>{sub.label}</Link>
-                      </li>
+                      <div key={subIndex}>
+                        {sub.section && (
+                          <div 
+                            className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500"
+                          >
+                            {sub.section}
+                          </div>
+                        )}
+                        <Link href={sub.href}>
+                          <div className="px-4 py-3 hover:bg-opacity-10 hover:bg-white transition-colors flex items-start gap-3 cursor-pointer">
+                            {sub.icon && (
+                              <div 
+                                className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 mt-1"
+                                style={{ backgroundColor: sub.iconBg || "var(--icon-bg, #2a2a2a)" }}
+                              >
+                                {sub.icon}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-black">
+                                {sub.label}
+                              </div>
+                              {sub.description && (
+                                <div 
+                                  className="text-xs mt-0.5"
+                                  style={{ color: "var(--dropdown-desc, #999)" }}
+                                >
+                                  {sub.description}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 )}
               </li>
             ))}
