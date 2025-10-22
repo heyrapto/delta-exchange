@@ -1,4 +1,4 @@
-export const Button = ({ children, variant = "primary", className }: { children: React.ReactNode, variant?: "primary" | "secondary", className?: string }) => {
+export const Button = ({ children, variant = "primary", className, onClick }: { children: React.ReactNode, variant?: "primary" | "secondary", className?: string, onClick?: () => void }) => {
     const baseClasses = "px-2 sm:px-4 h-[36px] sm:h-[42px] rounded-none cursor-pointer min-w-[80px] sm:min-w-[130px] text-xs sm:text-sm";
     
     const getButtonStyle = () => {
@@ -23,7 +23,7 @@ export const Button = ({ children, variant = "primary", className }: { children:
     };
 
   return (
-    <button className={`${baseClasses} ${className}`} style={getButtonStyle()}>
+    <button className={`${baseClasses} ${className}`} style={getButtonStyle()} onClick={onClick}>
       {children}
     </button>
   );

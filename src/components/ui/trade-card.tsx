@@ -56,6 +56,10 @@ export const TradeCard = () => {
     const [showConfirmation, setShowConfirmation] = useState(false)
     const [showNotification, setShowNotification] = useState(false)
     const [showLeverageModal, setShowLeverageModal] = useState(false)
+    const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false)
+    const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
+    const [showDeltaDropdown, setShowDeltaDropdown] = useState(false)
+    const [showLotSizeHeaderDropdown, setShowLotSizeHeaderDropdown] = useState(false)
     const [notificationData, setNotificationData] = useState({
         title: '',
         message: '',
@@ -63,6 +67,9 @@ export const TradeCard = () => {
     })
 
     const leverageOptions = [1, 2, 5, 10, 20]
+    const currencyOptions = ['USD', 'EUR', 'NGN', 'GBP', 'JPY']
+    const lotSizeOptions = ['0.001 BTC', '0.01 BTC', '0.1 BTC', '1 BTC']
+    const deltaOptions = ['-0.44', '-0.38', '-0.32', '-0.26', '-0.20']
 
     // Live calculations
     const getCurrentPrice = () => {
@@ -113,13 +120,15 @@ export const TradeCard = () => {
         { 
             label: "Delta", 
             value: getDeltaValue(), 
-            icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--warning-color)' }} /> 
+            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--warning-color)' }} onClick={() => setShowDeltaDropdown(!showDeltaDropdown)} />,
+            hasDropdown: true
         },
         { 
             label: "Lot Size", 
             value: "0.001 BTC", 
-            icon: <BiChevronDown className="w-4 h-4" style={{ color: 'var(--text-secondary)' }} />, 
-            center: true 
+            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--text-secondary)' }} onClick={() => setShowLotSizeHeaderDropdown(!showLotSizeHeaderDropdown)} />, 
+            center: true,
+            hasDropdown: true
         },
     ]
 
@@ -237,11 +246,41 @@ export const TradeCard = () => {
                 {headerStats.map((s, i) => (
                     <div
                         key={i}
-                        className={`flex items-center gap-1 ${s.center ? "justify-center" : ""}`}
+                        className={`flex items-center gap-1 relative ${s.center ? "justify-center" : ""}`}
                     >
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
                         {s.icon}
+                        
+                        {/* Delta Dropdown */}
+                        {s.hasDropdown && s.label === "Delta" && showDeltaDropdown && (
+                            <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
+                                {deltaOptions.map((delta) => (
+                                    <div
+                                        key={delta}
+                                        onClick={() => setShowDeltaDropdown(false)}
+                                        className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
+                                    >
+                                        {delta}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        {/* Lot Size Header Dropdown */}
+                        {s.hasDropdown && s.label === "Lot Size" && showLotSizeHeaderDropdown && (
+                            <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[100px]">
+                                {lotSizeOptions.map((size) => (
+                                    <div
+                                        key={size}
+                                        onClick={() => setShowLotSizeHeaderDropdown(false)}
+                                        className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
+                                    >
+                                        {size}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
@@ -298,28 +337,28 @@ export const TradeCard = () => {
                 </div>
 
                 {/* LEVERAGE PANEL */}
-<div className="mb-3 bg-gray-100/50 p-3">
-  <div
-    onClick={() => setShowLeveragePanel(!showLeveragePanel)}
-    className="flex items-center justify-between py-2 cursor-pointer"
-  >
-    <div className="flex gap-2 items-center">
-      <span className="text-gray-900 text-[11px]">Leverage</span>
-      <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
-    </div>
-    <div className="flex items-center gap-2">
-      {showLeveragePanel ? (
-        <BiChevronUp className="w-3 h-3 text-gray-400" />
-      ) : (
-        <BiChevronDown className="w-3 h-3 text-gray-400" />
-      )}
-    </div>
-  </div>
+                <div className="mb-3 bg-gray-100/50 p-3">
+                    <div
+                        onClick={() => setShowLeveragePanel(!showLeveragePanel)}
+                        className="flex items-center justify-between py-2 cursor-pointer"
+                    >
+                        <div className="flex gap-2 items-center">
+                            <span className="text-gray-900 text-[11px]">Leverage</span>
+                            <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {showLeveragePanel ? (
+                                <BiChevronUp className="w-3 h-3 text-gray-400" />
+                            ) : (
+                                <BiChevronDown className="w-3 h-3 text-gray-400" />
+                            )}
+                        </div>
+                    </div>
 
-  {showLeveragePanel && (
+                    {showLeveragePanel && (
     <LeverageSelector />
-  )}
-</div>
+                    )}
+                </div>
 
 
                 {/* ORDER TABS */}
@@ -440,8 +479,25 @@ export const TradeCard = () => {
                                 placeholder={tradeType === "long" ? "Best Offer" : "Best Bid"}
                                 className="bg-transparent outline-none text-green-500 text-[11px] flex-1 placeholder-gray-500/60"
                             />
-                            <span className="text-gray-400 ml-1 text-[10px]">USD</span>
-                            <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
+                            <div className="relative">
+                                <div className="flex items-center gap-1">
+                                <span className="text-gray-400 ml-1 text-[10px] cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>USD</span>
+                                    <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)} />
+                                </div>
+                                {showCurrencyDropdown && (
+                                    <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
+                                        {currencyOptions.map((currency) => (
+                                            <div
+                                                key={currency}
+                                                onClick={() => setShowCurrencyDropdown(false)}
+                                                className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
+                                            >
+                                                {currency}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -457,8 +513,25 @@ export const TradeCard = () => {
                             placeholder="1 Lot = 0.001 BTC"
                             className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
-                        <span className="text-gray-400 ml-1 text-[10px]">Lot</span>
-                        <BiChevronDown className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
+                        <div className="relative">
+                            <div className="flex items-center gap-1">
+                            <span className="text-gray-400 ml-1 text-[10px] cursor-pointer" onClick={() => setShowLotSizeDropdown(!showLotSizeDropdown)}>Lot</span>
+                            <BiChevronDown className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" onClick={() => setShowLotSizeDropdown(!showLotSizeDropdown)} />
+                            </div>
+                            {showLotSizeDropdown && (
+                                <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[100px]">
+                                    {lotSizeOptions.map((size) => (
+                                        <div
+                                            key={size}
+                                            onClick={() => setShowLotSizeDropdown(false)}
+                                            className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
+                                        >
+                                            {size}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex gap-3 text-[10px] text-gray-500 mb-2">
