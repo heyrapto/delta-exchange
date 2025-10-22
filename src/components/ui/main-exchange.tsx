@@ -187,7 +187,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 ))}
                 </div>
 
-<button className="p-1 text-gray-400 hover:text-white flex-shrink-0">
+                <button className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer">
                         <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
                         </svg>
