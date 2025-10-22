@@ -12,6 +12,8 @@ import { CgProfile } from "react-icons/cg";
 import { FcSettings } from "react-icons/fc";
 import { BsBox } from "react-icons/bs";
 import { navItems } from "@/consants";
+import { AccountDropdown } from "../dropdowns/account";
+import { GrNotification } from "react-icons/gr";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -58,8 +60,8 @@ export const Header = () => {
                 onClick={() =>
                   item.dropdown
                     ? setActiveDropdown(
-                        activeDropdown === index ? null : index
-                      )
+                      activeDropdown === index ? null : index
+                    )
                     : null
                 }
               >
@@ -125,18 +127,14 @@ export const Header = () => {
           <AccountMargin />
           <Wallet balance="100" />
 
-          <div className="flex gap-4 flex-wrap justify-end">
-            {[GiPositionMarker, CgProfile, BiNotification, FcSettings, BsBox].map(
-              (Icon, i) => (
-                <Icon
-                  key={i}
-                  size={20}
-                  className="cursor-pointer transition-colors"
-                  style={{ color: "var(--text-muted)" }}
-                />
-              )
-            )}
+          <div className="flex gap-4 flex-wrap justify-end items-center">
+            {/* <GiPositionMarker size={20} style={{ color: "var(--text-muted)" }} /> */}
+            <AccountDropdown /> 
+            <GrNotification size={20} />
+            <FcSettings size={20} style={{ color: "var(--text-muted)" }} />
+            <BsBox size={20} style={{ color: "var(--text-muted)" }} />
           </div>
+
         </div>
       </div>
     </header>
