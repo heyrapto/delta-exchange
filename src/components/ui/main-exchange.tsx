@@ -104,7 +104,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                             onClick={() => setViewMode(tab.value)}
                             className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors cursor-pointer ${
                                 viewMode === tab.value
-                                    ? "bg-green-500 text-black"
+                                    ? "bg-green-500 text-white"
                                     : "bg-transparent text-gray-900"
                             }`}
                         >
