@@ -7,13 +7,14 @@ import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
 import { OptionsChain } from "./options-chain"
 import { useTradeStore } from "@/store/trade-store"
+import { GridDropdown } from "../dropdowns/grid"
 
 interface MainExchangeProps {
     strategyView: boolean
     setStrategyView: (value: boolean) => void
 }
 
-export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps) => {
+export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProps) => {
     const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
     const [viewMode, setViewMode] = useState<ViewMode>("table")
     const [tableView, setTableView] = useState<TableView>("standard")
@@ -26,6 +27,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
     const [optionsData, setOptionsData] = useState<OptionData[]>([])
     const [loading, setLoading] = useState(true)
     const gridDropdownRef = useRef<HTMLDivElement>(null)
+    const gridButtonRef = useRef<HTMLButtonElement>(null);
 
     const dates = [
         "18 Oct 25", "19 Oct 25", "20 Oct 25", "24 Oct 25",
@@ -46,16 +48,16 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
     useEffect(() => {
         // Set initial BTC price to ensure it's correct from the start
         if (selectedContract === 'BTC') {
-            updateMarketData({ 
-                currentPrice: 108068.0, 
-                markPrice: 108068.0, 
+            updateMarketData({
+                currentPrice: 108068.0,
+                markPrice: 108068.0,
                 lastPrice: 108068.0,
                 indexPrice: 108000.0
             })
         } else if (selectedContract === 'ETH') {
-            updateMarketData({ 
-                currentPrice: 3120.0, 
-                markPrice: 3120.0, 
+            updateMarketData({
+                currentPrice: 3120.0,
+                markPrice: 3120.0,
                 lastPrice: 3120.0,
                 indexPrice: 3100.0
             })
@@ -67,7 +69,7 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 const mockData: OptionData[] = Array.from({ length: 20 }, (_, i) => {
                     const strike = 96000 + (i * 1000)
                     const isITM = strike < currentPrice
-                    
+
                     return {
                         strike,
                         delta: 0.76 - (i * 0.02),
@@ -113,18 +115,17 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
     return (
         <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
             {/* Top Navigation Bar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-3 py-2 border gap-2 sm:gap-0  md:bg-[var(--trading-bg)] bg-gray-100/50" style={{ borderColor: 'var(--trading-border)'}}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-3 py-2 border gap-2 sm:gap-0  md:bg-[var(--trading-bg)] bg-gray-100/50" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                     {/* Table/Chart Toggle */}
                     {viewTabs.map((tab) => (
                         <button
                             key={tab.value}
                             onClick={() => setViewMode(tab.value)}
-                            className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors cursor-pointer ${
-                                viewMode === tab.value
+                            className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors cursor-pointer ${viewMode === tab.value
                                     ? "bg-green-500 text-white"
                                     : "bg-transparent text-gray-900"
-                            }`}
+                                }`}
                         >
                             {tab.label}
                         </button>
@@ -151,172 +152,78 @@ export const MainExchange = ({strategyView, setStrategyView }: MainExchangeProps
                 <div className="md:flex hidden items-center gap-1 sm:gap-2 relative w-full sm:w-auto justify-between sm:justify-end">
                     <button
                         onClick={() => setShowResources(!showResources)}
-                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500": "border-gray-300"} relative`}
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500" : "border-gray-300"} relative`}
                     >
-                        <SiStackblitz className="w-3 h-3 sm:w-4 sm:h-4" /> 
+                        <SiStackblitz className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Resources</span>
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
                     </button>
                     <button
                         onClick={() => setStrategyView(!strategyView)}
-                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] ${
-                            strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
-                        }`}
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] ${strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
+                            }`}
                     >
                         <span className="hidden sm:inline">Strategy Builder</span>
                         <span className="sm:hidden">Strategy</span>
                         <div className={`w-6 h-3 sm:w-8 sm:h-4 rounded-full relative ${strategyView ? "bg-green-700" : "bg-gray-700"}`}>
                             <div
-                                className={`absolute top-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full transition-all ${
-                                    strategyView ? "right-3 sm:right-4" : "right-0.5"
-                                }`}
+                                className={`absolute top-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full transition-all ${strategyView ? "right-3 sm:right-4" : "right-0.5"
+                                    }`}
                             ></div>
                         </div>
                     </button>
-                   
-                {/* Resources Dropdown */}
-            {showResources && (
-                <div className="absolute top-10 left-3 bg-gray-100/50 rounded-lg shadow-lg z-50 min-w-[150px] border border-gray-300">
-                    <button className="w-full text-left px-3 py-2 text-xs rounded text-green-400">
-                        📊 Settlement Prices
-                    </button>
-                </div>
-            )}
+
+                    {/* Resources Dropdown */}
+                    {showResources && (
+                        <div className="absolute top-10 left-3 bg-gray-100/50 rounded-lg shadow-lg z-50 min-w-[150px] border border-gray-300">
+                            <button className="w-full text-left px-3 py-2 text-xs rounded text-green-400">
+                                📊 Settlement Prices
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Date Selection */}
             <div className="md:flex hidden justify-between items-center gap-2 px-2 sm:px-3 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="flex gap-1 sm:gap-2">
-                {dates.map((date) => (
-                    <button
-                        key={date}
-                        onClick={() => setSelectedDate(date)}
-                        className="px-2 sm:px-3 py-1 rounded text-[9px] sm:text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer"
-                        style={{
-                            backgroundColor: selectedDate === date ? 'var(--button-primary-bg)' : 'transparent',
-                            color: selectedDate === date ? 'var(--button-primary-text)' : 'var(--text-secondary)',
-                            border: selectedDate === date ? '1px solid var(--button-primary-bg)' : '1px solid transparent'
-                        }}
-                    >
-                        {date}
-                    </button>
-                ))}
+                    {dates.map((date) => (
+                        <button
+                            key={date}
+                            onClick={() => setSelectedDate(date)}
+                            className="px-2 sm:px-3 py-1 rounded text-[9px] sm:text-[10px] font-medium whitespace-nowrap transition-colors cursor-pointer"
+                            style={{
+                                backgroundColor: selectedDate === date ? 'var(--button-primary-bg)' : 'transparent',
+                                color: selectedDate === date ? 'var(--button-primary-text)' : 'var(--text-secondary)',
+                                border: selectedDate === date ? '1px solid var(--button-primary-bg)' : '1px solid transparent'
+                            }}
+                        >
+                            {date}
+                        </button>
+                    ))}
                 </div>
 
                 <div className="relative">
-                    <button 
-                        onClick={() => setShowGridDropdown(!showGridDropdown)}
-                        className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer"
-                    >
-                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
-                        </svg>
-                    </button>
-                    
-                    {showGridDropdown && (
-                        <div className="absolute top-10 right-4 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-[999999] min-w-[280px]" ref={gridDropdownRef}>
-                            <div className="p-3">
-                                <div className="text-xs font-medium text-gray-300 mb-3">Column Settings</div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {/* Left Column */}
-                                    <div className="space-y-1">
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>OI</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Bid/ Ask</span>
-                                        </label>
-                                        <div className="ml-4 space-y-1">
-                                            <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded bg-gray-700">
-                                                <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                                <span className="text-xs">⚫</span>
-                                                <span>Qty</span>
-                                            </label>
-                                            <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded bg-gray-700">
-                                                <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                                <span className="text-xs">⚫</span>
-                                                <span>Mark</span>
-                                            </label>
-                                        </div>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Delta</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Volume</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>6H OI Chg.</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>POS</span>
-                                        </label>
-                                    </div>
-                                    
-                                    {/* Right Column */}
-                                    <div className="space-y-1">
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Gamma</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Vega</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Theta</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>24hr Chg.</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Last</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Open</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>High</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 text-xs text-gray-300 cursor-pointer hover:bg-gray-700 p-1 rounded">
-                                            <input type="checkbox" defaultChecked className="w-3 h-3 text-orange-500 bg-gray-700 border-gray-600 rounded focus:ring-orange-500" />
-                                            <span className="text-xs">⚫</span>
-                                            <span>Low</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+  <button 
+    ref={gridButtonRef}
+    onClick={() => setShowGridDropdown(!showGridDropdown)}
+    className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer"
+  >
+    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
+    </svg>
+  </button>
+
+                    <GridDropdown
+                        isOpen={showGridDropdown}
+                        onClose={() => setShowGridDropdown(false)}
+                        buttonRef={gridButtonRef as any}
+                    />
                 </div>
             </div>
 
             {/* Price Info Bar */}
-            <div className="px-2 sm:px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)'}}>
+            <div className="px-2 sm:px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="flex flex-row items-center justify-between gap-2 sm:gap-4">
                     <div className="flex items-center gap-1">
                         <span className="text-sm sm:text-[16px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
