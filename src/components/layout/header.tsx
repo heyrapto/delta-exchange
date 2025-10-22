@@ -125,7 +125,7 @@ export const Header = () => {
           <Button variant="primary">Add Bank</Button>
 
           <AccountMargin />
-          <Wallet balance="100" />
+          <Wallet balance="0.00" />
         <div className="flex gap-4 items-center">
           <AccountDropdown />
           <GrNotification
