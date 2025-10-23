@@ -67,7 +67,7 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
 
       {/* Chart Tabs */}
       <div className="flex border-b" style={{ borderColor: 'var(--trading-border)' }}>
-        <button className="px-4 py-2 text-sm border-b-2 border-orange-500" style={{ color: 'var(--text-primary)' }}>
+        <button className="px-4 py-2 text-sm border-b-2 border-green-500" style={{ color: 'var(--text-primary)' }}>
           PnL Chart
         </button>
         <button className="px-4 py-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -83,8 +83,8 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
         <div className="h-full bg-gray-50 rounded-lg flex items-center justify-center relative" style={{ backgroundColor: 'var(--trading-bg)' }}>
           {/* Chart Placeholder */}
           <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 bg-orange-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+            <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
               </svg>
             </div>
@@ -118,7 +118,7 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
                 style={{ borderColor: 'var(--trading-border)' }}
               />
               <div className="w-32 h-2 bg-gray-200 rounded-full">
-                <div className="w-1/2 h-full bg-orange-500 rounded-full"></div>
+                <div className="w-1/2 h-full bg-green-500 rounded-full"></div>
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
                 style={{ borderColor: 'var(--trading-border)' }}
               />
               <div className="w-32 h-2 bg-gray-200 rounded-full">
-                <div className="w-3/4 h-full bg-orange-500 rounded-full"></div>
+                <div className="w-3/4 h-full bg-green-500 rounded-full"></div>
               </div>
             </div>
             <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>0 days to Expiry</p>

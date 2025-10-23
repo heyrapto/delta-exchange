@@ -113,7 +113,7 @@ export const StrategyBuilder = () => {
 
               {/* Price */}
               <div className="flex items-center gap-1">
-                <button className="w-6 h-6 rounded bg-orange-500 text-white text-xs flex items-center justify-center">
+                <button className="w-6 h-6 rounded bg-green-500 text-white text-xs flex items-center justify-center">
                   M
                 </button>
                 <span className="text-sm">Market Price</span>
@@ -180,7 +180,7 @@ export const StrategyBuilder = () => {
             <span>Analyse Payoff</span>
           </button>
           <button 
-            className="flex-1 bg-orange-500 text-white py-3 rounded font-medium hover:bg-orange-600 transition-colors"
+            className="flex-1 bg-green-500 text-white py-3 rounded font-medium hover:bg-green-600 transition-colors"
             onClick={handlePlaceOrder}
           >
             Place Order
