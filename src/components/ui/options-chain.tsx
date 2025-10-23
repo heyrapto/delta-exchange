@@ -76,7 +76,7 @@ export const OptionsChain = ({
     }
   }
 
-  // Handle calls scroll - sync with puts
+  // Handle calls scroll - sync with puts (opposite direction)
   const handleCallsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
     const scrollLeft = e.currentTarget.scrollLeft
@@ -87,10 +87,14 @@ export const OptionsChain = ({
       mainScrollRef.current.scrollLeft = scrollLeft
     }
     
-    // Sync with puts
+    // Sync with puts (opposite horizontal direction)
     if (putsScrollRef.current) {
       putsScrollRef.current.scrollTop = scrollTop
-      putsScrollRef.current.scrollLeft = scrollLeft
+      // Calculate opposite scroll position for puts
+      const putsMaxScroll = putsScrollRef.current.scrollWidth - putsScrollRef.current.clientWidth
+      const callsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = callsMaxScroll > 0 ? (putsMaxScroll * scrollLeft) / callsMaxScroll : 0
+      putsScrollRef.current.scrollLeft = putsMaxScroll - oppositeScrollLeft
     }
     
     // Sync headers
@@ -98,11 +102,14 @@ export const OptionsChain = ({
       callsHeaderRef.current.scrollLeft = scrollLeft
     }
     if (putsHeaderRef.current) {
-      putsHeaderRef.current.scrollLeft = scrollLeft
+      const putsMaxScroll = putsHeaderRef.current.scrollWidth - putsHeaderRef.current.clientWidth
+      const callsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = callsMaxScroll > 0 ? (putsMaxScroll * scrollLeft) / callsMaxScroll : 0
+      putsHeaderRef.current.scrollLeft = putsMaxScroll - oppositeScrollLeft
     }
   }
 
-  // Handle puts scroll - sync with calls
+  // Handle puts scroll - sync with calls (opposite direction)
   const handlePutsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
     const scrollLeft = e.currentTarget.scrollLeft
@@ -113,18 +120,25 @@ export const OptionsChain = ({
       mainScrollRef.current.scrollLeft = scrollLeft
     }
     
-    // Sync with calls
+    // Sync with calls (opposite horizontal direction)
     if (callsScrollRef.current) {
       callsScrollRef.current.scrollTop = scrollTop
-      callsScrollRef.current.scrollLeft = scrollLeft
+      // Calculate opposite scroll position for calls
+      const callsMaxScroll = callsScrollRef.current.scrollWidth - callsScrollRef.current.clientWidth
+      const putsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = putsMaxScroll > 0 ? (callsMaxScroll * scrollLeft) / putsMaxScroll : 0
+      callsScrollRef.current.scrollLeft = callsMaxScroll - oppositeScrollLeft
     }
     
     // Sync headers
-    if (callsHeaderRef.current) {
-      callsHeaderRef.current.scrollLeft = scrollLeft
-    }
     if (putsHeaderRef.current) {
       putsHeaderRef.current.scrollLeft = scrollLeft
+    }
+    if (callsHeaderRef.current) {
+      const callsMaxScroll = callsHeaderRef.current.scrollWidth - callsHeaderRef.current.clientWidth
+      const putsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = putsMaxScroll > 0 ? (callsMaxScroll * scrollLeft) / putsMaxScroll : 0
+      callsHeaderRef.current.scrollLeft = callsMaxScroll - oppositeScrollLeft
     }
   }
 
@@ -527,7 +541,7 @@ const CallsRow = ({
 
       {/* Buy/Sell Buttons for Strategy Builder */}
       {isStrategyBuilderActive && (
-        <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+        <div className={`absolute right-8 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}>
           <button
@@ -731,7 +745,7 @@ const PutsRow = ({
 
       {/* Buy/Sell Buttons for Strategy Builder */}
       {isStrategyBuilderActive && (
-        <div className={`absolute left-2 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+        <div className={`absolute left-8 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}>
           <button
