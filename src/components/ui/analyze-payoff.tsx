@@ -97,7 +97,7 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
   }
 
   return (
-    <div className="h-[700px] w-full flex flex-col" style={{ color: 'var(--text-secondary)' }}>
+    <div className="h-full w-full flex flex-col border border-gray-300" style={{ color: 'var(--text-secondary)' }}>
       {/* Header */}
       <div className="flex items-center gap-4 p-4 border-b" style={{ borderColor: 'var(--trading-border)' }}>
         <button 
