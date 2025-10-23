@@ -1,5 +1,6 @@
 import { createPortal } from 'react-dom';
 import { useEffect, useState, useRef } from 'react';
+import { useGridStore } from '@/store/grid-store';
 
 interface ColumnItem {
   id: string;
@@ -9,99 +10,6 @@ interface ColumnItem {
   nested?: ColumnItem[];
 }
 
-const defaultColumns: ColumnItem[] = [
-  {
-    id: 'oi',
-    label: 'OI',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'bid-ask',
-    label: 'Bid/ Ask',
-    checked: true,
-    hasDragHandle: true,
-    nested: [
-      { id: 'qty', label: 'Qty', checked: true },
-      { id: 'mark', label: 'Mark', checked: true },
-    ]
-  },
-  {
-    id: 'delta',
-    label: 'Delta',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'volume',
-    label: 'Volume',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'oi-chg',
-    label: '6H OI Chg.',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'pos',
-    label: 'POS',
-    checked: true,
-    hasDragHandle: true,
-  },
-];
-
-const defaultColumnsRight: ColumnItem[] = [
-  {
-    id: 'gamma',
-    label: 'Gamma',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'vega',
-    label: 'Vega',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'theta',
-    label: 'Theta',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: '24hr-chg',
-    label: '24hr Chg.',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'last',
-    label: 'Last',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'open',
-    label: 'Open',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'high',
-    label: 'High',
-    checked: true,
-    hasDragHandle: true,
-  },
-  {
-    id: 'low',
-    label: 'Low',
-    checked: true,
-    hasDragHandle: true,
-  },
-];
 
 export const GridDropdown = ({ isOpen, onClose, buttonRef }: { 
   isOpen: boolean; 
@@ -110,8 +18,7 @@ export const GridDropdown = ({ isOpen, onClose, buttonRef }: {
 }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ top: 0, right: 0 });
-  const [leftColumns, setLeftColumns] = useState(defaultColumns);
-  const [rightColumns, setRightColumns] = useState(defaultColumnsRight);
+  const { leftColumns, rightColumns, toggleColumn } = useGridStore();
 
   useEffect(() => {
     if (isOpen && buttonRef.current) {
@@ -141,30 +48,6 @@ export const GridDropdown = ({ isOpen, onClose, buttonRef }: {
     }
   }, [isOpen, onClose, buttonRef]);
 
-  const handleToggle = (columnId: string, isLeft: boolean, parentId?: string) => {
-    const updateColumn = (columns: ColumnItem[]): ColumnItem[] => {
-      return columns.map(col => {
-        if (parentId && col.id === parentId && col.nested) {
-          return {
-            ...col,
-            nested: col.nested.map(nested => 
-              nested.id === columnId ? { ...nested, checked: !nested.checked } : nested
-            )
-          };
-        }
-        if (col.id === columnId) {
-          return { ...col, checked: !col.checked };
-        }
-        return col;
-      });
-    };
-
-    if (isLeft) {
-      setLeftColumns(updateColumn(leftColumns));
-    } else {
-      setRightColumns(updateColumn(rightColumns));
-    }
-  };
 
   const renderColumnItem = (item: ColumnItem, isLeft: boolean, isNested: boolean = false, parentId?: string) => (
     <label 
@@ -176,7 +59,7 @@ export const GridDropdown = ({ isOpen, onClose, buttonRef }: {
       <input 
         type="checkbox" 
         checked={item.checked}
-        onChange={() => handleToggle(item.id, isLeft, parentId)}
+        onChange={() => toggleColumn(item.id, isLeft, parentId)}
         className="w-4 h-4 rounded border-gray-600 bg-transparent text-[#ADFF2F] focus:ring-0 focus:ring-offset-0 cursor-pointer accent-[#ADFF2F]" 
       />
       {item.hasDragHandle && <span className="text-gray-900 text-xs">⋮⋮</span>}

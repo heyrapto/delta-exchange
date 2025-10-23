@@ -266,8 +266,9 @@ const CallsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
+      "Low", "High", "Open", "Last",
       "Delta", "Volume", "6H OI Chg.", "POS\nETH", "Gamma", "Vega", "Theta", 
-      "24hr Chg.", "Last", "Open", "High", "Low", "OI", "Bid Qty\nBTC", 
+      "24hr Chg.", "OI", "Bid Qty\nBTC", 
       "Bid\n(Price / IV)", "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC"
     ]
     
@@ -330,9 +331,8 @@ const PutsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
-      "Low", "High", "Open", "Last", "24hr Chg.", "Theta", "Vega", "Gamma", "POS\nETH",
-      "6H OI Chg.", "Volume", "Delta", "ETH", "Ask Qty\nBTC", "Ask\n(Price / IV)", 
-      "Mark\n(Price / IV)", "Bid\n(Price / IV)", "Bid Qty\nBTC", "OI"
+      "Qty\nBTC", "Delta", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", "Theta", "Bid Qty\nBTC", "Bid\n(Price / IV)",
+      "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC", "OI", "24hr Chg.", "Last","Open", "High", "Low",
     ]
     
     return (
@@ -350,9 +350,8 @@ const PutsHeader = ({ view }: { view: TableView }) => {
 
   if (view === "greek") {
     const headers = [
-      "Qty\nBTC", "Delta", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", "Theta",
-      "Low", "High", "Open", "Last", "24hr Chg.", "Bid Qty\nBTC", "Bid\n(Price / IV)",
-      "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC", "OI"
+      "Qty\nBTC", "Delta", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", "Theta", "Bid Qty\nBTC", "Bid\n(Price / IV)",
+      "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC", "OI", "24hr Chg.", "Last","Open", "High", "Low",
     ]
     
     return (
@@ -444,7 +443,7 @@ const CallsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-black">${data.mark.toFixed(1)}</div>
+              <div className="text-gray-800">${data.mark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((data.mark / data.mark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -489,7 +488,7 @@ const CallsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-black">${data.mark.toFixed(1)}</div>
+              <div className="text-gray-800">${data.mark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((data.mark / data.mark) * 100).toFixed(1)}%</div>
             </div>
           </div>
@@ -677,7 +676,7 @@ const PutsRow = ({
           </div>
           <div className={cellClass}>
             <div>
-              <div className="text-black">${putsMark.toFixed(1)}</div>
+              <div className="text-gray-800">${putsMark.toFixed(1)}</div>
               <div className="text-gray-500 text-[8px]">{((putsMark / putsMark) * 100).toFixed(1)}%</div>
             </div>
           </div>

@@ -5,13 +5,20 @@ import { useStrategyStore } from "@/store/strategy-store"
 import { useTradeStore } from "@/store/trade-store"
 import { BiTrash } from "react-icons/bi"
 import { AnalyzePayoff } from "./analyze-payoff"
-import { useToast } from "./toast"
+import Image from "next/image"
+import { ConfirmationModal, NotificationModal } from "./modals"
 
 export const StrategyBuilder = () => {
   const { selectedOrders, removeOrderFromStrategy, clearStrategy } = useStrategyStore()
   const { placeOrder } = useTradeStore()
-  const { showToast, ToastContainer } = useToast()
   const [showAnalyzePayoff, setShowAnalyzePayoff] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
+  const [notificationData, setNotificationData] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'info' | 'warning'
+});
 
   const getOrderColor = (side: 'buy' | 'sell') => {
     return side === 'buy' ? 'text-green-400' : 'text-red-400'
@@ -33,9 +40,17 @@ export const StrategyBuilder = () => {
 
   const handlePlaceOrder = () => {
     if (selectedOrders.length === 0) {
-      showToast('No orders to place', 'warning')
+      setNotificationData({
+        title: 'No orders to place',
+        message: 'Please add at least one order to the strategy',
+        type: 'warning'
+      })
+      setShowNotification(true)
       return
     }
+
+    // Store the order count before clearing
+    const orderCount = selectedOrders.length
 
     // Convert strategy orders to trade orders
     selectedOrders.forEach(order => {
@@ -46,33 +61,97 @@ export const StrategyBuilder = () => {
         quantity: order.quantity
       })
     })
-    
-    // Clear strategy after placing orders
+
+    // Clear strategy immediately
     clearStrategy()
-    
-    // Show success toast
-    showToast(`Successfully placed ${selectedOrders.length} order${selectedOrders.length > 1 ? 's' : ''} from strategy!`, 'success')
+
+    // Show notification after clearing with a small delay to ensure proper rendering
+    setTimeout(() => {
+      setNotificationData({
+        title: 'Order Placed',
+        message: `Successfully placed ${orderCount} order${orderCount > 1 ? 's' : ''} from strategy!`,
+        type: 'success'
+      })
+      setShowNotification(true)
+    }, 50)
   }
 
   if (showAnalyzePayoff) {
-    return <AnalyzePayoff onBack={() => setShowAnalyzePayoff(false)} />
+    return (
+      <>
+        <AnalyzePayoff onBack={() => setShowAnalyzePayoff(false)} />
+        
+        {/* Modals - Always render to ensure notifications work */}
+        <ConfirmationModal
+          isOpen={showConfirmation}
+          onClose={() => setShowConfirmation(false)}
+          onConfirm={() => {}}
+          title="Confirm Trade"
+          message="Are you sure you want to place this trade?"
+          type="warning"
+        />
+
+        <NotificationModal
+          isOpen={showNotification}
+          onClose={() => setShowNotification(false)}
+          title={notificationData.title}
+          message={notificationData.message}
+          type={notificationData.type}
+        />
+      </>
+    )
   }
 
   if (selectedOrders.length === 0) {
     return (
-      <div className="h-[700px] w-full flex flex-col items-center justify-center" style={{ color: 'var(--text-secondary)' }}>
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mb-4">
-            <span className="text-2xl">📊</span>
-          </div>
-          <div className="text-center">
-            <p className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>+ Add Contracts from Options Chain</p>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Selected contracts will show up here
-            </p>
-          </div>
-        </div>
+      <div className="h-[700px] w-full flex flex-col items-center justify-between relative" style={{ color: 'var(--text-secondary)' }}>
+      {/* Placeholder Image */}
+      <div className="flex flex-col items-center gap-2 mt-[150px]">
+      <Image src={"/basket-order.webp"} width={150} height={150} alt="Add Contracts" className="mb-4 opacity-80" />
+
+      {/* Main Text */}
+      <div className="text-center">
+        <p className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>+ Add Contracts from Options Chain</p>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          Selected contracts will show up here
+        </p>
       </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-auto w-full px-4 py-2 text-sm justify-center items-center flex flex-col" style={{ color: 'var(--text-secondary)' }}>
+
+         {/* Learn More Link */}
+      <a
+        href="#"
+        className="text-sm mb-6 hover:underline flex items-center gap-1"
+        style={{ color: 'var(--button-primary-bg)' }}
+        target="_blank"
+      >
+        Learn more about basket orders
+        <span className="inline-block">↗</span>
+      </a>
+        <span>Available Margin 0 USD</span>
+      </div>
+
+      {/* Modals - Always render to ensure notifications work */}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={() => {}}
+        title="Confirm Trade"
+        message="Are you sure you want to place this trade?"
+        type="warning"
+      />
+
+      <NotificationModal
+        isOpen={showNotification}
+        onClose={() => setShowNotification(false)}
+        title={notificationData.title}
+        message={notificationData.message}
+        type={notificationData.type}
+      />
+    </div>
     )
   }
 
@@ -195,8 +274,22 @@ export const StrategyBuilder = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
-      <ToastContainer />
+          <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={() => {}}
+                title="Confirm Trade"
+                message="Are you sure you want to place this trade?"
+                type="warning"
+            />
+
+            <NotificationModal
+                isOpen={showNotification}
+                onClose={() => setShowNotification(false)}
+                title={notificationData.title}
+                message={notificationData.message}
+                type={notificationData.type}
+            />
     </div>
   )
 }
