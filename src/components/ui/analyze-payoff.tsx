@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useStrategyStore } from "@/store/strategy-store"
 import { useTradeStore } from "@/store/trade-store"
+import { PnLChart } from "./chart/pnl-chart"
 
 interface AnalyzePayoffProps {
   onBack: () => void
@@ -184,22 +185,13 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
               </div>
               
               {/* Chart Area */}
-              <div className="h-64 bg-gray-100 rounded flex items-center justify-center relative" style={{ backgroundColor: 'var(--trading-bg)' }}>
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-8 h-8 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                    </svg>
-                  </div>
-                  <p className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>PnL Chart</p>
-                  <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                    Interactive chart showing profit/loss scenarios
-                  </p>
-                  <div className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    <p>Projected Loss: -0.10 (0%)</p>
-                  </div>
-                </div>
-              </div>
+              <PnLChart
+  prices={generatePnLData().prices}
+  pnlValues={generatePnLData().pnlValues}
+  breakeven={parseFloat(calculateBreakeven())}
+  currentPrice={selectedContract === 'BTC' ? 108068 : 3120}
+/>
+
             </div>
           </div>
         )}
