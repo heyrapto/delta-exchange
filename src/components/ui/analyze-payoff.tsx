@@ -13,10 +13,11 @@ type TabType = 'chart' | 'table' | 'greeks'
 
 export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
   const { selectedOrders } = useStrategyStore()
-  const { selectedContract } = useTradeStore()
+  const { selectedContract, currentPrice } = useTradeStore()
   const [activeTab, setActiveTab] = useState<TabType>('chart')
-  const [targetPrice, setTargetPrice] = useState(3798)
+  const [targetPrice, setTargetPrice] = useState(selectedContract === 'BTC' ? 108068 : 3120)
   const [targetDate, setTargetDate] = useState("23 Oct 2025, 01:00pm IST")
+  const [daysToExpiry, setDaysToExpiry] = useState(0)
 
   const calculateMaxProfit = () => {
     // Calculate based on selected orders
@@ -40,9 +41,60 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
   }
 
   const calculateBreakeven = () => {
-    // Calculate breakeven price
-    const assetPrice = selectedContract === 'BTC' ? 108068 : 3120
-    return `${assetPrice.toFixed(2)}`
+    // Calculate breakeven price based on target price
+    return `${targetPrice.toFixed(2)}`
+  }
+
+  // Reset functions
+  const resetTargetPrice = () => {
+    setTargetPrice(selectedContract === 'BTC' ? 108068 : 3120)
+  }
+
+  const resetTargetDate = () => {
+    setTargetDate("23 Oct 2025, 01:00pm IST")
+    setDaysToExpiry(0)
+  }
+
+  // Calculate slider position for target price
+  const getPriceSliderPosition = () => {
+    const basePrice = selectedContract === 'BTC' ? 108068 : 3120
+    const minPrice = basePrice * 0.9
+    const maxPrice = basePrice * 1.1
+    return ((targetPrice - minPrice) / (maxPrice - minPrice)) * 100
+  }
+
+  // Calculate slider position for target date
+  const getDateSliderPosition = () => {
+    const maxDays = 30
+    return ((30 - daysToExpiry) / maxDays) * 100
+  }
+
+  // Handle price slider change
+  const handlePriceSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const basePrice = selectedContract === 'BTC' ? 108068 : 3120
+    const minPrice = basePrice * 0.9
+    const maxPrice = basePrice * 1.1
+    const percentage = parseFloat(e.target.value) / 100
+    const newPrice = minPrice + (maxPrice - minPrice) * percentage
+    setTargetPrice(Math.round(newPrice))
+  }
+
+  // Handle date slider change
+  const handleDateSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const maxDays = 30
+    const percentage = parseFloat(e.target.value) / 100
+    const newDays = Math.round(maxDays - (maxDays * percentage))
+    setDaysToExpiry(newDays)
+    
+    // Update target date
+    const targetDateObj = new Date("2025-10-23")
+    targetDateObj.setDate(targetDateObj.getDate() + newDays)
+    const formattedDate = targetDateObj.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }) + ", 01:00pm IST"
+    setTargetDate(formattedDate)
   }
 
   const calculateRewardRisk = () => {
@@ -311,7 +363,12 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">{selectedContract} Target Price</label>
-              <button className="text-xs text-blue-400 hover:text-blue-300">Reset</button>
+              <button 
+                onClick={resetTargetPrice}
+                className="text-xs text-blue-400 hover:text-blue-300"
+              >
+                Reset
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -321,8 +378,19 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
                 className="flex-1 px-3 py-2 border rounded text-sm"
                 style={{ borderColor: 'var(--trading-border)' }}
               />
-              <div className="w-32 h-2 bg-gray-200 rounded-full">
-                <div className="w-1/2 h-full bg-green-500 rounded-full"></div>
+              <div className="w-32 h-2 bg-gray-200 rounded-full relative">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={getPriceSliderPosition()}
+                  onChange={handlePriceSliderChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div 
+                  className="h-full bg-green-500 rounded-full transition-all duration-200"
+                  style={{ width: `${getPriceSliderPosition()}%` }}
+                ></div>
               </div>
             </div>
           </div>
@@ -331,21 +399,39 @@ export const AnalyzePayoff = ({ onBack }: AnalyzePayoffProps) => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Target Date</label>
-              <button className="text-xs text-blue-400 hover:text-blue-300">Reset</button>
+              <button 
+                onClick={resetTargetDate}
+                className="text-xs text-blue-400 hover:text-blue-300"
+              >
+                Reset
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 value={targetDate}
-                onChange={(e) => setTargetDate(e.target.value)}
-                className="flex-1 px-3 py-2 border rounded text-sm"
+                readOnly
+                className="flex-1 px-3 py-2 border rounded text-sm bg-gray-50"
                 style={{ borderColor: 'var(--trading-border)' }}
               />
-              <div className="w-32 h-2 bg-gray-200 rounded-full">
-                <div className="w-3/4 h-full bg-green-500 rounded-full"></div>
+              <div className="w-32 h-2 bg-gray-200 rounded-full relative">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={getDateSliderPosition()}
+                  onChange={handleDateSliderChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <div 
+                  className="h-full bg-green-500 rounded-full transition-all duration-200"
+                  style={{ width: `${getDateSliderPosition()}%` }}
+                ></div>
               </div>
             </div>
-            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>0 days to Expiry</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+              {daysToExpiry} days to Expiry
+            </p>
           </div>
         </div>
       </div>

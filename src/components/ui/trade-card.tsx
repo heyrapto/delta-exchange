@@ -64,7 +64,7 @@ export const TradeCard = () => {
         title: '',
         message: '',
         type: 'info' as 'success' | 'error' | 'info' | 'warning'
-    })
+    });
 
     const leverageOptions = [1, 2, 5, 10, 20]
     const currencyOptions = ['USD', 'EUR', 'NGN', 'GBP', 'JPY']

@@ -1,4 +1,3 @@
 Critical:
-1. The calls has and orange border that reaches the strikecell when active (see image attached)
-2. The table header start alignment
-3. Buy/sell buttons positioning
+1. The calls has an orange border that reaches the strikecell in that same row when active (see image attached)
+2. Buy/sell buttons positioning

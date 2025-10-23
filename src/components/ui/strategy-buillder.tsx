@@ -5,14 +5,20 @@ import { useStrategyStore } from "@/store/strategy-store"
 import { useTradeStore } from "@/store/trade-store"
 import { BiTrash } from "react-icons/bi"
 import { AnalyzePayoff } from "./analyze-payoff"
-import { useToast } from "./toast"
 import Image from "next/image"
+import { ConfirmationModal, NotificationModal } from "./modals"
 
 export const StrategyBuilder = () => {
   const { selectedOrders, removeOrderFromStrategy, clearStrategy } = useStrategyStore()
   const { placeOrder } = useTradeStore()
-  const { showToast, ToastContainer } = useToast()
   const [showAnalyzePayoff, setShowAnalyzePayoff] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [showNotification, setShowNotification] = useState(false)
+  const [notificationData, setNotificationData] = useState({
+    title: '',
+    message: '',
+    type: 'info' as 'success' | 'error' | 'info' | 'warning'
+});
 
   const getOrderColor = (side: 'buy' | 'sell') => {
     return side === 'buy' ? 'text-green-400' : 'text-red-400'
@@ -34,7 +40,12 @@ export const StrategyBuilder = () => {
 
   const handlePlaceOrder = () => {
     if (selectedOrders.length === 0) {
-      showToast('No orders to place', 'warning')
+      setNotificationData({
+        title: 'No orders to place',
+        message: 'Please add at least one order to the strategy',
+        type: 'warning'
+      })
+      setShowNotification(true)
       return
     }
 
@@ -47,12 +58,19 @@ export const StrategyBuilder = () => {
         quantity: order.quantity
       })
     })
+
+
+    setNotificationData({
+      title: 'Order Placed',
+      message: `Successfully placed ${selectedOrders.length} order${selectedOrders.length > 1 ? 's' : ''} from strategy!`,
+      type: 'success'
+    })
+    setShowNotification(true)
     
-    // Clear strategy after placing orders
-    clearStrategy()
-    
-    // Show success toast
-    showToast(`Successfully placed ${selectedOrders.length} order${selectedOrders.length > 1 ? 's' : ''} from strategy!`, 'success')
+    // Delay clearing to allow modal to show first
+    setTimeout(() => {
+      clearStrategy()
+    }, 100)    
   }
 
   if (showAnalyzePayoff) {
@@ -213,8 +231,22 @@ export const StrategyBuilder = () => {
         </div>
       </div>
 
-      {/* Toast Container */}
-      <ToastContainer />
+          <ConfirmationModal
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                onConfirm={() => {}}
+                title="Confirm Trade"
+                message="Are you sure you want to place this trade?"
+                type="warning"
+            />
+
+            <NotificationModal
+                isOpen={showNotification}
+                onClose={() => setShowNotification(false)}
+                title={notificationData.title}
+                message={notificationData.message}
+                type={notificationData.type}
+            />
     </div>
   )
 }
