@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { OptionData, TableView } from "@/types"
+import { useStrategyStore } from "@/store/strategy-store"
 
 interface OptionsChainProps {
   optionsData: OptionData[]
@@ -9,6 +10,7 @@ interface OptionsChainProps {
   onStrikeSelect: (strike: number) => void
   view: TableView
   loading: boolean
+  isStrategyBuilderActive: boolean
 }
 
 const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b border-gray-400/50";
@@ -18,13 +20,42 @@ export const OptionsChain = ({
   selectedStrike, 
   onStrikeSelect, 
   view, 
-  loading 
+  loading,
+  isStrategyBuilderActive
 }: OptionsChainProps) => {
   const mainScrollRef = useRef<HTMLDivElement>(null)
   const callsScrollRef = useRef<HTMLDivElement>(null)
   const putsScrollRef = useRef<HTMLDivElement>(null)
   const callsHeaderRef = useRef<HTMLDivElement>(null)
   const putsHeaderRef = useRef<HTMLDivElement>(null)
+  
+  // Strategy store
+  const { addOrderToStrategy, selectedOrders } = useStrategyStore()
+  
+  // Shared hover state for both rows
+  const [hoveredStrike, setHoveredStrike] = useState<number | null>(null)
+  
+  // Check if an order is already selected
+  const isOrderSelected = (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => {
+    return selectedOrders.some(order => 
+      order.type === type && order.side === side && order.strike === strike
+    )
+  }
+  
+  // Handle Buy/Sell button clicks
+  const handleOrderClick = (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => {
+    if (isStrategyBuilderActive) {
+      addOrderToStrategy({
+        type,
+        side,
+        strike,
+        price,
+        quantity: 1,
+        contract: `${type === 'call' ? 'C' : 'P'}-ETH-${strike}-231025`,
+        leverage: 100
+      })
+    }
+  }
 
   // Handle main container scroll - sync everything
   const handleMainScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -48,7 +79,7 @@ export const OptionsChain = ({
     }
   }
 
-  // Handle calls scroll - sync with puts
+  // Handle calls scroll - sync with puts (opposite direction)
   const handleCallsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
     const scrollLeft = e.currentTarget.scrollLeft
@@ -59,10 +90,14 @@ export const OptionsChain = ({
       mainScrollRef.current.scrollLeft = scrollLeft
     }
     
-    // Sync with puts
+    // Sync with puts (opposite horizontal direction)
     if (putsScrollRef.current) {
       putsScrollRef.current.scrollTop = scrollTop
-      putsScrollRef.current.scrollLeft = scrollLeft
+      // Calculate opposite scroll position for puts
+      const putsMaxScroll = putsScrollRef.current.scrollWidth - putsScrollRef.current.clientWidth
+      const callsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = callsMaxScroll > 0 ? (putsMaxScroll * scrollLeft) / callsMaxScroll : 0
+      putsScrollRef.current.scrollLeft = putsMaxScroll - oppositeScrollLeft
     }
     
     // Sync headers
@@ -70,11 +105,14 @@ export const OptionsChain = ({
       callsHeaderRef.current.scrollLeft = scrollLeft
     }
     if (putsHeaderRef.current) {
-      putsHeaderRef.current.scrollLeft = scrollLeft
+      const putsMaxScroll = putsHeaderRef.current.scrollWidth - putsHeaderRef.current.clientWidth
+      const callsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = callsMaxScroll > 0 ? (putsMaxScroll * scrollLeft) / callsMaxScroll : 0
+      putsHeaderRef.current.scrollLeft = putsMaxScroll - oppositeScrollLeft
     }
   }
 
-  // Handle puts scroll - sync with calls
+  // Handle puts scroll - sync with calls (opposite direction)
   const handlePutsScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const scrollTop = e.currentTarget.scrollTop
     const scrollLeft = e.currentTarget.scrollLeft
@@ -85,18 +123,25 @@ export const OptionsChain = ({
       mainScrollRef.current.scrollLeft = scrollLeft
     }
     
-    // Sync with calls
+    // Sync with calls (opposite horizontal direction)
     if (callsScrollRef.current) {
       callsScrollRef.current.scrollTop = scrollTop
-      callsScrollRef.current.scrollLeft = scrollLeft
+      // Calculate opposite scroll position for calls
+      const callsMaxScroll = callsScrollRef.current.scrollWidth - callsScrollRef.current.clientWidth
+      const putsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = putsMaxScroll > 0 ? (callsMaxScroll * scrollLeft) / putsMaxScroll : 0
+      callsScrollRef.current.scrollLeft = callsMaxScroll - oppositeScrollLeft
     }
     
     // Sync headers
-    if (callsHeaderRef.current) {
-      callsHeaderRef.current.scrollLeft = scrollLeft
-    }
     if (putsHeaderRef.current) {
       putsHeaderRef.current.scrollLeft = scrollLeft
+    }
+    if (callsHeaderRef.current) {
+      const callsMaxScroll = callsHeaderRef.current.scrollWidth - callsHeaderRef.current.clientWidth
+      const putsMaxScroll = e.currentTarget.scrollWidth - e.currentTarget.clientWidth
+      const oppositeScrollLeft = putsMaxScroll > 0 ? (callsMaxScroll * scrollLeft) / putsMaxScroll : 0
+      callsHeaderRef.current.scrollLeft = callsMaxScroll - oppositeScrollLeft
     }
   }
 
@@ -161,6 +206,11 @@ export const OptionsChain = ({
                   isSelected={data.strike === selectedStrike}
                   view={view}
                   onSelect={() => onStrikeSelect(data.strike)}
+                  isStrategyBuilderActive={isStrategyBuilderActive}
+                  onOrderClick={handleOrderClick}
+                  isOrderSelected={isOrderSelected}
+                  hoveredStrike={hoveredStrike}
+                  onHoverChange={setHoveredStrike}
                 />
               ))}
             </div>
@@ -193,6 +243,11 @@ export const OptionsChain = ({
                   isSelected={data.strike === selectedStrike}
                   view={view}
                   onSelect={() => onStrikeSelect(data.strike)}
+                  isStrategyBuilderActive={isStrategyBuilderActive}
+                  onOrderClick={handleOrderClick}
+                  isOrderSelected={isOrderSelected}
+                  hoveredStrike={hoveredStrike}
+                  onHoverChange={setHoveredStrike}
                 />
               ))}
             </div>
@@ -209,9 +264,9 @@ const CallsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
-      "Delta", "Bid Qty\nBTC", "Bid\n(Price / IV)", "Mark\n(Price / IV)", "Ask\n(Price / IV)", 
-      "Ask Qty\nBTC", "OI", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", 
-      "Theta", "Low", "High", "Open", "Last", "24hr Chg."
+      "Delta", "Volume", "6H OI Chg.", "POS\nETH", "Gamma", "Vega", "Theta", 
+      "24hr Chg.", "Last", "Open", "High", "Low", "OI", "Bid Qty\nBTC", 
+      "Bid\n(Price / IV)", "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC"
     ]
     
     return (
@@ -273,9 +328,9 @@ const PutsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
-      "OI", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", "Theta", "Low", "High",
-      "Open", "Last", "24hr Chg.", "Delta", "Bid Qty\nBTC", "Bid\n(Price / IV)", 
-      "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC"
+      "Low", "High", "Open", "Last", "24hr Chg.", "Theta", "Vega", "Gamma", "POS\nETH",
+      "6H OI Chg.", "Volume", "Delta", "ETH", "Ask Qty\nBTC", "Ask\n(Price / IV)", 
+      "Mark\n(Price / IV)", "Bid\n(Price / IV)", "Bid Qty\nBTC", "OI"
     ]
     
     return (
@@ -336,17 +391,33 @@ const CallsRow = ({
   data, 
   isSelected, 
   view, 
-  onSelect 
+  onSelect,
+  isStrategyBuilderActive,
+  onOrderClick,
+  isOrderSelected,
+  hoveredStrike,
+  onHoverChange
 }: { 
   data: OptionData
   isSelected: boolean
   view: TableView
   onSelect: () => void
+  isStrategyBuilderActive: boolean
+  onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
+  isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
+  hoveredStrike: number | null
+  onHoverChange: (strike: number | null) => void
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const isHovered = hoveredStrike === data.strike
 
-  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  } ${
+    isOrderSelected('call', 'buy', data.strike) 
+      ? "bg-green-100/30 border-green-400/50" 
+      : isOrderSelected('call', 'sell', data.strike)
+      ? "bg-red-100/30 border-red-400/50"
+      : ""
   }`;
   
   const cellClass =
@@ -355,8 +426,8 @@ const CallsRow = ({
   return (
     <div
       className={rowClass}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => onHoverChange(data.strike)}
+      onMouseLeave={() => onHoverChange(null)}
       onClick={onSelect}
     >
       {view === "standard" && (
@@ -478,6 +549,52 @@ const CallsRow = ({
           <div className={cellClass}>${data.oi.toFixed(2)}K</div>
         </>
       )}
+
+      {/* Buy/Sell Buttons for Strategy Builder */}
+      {isStrategyBuilderActive && (
+        <div className={`absolute right-8 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('call', 'buy', data.strike, data.mark)
+            }}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
+              isOrderSelected('call', 'buy', data.strike) 
+                ? 'bg-green-600 text-white' 
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            {isOrderSelected('call', 'buy', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Buy'
+            )}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('call', 'sell', data.strike, data.mark)
+            }}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
+              isOrderSelected('call', 'sell', data.strike) 
+                ? 'bg-red-600 text-white' 
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+          >
+            {isOrderSelected('call', 'sell', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Sell'
+            )}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -487,17 +604,33 @@ const PutsRow = ({
   data, 
   isSelected, 
   view, 
-  onSelect 
+  onSelect,
+  isStrategyBuilderActive,
+  onOrderClick,
+  isOrderSelected,
+  hoveredStrike,
+  onHoverChange
 }: { 
   data: OptionData
   isSelected: boolean
   view: TableView
   onSelect: () => void
+  isStrategyBuilderActive: boolean
+  onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
+  isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
+  hoveredStrike: number | null
+  onHoverChange: (strike: number | null) => void
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const isHovered = hoveredStrike === data.strike
 
-  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer ${
+  const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
+  } ${
+    isOrderSelected('put', 'buy', data.strike) 
+      ? "bg-green-100/30 border-green-400/50" 
+      : isOrderSelected('put', 'sell', data.strike)
+      ? "bg-red-100/30 border-red-400/50"
+      : ""
   }`;
   
   const cellClass =
@@ -512,8 +645,8 @@ const PutsRow = ({
   return (
     <div
       className={rowClass}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => onHoverChange(data.strike)}
+      onMouseLeave={() => onHoverChange(null)}
       onClick={onSelect}
     >
       {view === "standard" && (
@@ -635,6 +768,52 @@ const PutsRow = ({
           <div className={cellClass}>{data.askQty.toFixed(3)}</div>
           <div className={cellClass}>${data.oi.toFixed(2)}K</div>
         </>
+      )}
+
+      {/* Buy/Sell Buttons for Strategy Builder */}
+      {isStrategyBuilderActive && (
+        <div className={`absolute left-8 top-1/2 transform -translate-y-1/2 flex gap-1 z-10 transition-opacity duration-200 ${
+          isHovered ? 'opacity-100' : 'opacity-0'
+        }`}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('put', 'buy', data.strike, data.mark)
+            }}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
+              isOrderSelected('put', 'buy', data.strike) 
+                ? 'bg-green-600 text-white' 
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            }`}
+          >
+            {isOrderSelected('put', 'buy', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Buy'
+            )}
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onOrderClick('put', 'sell', data.strike, data.mark)
+            }}
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
+              isOrderSelected('put', 'sell', data.strike) 
+                ? 'bg-red-600 text-white' 
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+          >
+            {isOrderSelected('put', 'sell', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Sell'
+            )}
+          </button>
+        </div>
       )}
     </div>
   )

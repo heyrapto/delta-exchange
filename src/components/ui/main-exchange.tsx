@@ -7,6 +7,7 @@ import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
 import { OptionsChain } from "./options-chain"
 import { useTradeStore } from "@/store/trade-store"
+import { useStrategyStore } from "@/store/strategy-store"
 import { GridDropdown } from "../dropdowns/grid"
 
 interface MainExchangeProps {
@@ -16,6 +17,7 @@ interface MainExchangeProps {
 
 export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProps) => {
     const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
+    const { isStrategyBuilderActive, setStrategyBuilderActive } = useStrategyStore()
     const [viewMode, setViewMode] = useState<ViewMode>("table")
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
@@ -159,7 +161,10 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
                     </button>
                     <button
-                        onClick={() => setStrategyView(!strategyView)}
+                        onClick={() => {
+                            setStrategyView(!strategyView)
+                            setStrategyBuilderActive(!strategyView)
+                        }}
                         className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] ${strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
                             }`}
                     >
@@ -248,13 +253,14 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
             {/* Main Content Area */}
             <div className="flex-1 overflow-hidden">
                 {viewMode === "table" ? (
-                    <OptionsChain
-                        optionsData={optionsData}
-                        selectedStrike={selectedStrike}
-                        onStrikeSelect={setSelectedStrike}
-                        view={tableView}
-                        loading={loading}
-                    />
+                        <OptionsChain
+                            optionsData={optionsData}
+                            selectedStrike={selectedStrike}
+                            onStrikeSelect={setSelectedStrike}
+                            view={tableView}
+                            loading={loading}
+                            isStrategyBuilderActive={isStrategyBuilderActive}
+                        />
                 ) : (
                     <TradingViewChart symbol={`BINANCE:${selectedContract}USDT`} />
                 )}
