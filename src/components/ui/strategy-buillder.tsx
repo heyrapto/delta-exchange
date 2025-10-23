@@ -5,10 +5,12 @@ import { useStrategyStore } from "@/store/strategy-store"
 import { useTradeStore } from "@/store/trade-store"
 import { BiTrash } from "react-icons/bi"
 import { AnalyzePayoff } from "./analyze-payoff"
+import { useToast } from "./toast"
 
 export const StrategyBuilder = () => {
   const { selectedOrders, removeOrderFromStrategy, clearStrategy } = useStrategyStore()
   const { placeOrder } = useTradeStore()
+  const { showToast, ToastContainer } = useToast()
   const [showAnalyzePayoff, setShowAnalyzePayoff] = useState(false)
 
   const getOrderColor = (side: 'buy' | 'sell') => {
@@ -30,6 +32,11 @@ export const StrategyBuilder = () => {
   }
 
   const handlePlaceOrder = () => {
+    if (selectedOrders.length === 0) {
+      showToast('No orders to place', 'warning')
+      return
+    }
+
     // Convert strategy orders to trade orders
     selectedOrders.forEach(order => {
       placeOrder({
@@ -43,8 +50,8 @@ export const StrategyBuilder = () => {
     // Clear strategy after placing orders
     clearStrategy()
     
-    // Show success message (you could add a toast here)
-    console.log('Orders placed successfully!')
+    // Show success toast
+    showToast(`Successfully placed ${selectedOrders.length} order${selectedOrders.length > 1 ? 's' : ''} from strategy!`, 'success')
   }
 
   if (showAnalyzePayoff) {
@@ -187,6 +194,9 @@ export const StrategyBuilder = () => {
           </button>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </div>
   )
 }

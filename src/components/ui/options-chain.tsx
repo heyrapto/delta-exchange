@@ -11,6 +11,7 @@ interface OptionsChainProps {
   view: TableView
   loading: boolean
   isStrategyBuilderActive: boolean
+  selectedContract: 'BTC' | 'ETH'
 }
 
 const ROW_HEIGHT_CLASS = "h-[26px] sm:h-[28px] flex items-center justify-center border-b border-gray-400/50";
@@ -21,7 +22,8 @@ export const OptionsChain = ({
   onStrikeSelect, 
   view, 
   loading,
-  isStrategyBuilderActive
+  isStrategyBuilderActive,
+  selectedContract
 }: OptionsChainProps) => {
   const mainScrollRef = useRef<HTMLDivElement>(null)
   const callsScrollRef = useRef<HTMLDivElement>(null)
@@ -51,7 +53,7 @@ export const OptionsChain = ({
         strike,
         price,
         quantity: 1,
-        contract: `${type === 'call' ? 'C' : 'P'}-ETH-${strike}-231025`,
+        contract: `${type === 'call' ? 'C' : 'P'}-${selectedContract}-${strike}-231025`,
         leverage: 100
       })
     }
