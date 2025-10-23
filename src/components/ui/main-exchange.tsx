@@ -260,6 +260,7 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
                             view={tableView}
                             loading={loading}
                             isStrategyBuilderActive={isStrategyBuilderActive}
+                            selectedContract={selectedContract as 'BTC' | 'ETH'}
                         />
                 ) : (
                     <TradingViewChart symbol={`BINANCE:${selectedContract}USDT`} />
