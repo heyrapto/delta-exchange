@@ -49,6 +49,9 @@ export const StrategyBuilder = () => {
       return
     }
 
+    // Store the order count before clearing
+    const orderCount = selectedOrders.length
+
     // Convert strategy orders to trade orders
     selectedOrders.forEach(order => {
       placeOrder({
@@ -59,27 +62,49 @@ export const StrategyBuilder = () => {
       })
     })
 
+    // Clear strategy immediately
+    clearStrategy()
 
-    setNotificationData({
-      title: 'Order Placed',
-      message: `Successfully placed ${selectedOrders.length} order${selectedOrders.length > 1 ? 's' : ''} from strategy!`,
-      type: 'success'
-    })
-    setShowNotification(true)
-    
-    // Delay clearing to allow modal to show first
+    // Show notification after clearing with a small delay to ensure proper rendering
     setTimeout(() => {
-      clearStrategy()
-    }, 100)    
+      setNotificationData({
+        title: 'Order Placed',
+        message: `Successfully placed ${orderCount} order${orderCount > 1 ? 's' : ''} from strategy!`,
+        type: 'success'
+      })
+      setShowNotification(true)
+    }, 50)
   }
 
   if (showAnalyzePayoff) {
-    return <AnalyzePayoff onBack={() => setShowAnalyzePayoff(false)} />
+    return (
+      <>
+        <AnalyzePayoff onBack={() => setShowAnalyzePayoff(false)} />
+        
+        {/* Modals - Always render to ensure notifications work */}
+        <ConfirmationModal
+          isOpen={showConfirmation}
+          onClose={() => setShowConfirmation(false)}
+          onConfirm={() => {}}
+          title="Confirm Trade"
+          message="Are you sure you want to place this trade?"
+          type="warning"
+        />
+
+        <NotificationModal
+          isOpen={showNotification}
+          onClose={() => setShowNotification(false)}
+          title={notificationData.title}
+          message={notificationData.message}
+          type={notificationData.type}
+        />
+      </>
+    )
   }
 
   if (selectedOrders.length === 0) {
     return (
-      <div className="h-[700px] w-full flex flex-col items-center justify-between" style={{ color: 'var(--text-secondary)' }}>
+      <div className="h-[700px] w-full flex flex-col items-center justify-between relative" style={{ color: 'var(--text-secondary)' }}>
       {/* Placeholder Image */}
       <div className="flex flex-col items-center gap-2 mt-[150px]">
       <Image src={"/basket-order.webp"} width={150} height={150} alt="Add Contracts" className="mb-4 opacity-80" />
@@ -108,6 +133,24 @@ export const StrategyBuilder = () => {
       </a>
         <span>Available Margin 0 USD</span>
       </div>
+
+      {/* Modals - Always render to ensure notifications work */}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={() => setShowConfirmation(false)}
+        onConfirm={() => {}}
+        title="Confirm Trade"
+        message="Are you sure you want to place this trade?"
+        type="warning"
+      />
+
+      <NotificationModal
+        isOpen={showNotification}
+        onClose={() => setShowNotification(false)}
+        title={notificationData.title}
+        message={notificationData.message}
+        type={notificationData.type}
+      />
     </div>
     )
   }
