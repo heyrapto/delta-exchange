@@ -32,6 +32,9 @@ export const OptionsChain = ({
   // Strategy store
   const { addOrderToStrategy, selectedOrders } = useStrategyStore()
   
+  // Shared hover state for both rows
+  const [hoveredStrike, setHoveredStrike] = useState<number | null>(null)
+  
   // Check if an order is already selected
   const isOrderSelected = (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => {
     return selectedOrders.some(order => 
@@ -206,6 +209,8 @@ export const OptionsChain = ({
                   isStrategyBuilderActive={isStrategyBuilderActive}
                   onOrderClick={handleOrderClick}
                   isOrderSelected={isOrderSelected}
+                  hoveredStrike={hoveredStrike}
+                  onHoverChange={setHoveredStrike}
                 />
               ))}
             </div>
@@ -241,6 +246,8 @@ export const OptionsChain = ({
                   isStrategyBuilderActive={isStrategyBuilderActive}
                   onOrderClick={handleOrderClick}
                   isOrderSelected={isOrderSelected}
+                  hoveredStrike={hoveredStrike}
+                  onHoverChange={setHoveredStrike}
                 />
               ))}
             </div>
@@ -257,9 +264,9 @@ const CallsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
-      "Delta", "Bid Qty\nBTC", "Bid\n(Price / IV)", "Mark\n(Price / IV)", "Ask\n(Price / IV)", 
-      "Ask Qty\nBTC", "OI", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", 
-      "Theta", "Low", "High", "Open", "Last", "24hr Chg."
+      "Delta", "Volume", "6H OI Chg.", "POS\nETH", "Gamma", "Vega", "Theta", 
+      "24hr Chg.", "Last", "Open", "High", "Low", "OI", "Bid Qty\nBTC", 
+      "Bid\n(Price / IV)", "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC"
     ]
     
     return (
@@ -321,9 +328,9 @@ const PutsHeader = ({ view }: { view: TableView }) => {
   
   if (view === "standard") {
     const headers = [
-      "OI", "Volume", "6H OI Chg.", "POS\nBTC", "Gamma", "Vega", "Theta", "Low", "High",
-      "Open", "Last", "24hr Chg.", "Delta", "Bid Qty\nBTC", "Bid\n(Price / IV)", 
-      "Mark\n(Price / IV)", "Ask\n(Price / IV)", "Ask Qty\nBTC"
+      "Low", "High", "Open", "Last", "24hr Chg.", "Theta", "Vega", "Gamma", "POS\nETH",
+      "6H OI Chg.", "Volume", "Delta", "ETH", "Ask Qty\nBTC", "Ask\n(Price / IV)", 
+      "Mark\n(Price / IV)", "Bid\n(Price / IV)", "Bid Qty\nBTC", "OI"
     ]
     
     return (
@@ -387,7 +394,9 @@ const CallsRow = ({
   onSelect,
   isStrategyBuilderActive,
   onOrderClick,
-  isOrderSelected
+  isOrderSelected,
+  hoveredStrike,
+  onHoverChange
 }: { 
   data: OptionData
   isSelected: boolean
@@ -396,8 +405,10 @@ const CallsRow = ({
   isStrategyBuilderActive: boolean
   onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
   isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
+  hoveredStrike: number | null
+  onHoverChange: (strike: number | null) => void
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const isHovered = hoveredStrike === data.strike
 
   const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
@@ -415,8 +426,8 @@ const CallsRow = ({
   return (
     <div
       className={rowClass}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => onHoverChange(data.strike)}
+      onMouseLeave={() => onHoverChange(null)}
       onClick={onSelect}
     >
       {view === "standard" && (
@@ -549,26 +560,38 @@ const CallsRow = ({
               e.stopPropagation()
               onOrderClick('call', 'buy', data.strike, data.mark)
             }}
-            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
               isOrderSelected('call', 'buy', data.strike) 
                 ? 'bg-green-600 text-white' 
                 : 'bg-green-500 hover:bg-green-600 text-white'
             }`}
           >
-            Buy
+            {isOrderSelected('call', 'buy', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Buy'
+            )}
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation()
               onOrderClick('call', 'sell', data.strike, data.mark)
             }}
-            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
               isOrderSelected('call', 'sell', data.strike) 
                 ? 'bg-red-600 text-white' 
                 : 'bg-red-500 hover:bg-red-600 text-white'
             }`}
           >
-            Sell
+            {isOrderSelected('call', 'sell', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Sell'
+            )}
           </button>
         </div>
       )}
@@ -584,7 +607,9 @@ const PutsRow = ({
   onSelect,
   isStrategyBuilderActive,
   onOrderClick,
-  isOrderSelected
+  isOrderSelected,
+  hoveredStrike,
+  onHoverChange
 }: { 
   data: OptionData
   isSelected: boolean
@@ -593,8 +618,10 @@ const PutsRow = ({
   isStrategyBuilderActive: boolean
   onOrderClick: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number, price: number) => void
   isOrderSelected: (type: 'call' | 'put', side: 'buy' | 'sell', strike: number) => boolean
+  hoveredStrike: number | null
+  onHoverChange: (strike: number | null) => void
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const isHovered = hoveredStrike === data.strike
 
   const rowClass = `${ROW_HEIGHT_CLASS} cursor-pointer relative ${
     isSelected ? "bg-green-900/20 border-green-500/30" : "hover:bg-[#ADFF2F]/10"
@@ -618,8 +645,8 @@ const PutsRow = ({
   return (
     <div
       className={rowClass}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => onHoverChange(data.strike)}
+      onMouseLeave={() => onHoverChange(null)}
       onClick={onSelect}
     >
       {view === "standard" && (
@@ -753,26 +780,38 @@ const PutsRow = ({
               e.stopPropagation()
               onOrderClick('put', 'buy', data.strike, data.mark)
             }}
-            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
               isOrderSelected('put', 'buy', data.strike) 
                 ? 'bg-green-600 text-white' 
                 : 'bg-green-500 hover:bg-green-600 text-white'
             }`}
           >
-            Buy
+            {isOrderSelected('put', 'buy', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Buy'
+            )}
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation()
               onOrderClick('put', 'sell', data.strike, data.mark)
             }}
-            className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+            className={`px-2 py-1 rounded text-xs font-medium transition-colors flex items-center justify-center ${
               isOrderSelected('put', 'sell', data.strike) 
                 ? 'bg-red-600 text-white' 
                 : 'bg-red-500 hover:bg-red-600 text-white'
             }`}
           >
-            Sell
+            {isOrderSelected('put', 'sell', data.strike) ? (
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              'Sell'
+            )}
           </button>
         </div>
       )}
