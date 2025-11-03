@@ -1,3 +1,5 @@
 Critical:
 1. The calls has an orange border that reaches the strikecell in that same row when active (see image attached)
 2. Buy/sell buttons positioning
+
+3. Put is short call is long, leverage changes to period, do options screen

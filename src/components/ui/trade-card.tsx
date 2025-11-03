@@ -139,8 +139,8 @@ export const TradeCard = () => {
     ]
 
     const tradeButtons = [
-        { label: "Buy | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
-        { label: "Sell | Short", type: "short", activeColor: "bg-red-500 text-white" },
+        { label: "Call | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
+        { label: "Put | Short", type: "short", activeColor: "bg-red-500 text-white" },
     ] as const
 
     const orderTabs = [
