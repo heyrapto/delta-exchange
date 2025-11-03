@@ -125,8 +125,8 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
                             key={tab.value}
                             onClick={() => setViewMode(tab.value)}
                             className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors cursor-pointer ${viewMode === tab.value
-                                    ? "bg-green-500 text-white"
-                                    : "bg-transparent text-gray-900"
+                                ? "bg-green-500 text-white"
+                                : "bg-transparent text-gray-900"
                                 }`}
                         >
                             {tab.label}
@@ -209,15 +209,15 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
                 </div>
 
                 <div className="relative">
-  <button 
-    ref={gridButtonRef}
-    onClick={() => setShowGridDropdown(!showGridDropdown)}
-    className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer"
-  >
-    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z"/>
-    </svg>
-  </button>
+                    <button
+                        ref={gridButtonRef}
+                        onClick={() => setShowGridDropdown(!showGridDropdown)}
+                        className="p-1 text-gray-400 hover:text-black flex-shrink-0 cursor-pointer"
+                    >
+                        <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 3h2v2H3V3zm0 4h2v2H3V7zm0 4h2v2H3v-2zm4-8h2v2H7V3zm0 4h2v2H7V7zm0 4h2v2H7v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm4-8h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2z" />
+                        </svg>
+                    </button>
 
                     <GridDropdown
                         isOpen={showGridDropdown}
@@ -253,15 +253,15 @@ export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProp
             {/* Main Content Area */}
             <div className="flex-1 overflow-hidden">
                 {viewMode === "table" ? (
-                        <OptionsChain
-                            optionsData={optionsData}
-                            selectedStrike={selectedStrike}
-                            onStrikeSelect={setSelectedStrike}
-                            view={tableView}
-                            loading={loading}
-                            isStrategyBuilderActive={isStrategyBuilderActive}
-                            selectedContract={selectedContract as 'BTC' | 'ETH'}
-                        />
+                    <OptionsChain
+                        optionsData={optionsData}
+                        selectedStrike={selectedStrike}
+                        onStrikeSelect={setSelectedStrike}
+                        view={tableView}
+                        loading={loading}
+                        isStrategyBuilderActive={isStrategyBuilderActive}
+                        selectedContract={selectedContract as 'BTC' | 'ETH'}
+                    />
                 ) : (
                     <TradingViewChart symbol={`BINANCE:${selectedContract}USDT`} />
                 )}

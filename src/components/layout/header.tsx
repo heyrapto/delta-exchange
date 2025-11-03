@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BiChevronDown, BiSearch } from "react-icons/bi";
-import { Button } from "../ui/button";
+import { Button } from "../ui/reusable/button";
 import { AccountMargin } from "../ui/account-margin";
-import { Wallet } from "../ui/wallet";
+import { Wallet } from "../ui/reusable/wallet";
 import { FcSettings } from "react-icons/fc";
 import { BsBox } from "react-icons/bs";
 import { GrNotification } from "react-icons/gr";
@@ -15,7 +15,7 @@ import { AccountDropdown } from "../dropdowns/account";
 import { NotificationPanel } from "../panels/notification-panel";
 import { SettingsPanel } from "../panels/settings-panel";
 import { MorePanel } from "../panels/more-panel";
-import { useToast } from "../ui/toast";
+import { useToast } from "../ui/reusable/toast";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
