@@ -18,7 +18,7 @@ interface MainExchangeProps {
 export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProps) => {
     const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
     const { isStrategyBuilderActive, setStrategyBuilderActive } = useStrategyStore()
-    const [viewMode, setViewMode] = useState<ViewMode>("table")
+    const [viewMode, setViewMode] = useState<ViewMode>("chart")
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
     const [selectedDate, setSelectedDate] = useState("28 Nov 25")

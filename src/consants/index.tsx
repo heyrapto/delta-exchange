@@ -1,6 +1,7 @@
+import { navItemProps } from "@/types";
 import { BiGitBranch, BiBot, BiData, BiGift, BiShareAlt, BiKey, BiLineChart } from "react-icons/bi";
 
-export const navItems = [
+export const navItems: navItemProps[] = [
     {
         label: "Markets",
         href: "/",
@@ -13,15 +14,15 @@ export const navItems = [
         label: "Options",
         href: "/options",
     },
-    {
-        label: "Straddle",
-        href: "/",
-        hasNew: true,
-    },
-    {
-        label: "Trackers",
-        href: "/",
-    },
+    // {
+    //     label: "Straddle",
+    //     href: "/",
+    //     hasNew: true,
+    // },
+    // {
+    //     label: "Trackers",
+    //     href: "/",
+    // },
     {
         label: "AlgoHub",
         href: "/",

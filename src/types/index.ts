@@ -34,3 +34,10 @@ export type RecentTrade = {
     time: string
     type: "buy" | "sell"
 }
+
+export interface navItemProps {
+    label: string;
+    href: string
+    hasNew?: string
+    dropdown?: any[];
+}

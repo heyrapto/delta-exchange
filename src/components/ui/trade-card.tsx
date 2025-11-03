@@ -343,7 +343,7 @@ export const TradeCard = () => {
                         className="flex items-center justify-between py-2 cursor-pointer"
                     >
                         <div className="flex gap-2 items-center">
-                            <span className="text-gray-900 text-[11px]">Leverage</span>
+                            <span className="text-gray-900 text-[11px]">Period</span>
                             <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
                         </div>
                         <div className="flex items-center gap-2">
