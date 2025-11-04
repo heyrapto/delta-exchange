@@ -1,20 +1,32 @@
 "use client"
 
-import { Footer } from '@/components/layout/footer';
-import { Header } from '@/components/layout/header';
-import { Banner } from '@/components/ui/banner';
-import React from 'react'
+import { Exchange } from '@/components/exchange';
+import { MobileTradeView } from '@/components/exchange/mobile-trade-view';
+import { PageLayout } from '@/components/layout/page-layout';
+import { LoadingScreen } from '@/components/ui/loading-screen';
+import React, { useEffect, useState } from 'react'
 
 const OptionsTradePage = () => {
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("chart")
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (loading) return <LoadingScreen />
+  
   return (
-    <>
-       <Banner />
-       <Header />
-       <main>
-        
-       </main>
-       <Footer />
-    </>
+    <PageLayout>
+      <div>
+      {activeTab === "trade" ? (
+        <MobileTradeView />
+      ) : (
+        <Exchange />
+      )}
+      </div>
+    </PageLayout>
   )
 }
 

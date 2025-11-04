@@ -13,12 +13,13 @@ import { GridDropdown } from "../dropdowns/grid"
 interface MainExchangeProps {
     strategyView: boolean
     setStrategyView: (value: boolean) => void
+    viewMode: ViewMode
+    setViewMode: (value: ViewMode) => void
 }
 
-export const MainExchange = ({ strategyView, setStrategyView }: MainExchangeProps) => {
+export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewMode }: MainExchangeProps) => {
     const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
     const { isStrategyBuilderActive, setStrategyBuilderActive } = useStrategyStore()
-    const [viewMode, setViewMode] = useState<ViewMode>("chart")
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
     const [selectedDate, setSelectedDate] = useState("28 Nov 25")

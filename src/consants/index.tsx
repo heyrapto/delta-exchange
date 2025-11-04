@@ -4,11 +4,11 @@ import { BiGitBranch, BiBot, BiData, BiGift, BiShareAlt, BiKey, BiLineChart } fr
 export const navItems: navItemProps[] = [
     {
         label: "Markets",
-        href: "/",
+        href: "/markets",
     },
     {
         label: "Futures",
-        href: "/about",
+        href: "/futures",
     },
     {
         label: "Options",
@@ -25,44 +25,19 @@ export const navItems: navItemProps[] = [
     // },
     {
         label: "AlgoHub",
-        href: "/",
         dropdown: [
             {
-                section: "Trade",
-                label: "Strategy Builder",
-                description: "Create and analyse basket orders",
-                href: "/strategy-builder",
-                icon: <BiGitBranch size={20} color="#fff" />,
-                iconBg: "#ff6b35"
-            },
-            {
-                label: "Demo Trading",
+                label: "API",
                 description: "Simulate real trading without risk",
                 href: "/demo-trading",
                 icon: <BiLineChart size={20} color="#fff" />,
                 iconBg: "#4a90e2"
             },
             {
-                section: "Data",
-                label: "Analytics",
-                description: "A dashboard to visualize options data",
-                href: "/analytics",
-                icon: <BiData size={20} color="#fff" />,
-                iconBg: "#ff6b35"
-            },
-            {
-                section: "API & Automation",
-                label: "APIs",
+                label: "Trading Bot",
                 description: "Create API key and Start Trading",
                 href: "/apis",
                 icon: <BiKey size={20} color="#fff" />,
-                iconBg: "#4a90e2"
-            },
-            {
-                label: "Trading Bot",
-                description: "Automate Bots from TradingView",
-                href: "/trading-bot",
-                icon: <BiBot size={20} color="#fff" />,
                 iconBg: "#4a90e2"
             },
             {
@@ -76,7 +51,6 @@ export const navItems: navItemProps[] = [
     },
     {
         label: "More",
-        href: "/",
         dropdown: [
             {
                 section: "Trade",

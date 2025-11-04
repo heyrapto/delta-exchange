@@ -64,8 +64,8 @@ export const Header = () => {
                 onClick={() =>
                   item.dropdown
                     ? setActiveDropdown(
-                        activeDropdown === index ? null : index
-                      )
+                      activeDropdown === index ? null : index
+                    )
                     : null
                 }
               >
@@ -77,13 +77,21 @@ export const Header = () => {
                     New
                   </p>
                 )}
-                <Link
-                  href={item.href}
-                  className="whitespace-nowrap hover:opacity-70 transition-opacity flex items-center gap-1"
-                >
-                  {item.label}
-                  {item.dropdown && <BiChevronDown className="inline" />}
-                </Link>
+                {item.href ? (
+                  <Link
+                    href={item.href}
+                    className="whitespace-nowrap hover:opacity-70 transition-opacity flex items-center gap-1"
+                  >
+                    {item.label}
+                    {item.dropdown && <BiChevronDown className="inline" />}
+                  </Link>
+                ) : (
+                  <span className="whitespace-nowrap flex items-center gap-1 text-gray-600">
+                    {item.label}
+                    {item.dropdown && <BiChevronDown className="inline" />}
+                  </span>
+                )}
+
 
                 {item.dropdown && activeDropdown === index && (
                   <div
@@ -92,7 +100,7 @@ export const Header = () => {
                     {item.dropdown.map((sub, subIndex) => (
                       <div key={subIndex}>
                         {sub.section && (
-                          <div 
+                          <div
                             className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500"
                           >
                             {sub.section}
@@ -101,7 +109,7 @@ export const Header = () => {
                         <Link href={sub.href}>
                           <div className="px-4 py-3 hover:bg-opacity-10 hover:bg-white transition-colors flex items-start gap-3 cursor-pointer">
                             {sub.icon && (
-                              <div 
+                              <div
                                 className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 mt-1"
                                 style={{ backgroundColor: sub.iconBg || "var(--icon-bg, #2a2a2a)" }}
                               >
@@ -113,7 +121,7 @@ export const Header = () => {
                                 {sub.label}
                               </div>
                               {sub.description && (
-                                <div 
+                                <div
                                   className="text-xs mt-0.5"
                                   style={{ color: "var(--dropdown-desc, #999)" }}
                                 >
@@ -155,17 +163,17 @@ export const Header = () => {
 
           <AccountMargin />
           <Wallet balance="0.00" />
-        <div className="flex gap-4 items-center">
-          <AccountDropdown />
-          <GrNotification
-            size={20}
-            className="cursor-pointer"
-            style={{ color: "var(--text-muted)" }}
-            onClick={() => setNotifOpen(true)}
-          />
-          <FcSettings className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setSettingsOpen(true)} />
-          <BsBox className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setMoreOpen(true)} />
-        </div>
+          <div className="flex gap-4 items-center">
+            <AccountDropdown />
+            <GrNotification
+              size={20}
+              className="cursor-pointer"
+              style={{ color: "var(--text-muted)" }}
+              onClick={() => setNotifOpen(true)}
+            />
+            <FcSettings className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setSettingsOpen(true)} />
+            <BsBox className="cursor-pointer" size={20} style={{ color: "var(--text-muted)" }} onClick={() => setMoreOpen(true)} />
+          </div>
         </div>
       </div>
 
