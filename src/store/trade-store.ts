@@ -4,7 +4,7 @@ import { devtools } from 'zustand/middleware'
 export interface TradeState {
   // Trade Configuration
   tradeType: 'long' | 'short'
-  leverage: number
+  period: string
   orderType: 'limit' | 'market' | 'stopLimit'
   stopPriceType: 'mark' | 'last' | 'index'
   stopLimitType: 'stopLimit' | 'takeProfitLimit'
@@ -44,7 +44,7 @@ export interface TradeState {
     orderType: 'limit' | 'market' | 'stopLimit'
     price?: number
     quantity: number
-    leverage: number
+    period: string
     status: 'open' | 'filled' | 'cancelled'
     time: number
   }>
@@ -54,20 +54,20 @@ export interface TradeState {
     orderType: 'limit' | 'market' | 'stopLimit'
     price?: number
     quantity: number
-    leverage: number
+    period: string
     status: 'filled' | 'cancelled'
     time: number
     filledPrice?: number
   }>
   
   // UI State
-  showLeveragePanel: boolean
+  showPeriodPanel: boolean
   showStopPriceDropdown: boolean
   showStopLimitDropdown: boolean
   
   // Actions
   setTradeType: (type: 'long' | 'short') => void
-  setLeverage: (leverage: number) => void
+  setPeriod: (period: string) => void
   setOrderType: (type: 'limit' | 'market' | 'stopLimit') => void
   setStopPriceType: (type: 'mark' | 'last' | 'index') => void
   setStopLimitType: (type: 'stopLimit' | 'takeProfitLimit') => void
@@ -78,7 +78,7 @@ export interface TradeState {
   setReduceOnly: (value: boolean) => void
   setMaker: (value: boolean) => void
   setSetAsDefault: (value: boolean) => void
-  setShowLeveragePanel: (show: boolean) => void
+  setShowPeriodPanel: (show: boolean) => void
   setShowStopPriceDropdown: (show: boolean) => void
   setShowStopLimitDropdown: (show: boolean) => void
   updateMarketData: (data: Partial<Pick<TradeState, 'currentPrice' | 'markPrice' | 'indexPrice' | 'lastPrice' | 'markIV' | 'volume24h' | 'openInterest' | 'availableMargin'>>) => void
@@ -103,7 +103,7 @@ export const useTradeStore = create<TradeState>()(
     (set: any, get: any) => ({
       // Initial State
       tradeType: 'short',
-      leverage: 20,
+      period: '7',
       orderType: 'limit',
       stopPriceType: 'mark',
       stopLimitType: 'stopLimit',
@@ -114,7 +114,7 @@ export const useTradeStore = create<TradeState>()(
       reduceOnly: false,
       maker: false,
       setAsDefault: false,
-      showLeveragePanel: false,
+      showPeriodPanel: false,
       showStopPriceDropdown: false,
       showStopLimitDropdown: false,
       availableMargin: 0,
@@ -127,32 +127,28 @@ export const useTradeStore = create<TradeState>()(
 
       // Actions
       setTradeType: (type: any) => set({ tradeType: type }),
-      setLeverage: (leverage: any) => {
-        set({ leverage })
-        // Calculate funds required after leverage change
-        const { quantity, currentPrice } = get()
-        const qty = parseFloat(quantity) || 0
-        const funds = (qty * currentPrice) / leverage
-        set({ fundsRequired: funds })
+      setPeriod: (period: any) => {
+        set({ period })
+        // Period doesn't affect funds calculation for options
       },
       setOrderType: (type: any) => set({ orderType: type }),
       setStopPriceType: (type: any) => set({ stopPriceType: type }),
       setStopLimitType: (type: any) => set({ stopLimitType: type }),
       setQuantity: (quantity: any) => {
         set({ quantity })
-        // Calculate funds required after quantity change
-        const { currentPrice, leverage } = get()
+        // Calculate funds required after quantity change (options: quantity * price)
+        const { currentPrice } = get()
         const qty = parseFloat(quantity) || 0
-        const funds = (qty * currentPrice) / leverage
+        const funds = qty * currentPrice
         set({ fundsRequired: funds })
       },
       setStopPrice: (price: any) => set({ stopPrice: price }),
       setLimitPrice: (price: any) => set({ limitPrice: price }),
       setQuantityPercent: (percent: any) => {
-        const { maxPosition, currentPrice, leverage } = get()
-        const calculatedQuantity = (maxPosition * percent / 100) / (currentPrice * leverage)
+        const { maxPosition, currentPrice } = get()
+        const calculatedQuantity = (maxPosition * percent / 100) / currentPrice
         const qty = calculatedQuantity.toFixed(3)
-        const funds = (calculatedQuantity * currentPrice) / leverage
+        const funds = calculatedQuantity * currentPrice
         set({ 
           quantityPercent: percent,
           quantity: qty,
@@ -162,23 +158,23 @@ export const useTradeStore = create<TradeState>()(
       setReduceOnly: (value: any) => set({ reduceOnly: value }),
       setMaker: (value: any) => set({ maker: value }),
       setSetAsDefault: (value: any) => set({ setAsDefault: value }),
-      setShowLeveragePanel: (show: any) => set({ showLeveragePanel: show }),
+      setShowPeriodPanel: (show: any) => set({ showPeriodPanel: show }),
       setShowStopPriceDropdown: (show: any) => set({ showStopPriceDropdown: show }),
       setShowStopLimitDropdown: (show: any) => set({ showStopLimitDropdown: show }),
       
       updateMarketData: (data: any) => {
         set(data)
-        // Recalculate funds when market data changes
-        const { quantity, currentPrice, leverage } = get()
+        // Recalculate funds when market data changes (options: quantity * price)
+        const { quantity, currentPrice } = get()
         const qty = parseFloat(quantity) || 0
-        const funds = (qty * currentPrice) / leverage
+        const funds = qty * currentPrice
         set({ fundsRequired: funds })
       },
       
       setSelectedContract: (symbol: 'BTC' | 'ETH') => set({ selectedContract: symbol }),
       
       placeOrder: ({ side, orderType, price, quantity }) => {
-        const { leverage, openOrders } = get()
+        const { period, openOrders } = get()
         const id = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`
         const qtyNum = Number(quantity) || 0
         const newOrder = {
@@ -187,7 +183,7 @@ export const useTradeStore = create<TradeState>()(
           orderType,
           price,
           quantity: qtyNum,
-          leverage,
+          period,
           status: 'open' as const,
           time: Date.now(),
         }
@@ -220,7 +216,7 @@ export const useTradeStore = create<TradeState>()(
       
       resetTrade: () => set({
         tradeType: 'short',
-        leverage: 20,
+        period: '7',
         orderType: 'limit',
         stopPriceType: 'mark',
         stopLimitType: 'stopLimit',
@@ -231,7 +227,7 @@ export const useTradeStore = create<TradeState>()(
         reduceOnly: false,
         maker: false,
         setAsDefault: false,
-        showLeveragePanel: false,
+        showPeriodPanel: false,
         showStopPriceDropdown: false,
         showStopLimitDropdown: false,
         fundsRequired: 0,

@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react"
 import { Exchange } from "@/components/exchange"
 import { Footer } from "@/components/layout/footer"
-import { Header } from "@/components/layout/header"
-import { Banner } from "@/components/ui/banner"
 import { LoadingScreen } from "@/components/ui/loading-screen"
 import { BottomNavigation } from "@/components/layout/bottom-nav"
 import { MobileTradeView } from "@/components/exchange/mobile-trade-view"
+import { PageLayout } from "@/components/layout/page-layout"
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
@@ -21,9 +20,7 @@ export default function Home() {
   if (loading) return <LoadingScreen />
 
   return (
-    <div className="relative mx-auto w-full xl:max-w-[120rem] min-h-screen overflow-x-hidden" style={{ backgroundColor: 'var(--page-bg-color)' }}>
-      <Banner />
-      <Header />
+    <PageLayout>
       
       {activeTab === "trade" ? (
         <MobileTradeView />
@@ -33,6 +30,6 @@ export default function Home() {
       
       <Footer />
       <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-    </div>
+    </PageLayout>
   )
 }

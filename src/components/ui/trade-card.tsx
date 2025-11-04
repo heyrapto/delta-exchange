@@ -6,12 +6,12 @@ import { useTradeStore } from "@/store/trade-store"
 import { ConfirmationModal, NotificationModal } from "./modals"
 import { marketDataService } from "@/services/market-data"
 import { useEffect } from "react"
-import { LeverageSelector } from "./leverage-selector"
+import { PeriodSelector } from "./period-selector"
 
 export const TradeCard = () => {
     const {
         tradeType,
-        leverage,
+        period,
         orderType,
         stopPriceType,
         stopLimitType,
@@ -22,7 +22,7 @@ export const TradeCard = () => {
         reduceOnly,
         maker,
         setAsDefault,
-        showLeveragePanel,
+        showPeriodPanel,
         showStopPriceDropdown,
         showStopLimitDropdown,
         currentPrice,
@@ -36,7 +36,7 @@ export const TradeCard = () => {
         availableMargin,
         maxPosition,
         setTradeType,
-        setLeverage,
+        setPeriod,
         setOrderType,
         setStopPriceType,
         setStopLimitType,
@@ -47,7 +47,7 @@ export const TradeCard = () => {
         setReduceOnly,
         setMaker,
         setSetAsDefault,
-        setShowLeveragePanel,
+        setShowPeriodPanel,
         setShowStopPriceDropdown,
         setShowStopLimitDropdown
     } = useTradeStore()
@@ -55,7 +55,6 @@ export const TradeCard = () => {
     // Modal states
     const [showConfirmation, setShowConfirmation] = useState(false)
     const [showNotification, setShowNotification] = useState(false)
-    const [showLeverageModal, setShowLeverageModal] = useState(false)
     const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false)
     const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
     const [showDeltaDropdown, setShowDeltaDropdown] = useState(false)
@@ -66,7 +65,6 @@ export const TradeCard = () => {
         type: 'info' as 'success' | 'error' | 'info' | 'warning'
     });
 
-    const leverageOptions = [1, 2, 5, 10, 20]
     const currencyOptions = ['USD', 'EUR', 'NGN', 'GBP', 'JPY']
     const lotSizeOptions = ['0.001 BTC', '0.01 BTC', '0.1 BTC', '1 BTC']
     const deltaOptions = ['-0.44', '-0.38', '-0.32', '-0.26', '-0.20']
@@ -112,10 +110,6 @@ export const TradeCard = () => {
         return `${availableMargin.toFixed(2)} USD`
     }
 
-    const getMaxPositionDisplay = () => {
-        return `${(maxPosition / leverage).toLocaleString()} USD`
-    }
-
     const headerStats = [
         { 
             label: "Delta", 
@@ -139,8 +133,8 @@ export const TradeCard = () => {
     ]
 
     const tradeButtons = [
-        { label: "Buy | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
-        { label: "Sell | Short", type: "short", activeColor: "bg-red-500 text-white" },
+        { label: "Call | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
+        { label: "Put | Short", type: "short", activeColor: "bg-red-500 text-white" },
     ] as const
 
     const orderTabs = [
@@ -174,10 +168,6 @@ export const TradeCard = () => {
     }
 
     // Handler functions
-    const handleLeverageChange = (value: number) => {
-        setLeverage(value)
-        // calculateFundsRequired() is already called in setLeverage
-    }
 
     const handleQuantityPercentChange = (percent: number) => {
         setQuantityPercent(percent)
@@ -212,7 +202,7 @@ export const TradeCard = () => {
         }
 
         // Execute order through demo service and push to open orders
-        marketDataService.executeOrder(tradeType, parseFloat(quantity), leverage)
+        marketDataService.executeOrder(tradeType, parseFloat(quantity), parseInt(period))
         useTradeStore.getState().placeOrder({
             side: tradeType,
             orderType,
@@ -222,7 +212,7 @@ export const TradeCard = () => {
         
         setNotificationData({
             title: 'Order Placed',
-            message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots at ${leverage}x leverage`,
+            message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots with ${period} days period`,
             type: 'success'
         })
         setShowNotification(true)
@@ -336,18 +326,18 @@ export const TradeCard = () => {
                     ))}
                 </div>
 
-                {/* LEVERAGE PANEL */}
+                {/* PERIOD PANEL */}
                 <div className="mb-3 bg-gray-100/50 p-3">
                     <div
-                        onClick={() => setShowLeveragePanel(!showLeveragePanel)}
+                        onClick={() => setShowPeriodPanel(!showPeriodPanel)}
                         className="flex items-center justify-between py-2 cursor-pointer"
                     >
                         <div className="flex gap-2 items-center">
                             <span className="text-gray-900 text-[11px]">Period</span>
-                            <span className="text-green-500 text-[11px] font-medium">{leverage}x</span>
+                            <span className="text-green-500 text-[11px] font-medium">{period} days</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            {showLeveragePanel ? (
+                            {showPeriodPanel ? (
                                 <BiChevronUp className="w-3 h-3 text-gray-400" />
                             ) : (
                                 <BiChevronDown className="w-3 h-3 text-gray-400" />
@@ -355,8 +345,8 @@ export const TradeCard = () => {
                         </div>
                     </div>
 
-                    {showLeveragePanel && (
-    <LeverageSelector />
+                    {showPeriodPanel && (
+                        <PeriodSelector />
                     )}
                 </div>
 

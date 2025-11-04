@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState } from "react"
-import { Toast } from "@/components/ui/toast"
+import { Toast } from "@/components/ui/reusable/toast"
 
 type ToastType = "success" | "error" | "info" | "warning"
 interface ToastItem {

@@ -51,7 +51,7 @@ export const ExchangePanel = () => {
                             <th className="text-left px-2 py-1">Type</th>
                             <th className="text-left px-2 py-1">Price</th>
                             <th className="text-left px-2 py-1">Qty</th>
-                            <th className="text-left px-2 py-1">Lev</th>
+                            <th className="text-left px-2 py-1">Period</th>
                             <th className="text-left px-2 py-1">Status</th>
                             <th className="text-left px-2 py-1">Action</th>
                         </tr>
@@ -64,7 +64,7 @@ export const ExchangePanel = () => {
                                 <td className="px-2 py-2">{o.orderType}</td>
                                 <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
                                 <td className="px-2 py-2">{o.quantity}</td>
-                                <td className="px-2 py-2">{o.leverage}x</td>
+                                <td className="px-2 py-2">{o.period} days</td>
                                 <td className="px-2 py-2 capitalize">{o.status}</td>
                                 <td className="px-2 py-2">
                                     {o.status === 'open' && (
@@ -92,7 +92,7 @@ export const ExchangePanel = () => {
                             <th className="text-left px-2 py-1">Type</th>
                             <th className="text-left px-2 py-1">Price</th>
                             <th className="text-left px-2 py-1">Qty</th>
-                            <th className="text-left px-2 py-1">Lev</th>
+                            <th className="text-left px-2 py-1">Period</th>
                             <th className="text-left px-2 py-1">Status</th>
                         </tr>
                     </thead>
@@ -104,7 +104,7 @@ export const ExchangePanel = () => {
                                 <td className="px-2 py-2">{o.orderType}</td>
                                 <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
                                 <td className="px-2 py-2">{o.quantity}</td>
-                                <td className="px-2 py-2">{o.leverage}x</td>
+                                <td className="px-2 py-2">{o.period} days</td>
                                 <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
                             </tr>
                         ))}

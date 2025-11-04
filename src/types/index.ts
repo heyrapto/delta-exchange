@@ -37,7 +37,7 @@ export type RecentTrade = {
 
 export interface navItemProps {
     label: string;
-    href: string
+    href?: string
     hasNew?: string
     dropdown?: any[];
 }
