@@ -7,10 +7,11 @@ import { LoadingScreen } from "@/components/ui/loading-screen"
 import { BottomNavigation } from "@/components/layout/bottom-nav"
 import { MobileTradeView } from "@/components/exchange/mobile-trade-view"
 import { PageLayout } from "@/components/layout/page-layout"
+import { useUiStore } from "@/store/ui-store"
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("chart")
+  const activeTab = useUiStore((s) => s.activeTab)
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000)
@@ -21,15 +22,11 @@ export default function Home() {
 
   return (
     <PageLayout>
-      
       {activeTab === "trade" ? (
         <MobileTradeView />
       ) : (
         <Exchange />
       )}
-      
-      <Footer />
-      <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
     </PageLayout>
   )
 }
