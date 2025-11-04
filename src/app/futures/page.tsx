@@ -10,7 +10,6 @@ import { MarketTradePanel } from '@/components/ui/market-trade-panel'
 import { ExchangePanel } from '@/components/exchange/exchange-panel'
 import { useTradeStore } from '@/store/trade-store'
 import { useEffect, useState } from 'react'
-import { BottomNavigation } from '@/components/layout/bottom-nav'
 
 const FuturesPage = () => {
   const { currentPrice, markPrice, indexPrice } = useTradeStore()
@@ -111,8 +110,6 @@ const FuturesPage = () => {
         {/* Bottom Panel - Positions, Orders, etc. */}
         <ExchangePanel />
       </div>
-      {/* Mobile Bottom Navigation */}
-      <BottomNavigation activeTab={"chart"} setActiveTab={() => {}} />
     </PageLayout>
   )
 }

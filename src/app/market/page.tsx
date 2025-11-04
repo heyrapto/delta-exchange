@@ -5,7 +5,6 @@ import { LoadingScreen } from '@/components/ui/loading-screen'
 import { PromotionalCards } from '@/components/ui/promotional-cards'
 import { FuturesTable } from '@/components/ui/futures-table'
 import { useEffect, useState } from 'react'
-import { BottomNavigation } from '@/components/layout/bottom-nav'
 
 const MarketPage = () => {
   return (
@@ -18,9 +17,7 @@ const MarketPage = () => {
         <div className="flex-1">
           <FuturesTable />
         </div>
-      </div>
-      {/* Mobile Bottom Navigation */}
-      <BottomNavigation activeTab={"chart"} setActiveTab={() => {}} />
+    </div>
     </PageLayout>
   )
 }
