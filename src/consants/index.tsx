@@ -4,7 +4,7 @@ import { BiGitBranch, BiBot, BiData, BiGift, BiShareAlt, BiKey, BiLineChart } fr
 export const navItems: navItemProps[] = [
     {
         label: "Markets",
-        href: "/markets",
+        href: "/market",
     },
     {
         label: "Futures",

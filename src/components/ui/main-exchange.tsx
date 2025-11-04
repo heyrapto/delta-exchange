@@ -153,14 +153,14 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                 </div>
 
                 <div className="md:flex hidden items-center gap-1 sm:gap-2 relative w-full sm:w-auto justify-between sm:justify-end">
-                    <button
+                    {/* <button
                         onClick={() => setShowResources(!showResources)}
                         className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] bg-transparent cursor-pointer text-gray-800 border ${showResources ? "border-green-500 text-green-500" : "border-gray-300"} relative`}
                     >
                         <SiStackblitz className="w-3 h-3 sm:w-4 sm:h-4" />
                         <span className="hidden sm:inline">Resources</span>
                         <BiChevronDown className={`w-3 h-3 transition-transform ${showResources ? 'rotate-180' : ''}`} />
-                    </button>
+                    </button> */}
                     <button
                         onClick={() => {
                             setStrategyView(!strategyView)
