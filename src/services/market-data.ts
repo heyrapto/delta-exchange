@@ -58,13 +58,14 @@ export class MarketDataService {
   }
 
   // Simulate order execution
-  executeOrder(tradeType: 'long' | 'short', quantity: number, leverage: number) {
+  executeOrder(tradeType: 'long' | 'short', quantity: number, period: number) {
     const store = useTradeStore.getState()
     
     // Simulate execution delay
     setTimeout(() => {
       // Update available margin (simulate funds being used)
-      const fundsUsed = (quantity * store.currentPrice) / leverage
+      // For options: funds = quantity * price (period doesn't affect funds)
+      const fundsUsed = quantity * store.currentPrice
       const newAvailableMargin = Math.max(store.availableMargin - fundsUsed, 0)
       
       store.updateMarketData({

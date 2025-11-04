@@ -7,12 +7,14 @@ import React from 'react'
 
 const OptionsTradePage = () => {
   return (
-    <div>
+    <>
        <Banner />
        <Header />
-       <div></div>
+       <main>
+        
+       </main>
        <Footer />
-    </div>
+    </>
   )
 }
 

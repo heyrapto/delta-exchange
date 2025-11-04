@@ -53,8 +53,7 @@ export const OptionsChain = ({
         strike,
         price,
         quantity: 1,
-        contract: `${type === 'call' ? 'C' : 'P'}-${selectedContract}-${strike}-231025`,
-        leverage: 100
+        contract: `${type === 'call' ? 'C' : 'P'}-${selectedContract}-${strike}-231025`
       })
     }
   }
