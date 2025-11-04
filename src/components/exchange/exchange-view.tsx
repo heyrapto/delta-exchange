@@ -12,7 +12,7 @@ export const ExchangeView = () => {
     const [viewMode, setViewMode] = useState<ViewMode>("chart");
 
     return (
-        <div className="flex flex-col lg:flex-row h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-screen sm:h-[600px] lg:h-[700px] overflow-hidden">
             {/* Main Exchange - Full width on mobile, 60% on desktop */}
             <div className="w-full lg:w-[60%]">
                 <MainExchange viewMode={viewMode} setViewMode={setViewMode} strategyView={strategyView} setStrategyView={setStrategyView} />

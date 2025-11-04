@@ -116,7 +116,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
     }, [])
 
     return (
-        <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
+        <div className="relative w-full h-screen sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
             {/* Top Navigation Bar */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-2 sm:px-3 py-2 border gap-2 sm:gap-0  md:bg-[var(--trading-bg)] bg-gray-100/50" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="flex flex-wrap items-center gap-1 sm:gap-2">
