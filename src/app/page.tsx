@@ -21,14 +21,12 @@ export default function Home() {
 
   return (
     <PageLayout>
-      
       {activeTab === "trade" ? (
         <MobileTradeView />
       ) : (
         <Exchange />
       )}
       
-      <Footer />
       <BottomNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
     </PageLayout>
   )
