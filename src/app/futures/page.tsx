@@ -10,6 +10,7 @@ import { MarketTradePanel } from '@/components/ui/market-trade-panel'
 import { ExchangePanel } from '@/components/exchange/exchange-panel'
 import { useTradeStore } from '@/store/trade-store'
 import { useEffect, useState } from 'react'
+import { BottomNavigation } from '@/components/layout/bottom-nav'
 
 const FuturesPage = () => {
   const { currentPrice, markPrice, indexPrice } = useTradeStore()
@@ -64,12 +65,14 @@ const FuturesPage = () => {
 
   return (
     <PageLayout>
-      <div className="flex flex-col h-[calc(100vh-200px)]">
-        {/* Market Overview */}
-        <MarketOverview />
+      <div className="flex flex-col">
+        {/* Market Overview + Main Trading Area wrapper to match ExchangeView height */}
+        <div className="flex flex-col h-[600px] lg:h-[700px] overflow-hidden">
+          {/* Market Overview */}
+          <MarketOverview />
 
-        {/* Main Trading Area */}
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+          {/* Main Trading Area */}
+          <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
           {/* Left Section - Depth Chart */}
           <div className="w-full lg:w-[60%] h-[400px] lg:h-auto border-r border-gray-300">
             <DepthChart 
@@ -102,11 +105,14 @@ const FuturesPage = () => {
           <div className="w-full lg:w-[20%] min-h-[400px] lg:h-auto">
             <MarketTradePanel />
           </div>
+          </div>
         </div>
 
         {/* Bottom Panel - Positions, Orders, etc. */}
         <ExchangePanel />
       </div>
+      {/* Mobile Bottom Navigation */}
+      <BottomNavigation activeTab={"chart"} setActiveTab={() => {}} />
     </PageLayout>
   )
 }
