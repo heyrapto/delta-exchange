@@ -41,3 +41,5 @@ export interface navItemProps {
     hasNew?: string
     dropdown?: any[];
 }
+
+export type TSentiment = "bull" | "bear" | "high" | "low";

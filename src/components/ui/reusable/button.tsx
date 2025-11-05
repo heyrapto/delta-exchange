@@ -1,4 +1,13 @@
-export const Button = ({ children, variant = "primary", className, onClick }: { children: React.ReactNode, variant?: "primary" | "secondary", className?: string, onClick?: () => void }) => {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+  isLoading?: boolean;
+  children?: React.ReactNode;
+  variant?: "primary" | "secondary";
+  onclick?: () => void;
+}
+
+export const Button = ({ children, variant = "primary", className, onClick }: ButtonProps) => {
     const baseClasses = "px-2 sm:px-4 h-[36px] sm:h-[42px] rounded-none cursor-pointer min-w-[80px] sm:min-w-[130px] text-xs sm:text-sm";
     
     const getButtonStyle = () => {
@@ -18,12 +27,16 @@ export const Button = ({ children, variant = "primary", className, onClick }: { 
                 return {
                     backgroundColor: 'var(--button-primary-bg)',
                     color: 'var(--button-primary-text)'
-                };
+            };
         }
     };
 
   return (
-    <button className={`${baseClasses} ${className}`} style={getButtonStyle()} onClick={onClick}>
+    <button
+     className={`${baseClasses} ${className}`} 
+     style={getButtonStyle()} 
+     onClick={onClick}
+     >
       {children}
     </button>
   );

@@ -1,0 +1,5 @@
+export const ENVIRONMENT = {
+  ARBISCAN_API_KEY: process.env.NEXT_ARBISCAN_API_KEY,
+  PLATFORM_FEE_ADDRESS: process.env.NEXT_PLATFORM_FEE_ADDRESS,
+  BASE_URL: process.env.NEXT_BASE_URL,
+};
