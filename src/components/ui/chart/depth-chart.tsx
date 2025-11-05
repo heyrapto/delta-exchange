@@ -83,7 +83,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartPr
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-white border border-gray-300">
+    <div className="w-full h-full flex flex-col bg-white border border-gray-300 relative">
       {/* Tabs */}
       <div className="flex border-b border-gray-300 px-4">
         {["Traded Price", "Mark Price", "Funding", "Depth"].map((tab) => (
@@ -101,7 +101,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartPr
       </div>
 
       {/* Depth Slider */}
-      <div className="px-4 py-2 border-b border-gray-300">
+      <div className="px-4 py-2 border-gray-300">
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-600">Depth</span>
           <div className="flex-1 max-w-xs">

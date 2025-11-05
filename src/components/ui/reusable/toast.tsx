@@ -25,7 +25,7 @@ export const Toast = ({ message, type = 'info', duration = 3000, onClose }: Toas
       case 'warning':
         return 'bg-yellow-500 text-black'
       default:
-        return 'bg-blue-500 text-white'
+        return 'bg-green-300 text-black'
     }
   }
 
