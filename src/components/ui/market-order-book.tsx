@@ -4,7 +4,7 @@ import { useState } from "react"
 import { BiChevronDown } from "react-icons/bi"
 import { OrderBookEntry } from "@/types"
 
-interface MarketOrderBookProps {
+interface FuturesOrderBookProps {
   buyOrders: OrderBookEntry[]
   sellOrders: OrderBookEntry[]
   currentPrice: number
@@ -12,7 +12,7 @@ interface MarketOrderBookProps {
   indexPrice?: number
 }
 
-export const MarketOrderBook = ({ buyOrders, sellOrders, currentPrice, markPrice, indexPrice }: MarketOrderBookProps) => {
+export const FuturesOrderBook = ({ buyOrders, sellOrders, currentPrice, markPrice, indexPrice }: FuturesOrderBookProps) => {
   const [priceAggregation, setPriceAggregation] = useState(0.5)
   const [showAggregationDropdown, setShowAggregationDropdown] = useState(false)
 

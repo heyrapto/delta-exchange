@@ -3,7 +3,7 @@
 import { PageLayout } from '@/components/layout/page-layout'
 import { LoadingScreen } from '@/components/ui/loading-screen'
 import { PromotionalCards } from '@/components/ui/promotional-cards'
-import { FuturesTable } from '@/components/ui/futures-table'
+import { MarketsTable } from '@/components/ui/futures-table'
 import { useEffect, useState } from 'react'
 
 const MarketPage = () => {
@@ -15,7 +15,7 @@ const MarketPage = () => {
 
         {/* Futures Table Section */}
         <div className="flex-1">
-          <FuturesTable />
+          <MarketsTable />
         </div>
     </div>
     </PageLayout>
