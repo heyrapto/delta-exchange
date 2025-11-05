@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { BiChevronDown, BiChevronUp, BiDownload, BiSearch, BiStar } from "react-icons/bi"
 
-interface FuturesContract {
+interface MarketsContract {
   contract: string
   description: string
   lastPrice: number
@@ -19,7 +19,7 @@ interface FuturesContract {
 type SortField = "contract" | "change24h" | "volume24h" | "openInterest" | "funding"
 type SortDirection = "asc" | "desc"
 
-export const FuturesTable = () => {
+export const MarketsTable = () => {
   const [activeTab, setActiveTab] = useState("Futures")
   const [activeCategory, setActiveCategory] = useState("ALL")
   const [searchQuery, setSearchQuery] = useState("")
@@ -28,7 +28,7 @@ export const FuturesTable = () => {
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set())
 
   // Sample data
-  const contracts: FuturesContract[] = [
+  const contracts: MarketsContract[] = [
     {
       contract: "BTCUSD",
       description: "Bitcoin Perpetual 200x",

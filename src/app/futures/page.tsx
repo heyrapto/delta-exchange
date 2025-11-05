@@ -4,12 +4,12 @@ import { PageLayout } from '@/components/layout/page-layout'
 import { LoadingScreen } from '@/components/ui/loading-screen'
 import { MarketOverview } from '@/components/ui/market-overview'
 import { DepthChart } from '@/components/ui/chart/depth-chart'
-import { MarketOrderBook } from '@/components/ui/market-order-book'
 import { RecentTrades } from '@/components/ui/recent-trades'
-import { MarketTradePanel } from '@/components/ui/market-trade-panel'
 import { ExchangePanel } from '@/components/exchange/exchange-panel'
 import { useTradeStore } from '@/store/trade-store'
 import { useEffect, useState } from 'react'
+import { FuturesOrderBook } from '@/components/ui/market-order-book'
+import { FuturesTradePanel } from '@/components/ui/market-trade-panel'
 
 const FuturesPage = () => {
   const { currentPrice, markPrice, indexPrice } = useTradeStore()
@@ -85,7 +85,7 @@ const FuturesPage = () => {
           <div className="w-full lg:w-[20%] flex flex-col border-r border-gray-300">
             {/* Order Book */}
             <div className="flex-1 min-h-0">
-              <MarketOrderBook
+              <FuturesOrderBook
                 buyOrders={buyOrders.map(({ price, size }) => ({ price, size }))}
                 sellOrders={sellOrders.map(({ price, size }) => ({ price, size }))}
                 currentPrice={currentPrice}
@@ -102,7 +102,7 @@ const FuturesPage = () => {
 
           {/* Right Section - Trade Panel */}
           <div className="w-full lg:w-[20%] min-h-[400px] lg:h-auto">
-            <MarketTradePanel />
+            <FuturesTradePanel />
           </div>
           </div>
         </div>

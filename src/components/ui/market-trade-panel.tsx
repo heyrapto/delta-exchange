@@ -4,11 +4,11 @@ import { useState } from "react"
 import { Button } from "./reusable/button"
 import { HiOutlineExternalLink } from "react-icons/hi"
 
-interface MarketTradePanelProps {
+interface FuturesTradePanelProps {
   isLoggedIn?: boolean
 }
 
-export const MarketTradePanel = ({ isLoggedIn = false }: MarketTradePanelProps) => {
+export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps) => {
   const [leverage, setLeverage] = useState(20)
 
   if (!isLoggedIn) {

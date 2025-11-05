@@ -13,5 +13,3 @@ export const useUiStore = create<UiState>((set) => ({
   activeTab: "chart",
   setActiveTab: (tab) => set({ activeTab: tab }),
 }))
-
-
