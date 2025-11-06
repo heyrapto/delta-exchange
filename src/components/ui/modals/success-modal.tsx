@@ -15,16 +15,16 @@ const SuccessModal = ({ isOpen, onClose, txHash }: SuccessModalProps) => {
 
   return (
     <Modal>
-      <div className="flex items-center flex-col gap-3">
+      <div className="flex items-center flex-col gap-4 bg-white rounded-lg p-6 shadow-md border border-[#ADFF2F]">
         <div className="relative flex items-center justify-center">
-          <div className="absolute w-[5rem] h-[5rem] rounded-full bg-green-300/20 animate-pulse"></div>
-          <div className="absolute w-[4rem] h-[4rem] rounded-full bg-green-400/30"></div>
-          <div className="absolute w-[3rem] h-[3rem] rounded-full bg-green-500/40"></div>
-          <div className="relative w-[2.5rem] h-[2.5rem] rounded-full bg-green-600 flex items-center justify-center">
-            <GiCheckMark className="text-white text-[1.5rem]" />
+          <div className="absolute w-[5rem] h-[5rem] rounded-full" style={{ backgroundColor: '#ADFF2F33' }}></div>
+          <div className="absolute w-[4rem] h-[4rem] rounded-full" style={{ backgroundColor: '#ADFF2F66' }}></div>
+          <div className="absolute w-[3rem] h-[3rem] rounded-full" style={{ backgroundColor: '#ADFF2F99' }}></div>
+          <div className="relative w-[2.5rem] h-[2.5rem] rounded-full flex items-center justify-center" style={{ backgroundColor: '#ADFF2F' }}>
+            <GiCheckMark className="text-black text-[1.5rem]" />
           </div>
         </div>
-        <p className="text-[1.3rem] text-white mt-4">
+        <p className="text-[1.2rem] text-black mt-2 font-semibold text-center">
           Your transaction was confirmed successfully
         </p>
         <div className="flex items-center gap-3 font-bold">
