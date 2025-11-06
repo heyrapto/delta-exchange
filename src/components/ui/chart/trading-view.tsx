@@ -52,7 +52,7 @@ export const TradingViewChart = ({ symbol, interval = '60' }: { symbol: string; 
     }, [symbol, interval])
 
     return (
-        <div className="relative h-screen w-full">
+        <div className="relative h-screen md:h-full w-full">
             {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-[#1a1d25]/80 z-10">
                     <div className="w-8 h-8 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin"></div>

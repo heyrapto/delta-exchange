@@ -17,8 +17,8 @@ interface MainExchangeProps {
 }
 
 export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewMode }: MainExchangeProps) => {
-    const { updateMarketData, setSelectedContract, currentPrice, period } = useTradeStore()
-    const { state, handleAssetChange } = useAppContext()
+    const { updateMarketData, setSelectedContract } = useTradeStore()
+    const { state, handleAssetChange, formatNumber } = useAppContext()
     const { isStrategyBuilderActive, setStrategyBuilderActive } = useStrategyStore()
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
@@ -71,7 +71,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
             try {
                 const mockData: OptionData[] = Array.from({ length: 20 }, (_, i) => {
                     const strike = 96000 + (i * 1000)
-                    const isITM = strike < currentPrice
+                    const isITM = strike < state.assetPrice
 
                     return {
                         strike,
@@ -152,9 +152,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                                 setLocalSelectedContract(tab.value)
                                 setSelectedContract(tab.value as 'BTC' | 'ETH')
                                 handleAssetChange(tab.value as any)
-                                // Snap price for ETH/BTC demo
-                                const snap = tab.value === 'BTC' ? 108068.0 : 3120.0
-                                updateMarketData({ currentPrice: snap, lastPrice: snap, markPrice: snap })
+                                // Use AppContext price; do not override with static values
                             }}
                             className={`px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] font-medium transition-colors border cursor-pointer ${selectedContract === tab.value ? "bg-green-500 text-white" : "bg-transparent text-gray-900"}`}
                         >
@@ -249,8 +247,8 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                     </div>
                     <div className="flex items-center gap-2 sm:gap-4">
                         <div className="text-center">
-                            <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>{selectedContract}</span>
-                            <span className="text-[9px] sm:text-[10px] font-bold text-red-500">${currentPrice.toFixed(1)}</span>
+                            <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>{state.asset}</span>
+                            <span className="text-[9px] sm:text-[10px] font-bold text-red-500">{state.isFetching ? "..." : formatNumber(state.assetPrice)}</span>
                         </div>
                         <div className="text-[9px] sm:text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
                             <span className="hidden sm:inline">Time to Expiry </span>

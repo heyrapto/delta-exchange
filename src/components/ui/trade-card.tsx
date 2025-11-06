@@ -266,7 +266,7 @@ export const TradeCard = () => {
                     >
                         <div className="flex gap-2 items-center">
                             <span className="text-gray-900 text-[11px]">Period</span>
-                            <span className="text-green-500 text-[11px] font-medium">{period} days</span>
+                            <span className="text-green-500 text-[11px] font-medium">{state.period} days</span>
                         </div>
                         <div className="flex items-center gap-2">
                             {showPeriodPanel ? (
