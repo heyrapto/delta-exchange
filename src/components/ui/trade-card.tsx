@@ -133,16 +133,16 @@ export const TradeCard = () => {
     }
 
     const headerStats = [
-        {
-            label: "Delta",
-            value: getDeltaValue(),
+        { 
+            label: "Delta", 
+            value: getDeltaValue(), 
             icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--warning-color)' }} onClick={() => setShowDeltaDropdown(!showDeltaDropdown)} />,
             hasDropdown: true
         },
-        {
-            label: "Lot Size",
-            value: "0.001 BTC",
-            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--text-secondary)' }} onClick={() => setShowLotSizeHeaderDropdown(!showLotSizeHeaderDropdown)} />,
+        { 
+            label: "Lot Size", 
+            value: "0.001 BTC", 
+            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--text-secondary)' }} onClick={() => setShowLotSizeHeaderDropdown(!showLotSizeHeaderDropdown)} />, 
             center: true,
             hasDropdown: true
         },
@@ -184,6 +184,7 @@ export const TradeCard = () => {
     const handleQuantityChange = (value: string) => {
         if (isValidNumericInput(value)) {
             setQuantity(value)
+            handleAmountChange(value)
             // calculateFundsRequired() is already called in setQuantity
         }
     }
@@ -217,7 +218,7 @@ export const TradeCard = () => {
             price: limitPrice ? Number(limitPrice) : undefined,
             quantity: Number(quantity)
         })
-
+        
         setNotificationData({
             title: 'Order Placed',
             message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots with ${period} days period`,
@@ -231,7 +232,7 @@ export const TradeCard = () => {
     useEffect(() => {
         marketDataService.resetDemoData()
         marketDataService.startLiveUpdates()
-
+        
         return () => {
             marketDataService.stopLiveUpdates()
         }
@@ -249,7 +250,7 @@ export const TradeCard = () => {
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
                         {s.icon}
-
+                        
                         {/* Delta Dropdown */}
                         {s.hasDropdown && s.label === "Delta" && showDeltaDropdown && (
                             <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
@@ -264,7 +265,7 @@ export const TradeCard = () => {
                                 ))}
                             </div>
                         )}
-
+                        
                         {/* Lot Size Header Dropdown */}
                         {s.hasDropdown && s.label === "Lot Size" && showLotSizeHeaderDropdown && (
                             <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[100px]">
@@ -409,14 +410,14 @@ export const TradeCard = () => {
                                         ))}
                                 </SelectContent>
                             </Select>
-                        </div>
+                            </div>
                         {/* <p></p> */}
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-4 w-full">
           <TradeSummary />
-        </div>
+                </div>
 
                 <div className="mt-3 bg-gradient-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">

@@ -77,7 +77,7 @@ const strategyCall = async ({
       args: [account, CONTRACT_ADDRESS_ARB],
     });
 
-    if (allowance === 0n) {
+    if (allowance === BigInt(0)) {
       const approvalHash = await writeContract(wagmiConfig, {
         address: CONTRACT_ADDRESS_USDCe,
         abi: erc20ABI,

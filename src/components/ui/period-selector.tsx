@@ -2,6 +2,7 @@
 
 import { useTradeStore } from "@/store/trade-store"
 import { Slider } from "./reusable/slider"
+import { useAppContext } from "@/context/app-context"
 
 const formatExpirationDate = (days: number): string => {
   const today = new Date()
@@ -26,9 +27,11 @@ export const PeriodSelector = () => {
         period,
         setPeriod,
     } = useTradeStore()
+    const { handlePeriodChange } = useAppContext()
 
-    const handlePeriodChange = (value: string) => {
+    const handleLocalPeriodChange = (value: string) => {
         setPeriod(value)
+        handlePeriodChange(value)
     }
 
     return (
@@ -40,7 +43,7 @@ export const PeriodSelector = () => {
 
             <Slider
                 value={[+period]}
-                onValueChange={(value) => handlePeriodChange(value[0].toString())}
+                onValueChange={(value) => handleLocalPeriodChange(value[0].toString())}
                 max={90}
                 min={7}
                 step={1}

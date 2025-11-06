@@ -9,6 +9,7 @@ import { OptionsChain } from "./options-chain"
 import { useTradeStore } from "@/store/trade-store"
 import { useStrategyStore } from "@/store/strategy-store"
 import { GridDropdown } from "../dropdowns/grid"
+import { useAppContext } from "@/context/app-context"
 
 interface MainExchangeProps {
     strategyView: boolean
@@ -18,7 +19,8 @@ interface MainExchangeProps {
 }
 
 export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewMode }: MainExchangeProps) => {
-    const { updateMarketData, setSelectedContract, currentPrice } = useTradeStore()
+    const { updateMarketData, setSelectedContract, currentPrice, period } = useTradeStore()
+    const { state, handleAssetChange } = useAppContext()
     const { isStrategyBuilderActive, setStrategyBuilderActive } = useStrategyStore()
     const [tableView, setTableView] = useState<TableView>("standard")
     const [selectedContract, setLocalSelectedContract] = useState("BTC")
@@ -115,6 +117,16 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
+    const assetSymbol = state.asset === 'ETH' ? 'ETH' : 'BTC'
+    const tvSymbol = `BINANCE:${assetSymbol}USDT`
+    const mapDaysToInterval = (days: string): string => {
+        const d = parseInt(days, 10)
+        if (d <= 7) return '60' // 1h
+        if (d <= 14) return '240' // 4h
+        if (d <= 30) return 'D' // 1D
+        return 'W' // weekly for longer periods
+    }
+
     return (
         <div className="relative w-full h-screen sm:h-[600px] lg:h-[700px] flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--trading-bg)', color: 'var(--text-primary)' }}>
             {/* Top Navigation Bar */}
@@ -141,6 +153,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                             onClick={() => {
                                 setLocalSelectedContract(tab.value)
                                 setSelectedContract(tab.value as 'BTC' | 'ETH')
+                                handleAssetChange(tab.value as any)
                                 // Snap price for ETH/BTC demo
                                 const snap = tab.value === 'BTC' ? 108068.0 : 3120.0
                                 updateMarketData({ currentPrice: snap, lastPrice: snap, markPrice: snap })
@@ -264,7 +277,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                         selectedContract={selectedContract as 'BTC' | 'ETH'}
                     />
                 ) : (
-                    <TradingViewChart symbol={`BINANCE:${selectedContract}USDT`} />
+                    <TradingViewChart symbol={tvSymbol} interval={mapDaysToInterval(period)} />
                 )}
             </div>
         </div>

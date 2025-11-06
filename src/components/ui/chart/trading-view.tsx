@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"
 
-export const TradingViewChart = ({ symbol }: { symbol: string }) => {
+export const TradingViewChart = ({ symbol, interval = '60' }: { symbol: string; interval?: string }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -30,7 +30,7 @@ export const TradingViewChart = ({ symbol }: { symbol: string }) => {
                 new (window as any).TradingView.widget({
                     autosize: true,
                     symbol: symbol,
-                    interval: '60',
+                    interval: interval,
                     timezone: "Etc/UTC",
                     theme: "dark",
                     style: "1",
@@ -49,7 +49,7 @@ export const TradingViewChart = ({ symbol }: { symbol: string }) => {
         return () => {
             if (existingScript) existingScript.remove()
         }
-    }, [symbol])
+    }, [symbol, interval])
 
     return (
         <div className="relative h-screen w-full">
