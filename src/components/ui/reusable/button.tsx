@@ -7,7 +7,7 @@ export interface ButtonProps
   onclick?: () => void;
 }
 
-export const Button = ({ children, variant = "primary", className, onClick }: ButtonProps) => {
+export const Button = ({ children, variant = "primary", className, onClick, onclick }: ButtonProps) => {
     const baseClasses = "px-2 sm:px-4 h-[36px] sm:h-[42px] rounded-none cursor-pointer min-w-[80px] sm:min-w-[130px] text-xs sm:text-sm";
     
     const getButtonStyle = () => {
@@ -35,7 +35,7 @@ export const Button = ({ children, variant = "primary", className, onClick }: Bu
     <button
      className={`${baseClasses} ${className}`} 
      style={getButtonStyle()} 
-     onClick={onClick}
+     onClick={onClick || onclick}
      >
       {children}
     </button>
