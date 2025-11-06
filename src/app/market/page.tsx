@@ -1,10 +1,8 @@
 "use client"
 
 import { PageLayout } from '@/components/layout/page-layout'
-import { LoadingScreen } from '@/components/ui/loading-screen'
 import { PromotionalCards } from '@/components/ui/promotional-cards'
 import { MarketsTable } from '@/components/ui/futures-table'
-import { useEffect, useState } from 'react'
 
 const MarketPage = () => {
   return (
