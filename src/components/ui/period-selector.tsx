@@ -3,6 +3,7 @@
 import { useTradeStore } from "@/store/trade-store"
 import { Slider } from "./reusable/slider"
 import { useAppContext } from "@/context/app-context"
+import { useState } from "react"
 
 const formatExpirationDate = (days: number): string => {
   const today = new Date()
@@ -23,27 +24,18 @@ const formatExpirationDate = (days: number): string => {
 }
 
 export const PeriodSelector = () => {
-    const {
-        period,
-        setPeriod,
-    } = useTradeStore()
-    const { handlePeriodChange } = useAppContext()
-
-    const handleLocalPeriodChange = (value: string) => {
-        setPeriod(value)
-        handlePeriodChange(value)
-    }
+    const { state, handlePeriodChange } = useAppContext();
 
     return (
         <div className="relative bg-transparent border border-white/0 px-6 py-[14px] rounded-lg flex flex-col gap-3 justify-between">
             <div className="absolute inset-0 rounded-[8px] border border-white/[0.07] pointer-events-none" />
             <p className="text-black font-normal text-sm">
-                Period: <span className="text-black font-semibold text-sm">{period} days</span>
+                Period: <span className="text-black font-semibold text-sm">{state.period} days</span>
             </p>
 
             <Slider
-                value={[+period]}
-                onValueChange={(value) => handleLocalPeriodChange(value[0].toString())}
+                value={[+state.period]}
+                onValueChange={(value) => handlePeriodChange(value[0].toString())}
                 max={90}
                 min={7}
                 step={1}
@@ -51,7 +43,7 @@ export const PeriodSelector = () => {
             />
 
             <p className="text-xs leading-[18px] font-normal text-gray-700">
-                Expiration Date: <span className="font-semibold text-xs leading-[18px]">{formatExpirationDate(parseInt(period))}</span>
+                Expiration Date: <span className="font-semibold text-xs leading-[18px]">{formatExpirationDate(parseInt(state.period))}</span>
             </p>
         </div>
     )

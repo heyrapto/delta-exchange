@@ -81,7 +81,7 @@ export function TradeSummary() {
         onClose={() => setShowSuccessModal(false)}
         txHash={txHash}
       />
-      <div className="relative col-span-2 bg-green-100 border border-white/0 py-3.5 px-6 rounded-lg">
+      <div className="relative col-span-2  border border-white/0 py-3.5 px-6 rounded-lg">
         <div className="absolute inset-0 rounded-[8px] border border-white/[0.07] pointer-events-none" />
         <div className="flex flex-col md:flex-row items-start gap-6 md:gap-10 lg:gap-24">
           <div className="w-full md:max-w-[50%] space-y-2">

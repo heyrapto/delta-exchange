@@ -57,7 +57,6 @@ export const TradeCard = () => {
     } = useTradeStore()
     const {
         state,
-        handlePeriodChange,
         handleAmountChange,
         handleProfitZoneSelect,
     } = useAppContext();
@@ -69,16 +68,9 @@ export const TradeCard = () => {
         selectedProfitZone,
     } = state;
 
-    const formatExpirationDate = (periodInDays: number) => {
-        const expirationTimestamp = Date.now() + periodInDays * 24 * 60 * 60 * 1000;
-        return new Date(expirationTimestamp).toDateString();
-    };
-
     // Modal states
     const [showConfirmation, setShowConfirmation] = useState(false)
     const [showNotification, setShowNotification] = useState(false)
-    const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false)
-    const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
     const [showDeltaDropdown, setShowDeltaDropdown] = useState(false)
     const [showLotSizeHeaderDropdown, setShowLotSizeHeaderDropdown] = useState(false)
     const [notificationData, setNotificationData] = useState({
@@ -87,7 +79,6 @@ export const TradeCard = () => {
         type: 'info' as 'success' | 'error' | 'info' | 'warning'
     });
 
-    const currencyOptions = ['USD', 'EUR', 'NGN', 'GBP', 'JPY']
     const lotSizeOptions = ['0.001 BTC', '0.01 BTC', '0.1 BTC', '1 BTC']
     const deltaOptions = ['-0.44', '-0.38', '-0.32', '-0.26', '-0.20']
 
@@ -99,11 +90,6 @@ export const TradeCard = () => {
             case 'index': return indexPrice
             default: return currentPrice
         }
-    }
-
-    const getPriceDisplay = () => {
-        const price = getCurrentPrice()
-        return `$${price.toFixed(1)}`
     }
 
     const getDeltaValue = () => {
@@ -159,74 +145,11 @@ export const TradeCard = () => {
         { label: "Put | Short", type: "short", activeColor: "bg-red-500 text-white" },
     ] as const
 
-    const orderTabs = [
-        // { key: "limit" as const, label: "Limit", hasDropdown: false },
-        { key: "market" as const, label: "Market", hasDropdown: false },
-        // { key: "stopLimit" as const, label: "Stop Limit", hasDropdown: true },
-    ]
-    const stopLimitOptions = [
-        { value: "stopLimit", label: "Stop Limit" },
-        { value: "takeProfitLimit", label: "Take Profit Limit" }
-    ]
-
     // Helper function for numeric validation
     const isValidNumericInput = (value: string): boolean => {
         const numericRegex = /^[0-9]*\.?[0-9]*$/
         return numericRegex.test(value) || value === ''
     }
-
-    // Handler functions
-
-    const handleQuantityPercentChange = (percent: number) => {
-        setQuantityPercent(percent)
-    }
-
-    const handleQuantityChange = (value: string) => {
-        if (isValidNumericInput(value)) {
-            setQuantity(value)
-            handleAmountChange(value)
-            // calculateFundsRequired() is already called in setQuantity
-        }
-    }
-
-    const handleTradeSubmit = () => {
-        if (!quantity || parseFloat(quantity) <= 0) {
-            setNotificationData({
-                title: 'Invalid Quantity',
-                message: 'Please enter a valid quantity',
-                type: 'error'
-            })
-            setShowNotification(true)
-            return
-        }
-
-        if (fundsRequired > availableMargin) {
-            setNotificationData({
-                title: 'Insufficient Margin',
-                message: `Required: ${getFundsRequiredDisplay()}, Available: ${getAvailableMarginDisplay()}`,
-                type: 'warning'
-            })
-            setShowNotification(true)
-            return
-        }
-
-        // Execute order through demo service and push to open orders
-        marketDataService.executeOrder(tradeType, parseFloat(quantity), parseInt(period))
-        useTradeStore.getState().placeOrder({
-            side: tradeType,
-            orderType,
-            price: limitPrice ? Number(limitPrice) : undefined,
-            quantity: Number(quantity)
-        })
-        
-        setNotificationData({
-            title: 'Order Placed',
-            message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots with ${period} days period`,
-            type: 'success'
-        })
-        setShowNotification(true)
-    }
-
 
     // Initialize demo data and start live updates
     useEffect(() => {
@@ -365,8 +288,8 @@ export const TradeCard = () => {
                     <div className="bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between mb-1.5">
                         <input
                             type="text"
-                            value={quantity}
-                            onChange={(e) => handleQuantityChange(e.target.value)}
+                            value={state.amount}
+                            onChange={(value) => handleAmountChange(value.target.value)}
                             placeholder="1 Straps"
                             className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
@@ -416,7 +339,7 @@ export const TradeCard = () => {
                 </div>
 
                 <div className="flex flex-col gap-4 w-full">
-          <TradeSummary />
+                <TradeSummary />
                 </div>
 
                 <div className="mt-3 bg-gradient-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">

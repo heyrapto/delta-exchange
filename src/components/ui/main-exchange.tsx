@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { BiChevronDown } from "react-icons/bi"
-import { SiStackblitz } from "react-icons/si"
 import { TradingViewChart } from "./chart/trading-view"
 import { OptionData, TableView, ViewMode } from "@/types"
 import { OptionsChain } from "./options-chain"
@@ -204,6 +202,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
             </div>
 
             {/* Date Selection */}
+            {viewMode === "table" && (
             <div className="md:flex hidden justify-between items-center gap-2 px-2 sm:px-3 py-2 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--trading-border)' }}>
                 <div className="flex gap-1 sm:gap-2">
                     {dates.map((date) => (
@@ -239,7 +238,8 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                         buttonRef={gridButtonRef as any}
                     />
                 </div>
-            </div>
+            </div>            
+            )}
 
             {/* Price Info Bar */}
             <div className="px-2 sm:px-3 py-2 border-b" style={{ borderColor: 'var(--trading-border)' }}>
@@ -277,7 +277,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                         selectedContract={selectedContract as 'BTC' | 'ETH'}
                     />
                 ) : (
-                    <TradingViewChart symbol={tvSymbol} interval={mapDaysToInterval(period)} />
+                    <TradingViewChart symbol={tvSymbol} interval={mapDaysToInterval(state.period)} />
                 )}
             </div>
         </div>

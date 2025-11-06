@@ -3,8 +3,8 @@
 import { useRef, useState, useEffect } from "react"
 
 export const TradingViewChart = ({ symbol, interval = '60' }: { symbol: string; interval?: string }) => {
-    const containerRef = useRef<HTMLDivElement>(null)
-    const [isLoading, setIsLoading] = useState(true)
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         setIsLoading(true)
