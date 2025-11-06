@@ -1,8 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "./reusable/button"
-import { HiOutlineExternalLink } from "react-icons/hi"
+import CustomConnectButton from "../custom/connect-button"
+import { axiosInstance } from "@/utils/axios"
+import { useAccount } from "wagmi"
+import {
+    Asset,
+    callHegicStrategyContract,
+    OptionType,
+  } from "../../blockchain/hegic/hegicCalls";
+import { useAppContext } from "@/context/app-context"
+import { Hex } from "viem"
+import { toast } from "react-toastify";
 
 interface FuturesTradePanelProps {
   isLoggedIn?: boolean
@@ -10,6 +19,62 @@ interface FuturesTradePanelProps {
 
 export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps) => {
   const [leverage, setLeverage] = useState(20)
+  const [userBalance, setUserBalance] = useState<number | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [txHash, setTxHash] = useState<Hex | "">("");
+
+  const { state } = useAppContext();
+  const { asset, strategy, isFetching, selectedPremium, period, amount } =
+    state;
+
+  const { address } = useAccount();
+
+  const handleBalanceChange = (balance: number) => {
+    setUserBalance(balance);
+  };
+
+const callStrategy = async () => {
+    try {
+      setShowConfirmModal(true);
+      const tx = await callHegicStrategyContract({
+        optionType: state.strategy.toUpperCase() as OptionType,
+        amount: parseFloat(amount),
+        period,
+        asset: asset as Asset,
+        index: 0,
+        premium: parseFloat(selectedPremium),
+      });
+
+      if (typeof tx === "object" && "status" in tx) {
+        console.log("Transaction status:", tx.status);
+        console.log("Transaction message:", tx.message);
+
+        setShowConfirmModal(false);
+        toast.error(tx.message);
+      } else {
+        setTxHash(tx);
+        setShowConfirmModal(false);
+        setShowSuccessModal(true);
+
+        // call the referral reward function
+        try {
+          await axiosInstance.post("/referrals/reward", {
+            refereeAddress: address,
+            rewardAmount: parseFloat(amount) * 0.002,
+            transactionHash: tx,
+          });
+        } catch (rewardError) {
+          console.error("Referral reward failed:", rewardError);
+          toast.warning(
+            "Referral reward processing failed, but trade was successful"
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    }
+  };
 
   if (!isLoggedIn) {
     return (
@@ -18,20 +83,10 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
           <p className="text-gray-700 mb-6">
             Want to get started? Create an account in just a few seconds.
           </p>
-          <Button variant="primary" className="w-full mb-4">
-            Sign Up
-          </Button>
-          <div className="mb-4 text-gray-500 text-sm">OR</div>
-          <Button variant="secondary" className="w-full mb-6">
-            Log In
-          </Button>
-          <a
-            href="#"
-            className="text-sm text-[#ADFF2F] hover:underline flex items-center gap-1"
-          >
-            Try Delta's Demo Trading
-            <HiOutlineExternalLink className="w-4 h-4" />
-          </a>
+          <CustomConnectButton
+                onclick={callStrategy}
+                onBalanceChange={handleBalanceChange}
+            />
         </div>
 
         {/* Placeholder for order form elements when logged in */}

@@ -1,3 +1,9 @@
 Critical:
 1. The calls has an orange border that reaches the strikecell in that same row when active (see image attached)
 2. Buy/sell buttons positioning
+
+Must DO:
+1. Effect on input changes i.e period and values must have effect on the chart in real time.
+2. Update trade-card input fields
+3. I keep seeing "wrong network" on the custom connect button
+4. We need to update logic for amount as it was changed from quantitiy in trade card

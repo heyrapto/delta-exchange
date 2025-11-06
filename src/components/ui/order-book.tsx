@@ -91,9 +91,9 @@ export const OrderBook = () => {
       {/* Header */}
       <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
         <div className="flex items-center gap-1 sm:gap-2 mb-2">
-          <BiStar className="text-xs sm:text-sm" style={{ color: "var(--warning-color)" }} />
+          <BiStar className="text-xs" style={{ color: "var(--warning-color)" }} />
           <span
-            className="text-[10px] sm:text-xs font-medium truncate"
+            className="text-xs font-medium truncate"
             style={{ color: "var(--orderbook-text)" }}
           >
             P-BTC-106000-281125
@@ -102,12 +102,12 @@ export const OrderBook = () => {
         <div className="grid grid-cols-2 gap-1 sm:gap-2">
           <div>
             <div
-              className="text-[8px] sm:text-[9px]"
+              className="text-xs"
               style={{ color: "var(--orderbook-text-secondary)" }}
             >
               24h Change
             </div>
-            <div className="text-[10px] sm:text-[11px] font-medium text-green-500">14.68%</div>
+            <div className="text-xs font-medium text-green-500">14.68%</div>
           </div>
           <div className="text-right">
             <div
@@ -116,7 +116,7 @@ export const OrderBook = () => {
             >
               Price
             </div>
-            <div className="text-[10px] sm:text-[11px] font-medium text-green-500">
+            <div className="text-xs font-medium text-green-500">
               ${currentPrice.toFixed(2)}
             </div>
           </div>
@@ -127,7 +127,7 @@ export const OrderBook = () => {
       <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
         <div className="flex items-center justify-between">
           <h3
-            className="text-[10px] sm:text-xs font-medium"
+            className="text-xs sm:text-xs font-medium"
             style={{ color: "var(--orderbook-text)" }}
           >
             Order Book
@@ -176,7 +176,7 @@ export const OrderBook = () => {
         </div>
 
         {/* Column Headers */}
-        <div className="grid grid-cols-2 mt-1 sm:mt-2 text-[8px] sm:text-[9px] text-gray-400">
+        <div className="grid grid-cols-2 mt-1 sm:mt-2 text-xs text-gray-400">
           <div>Price (USD)</div>
           <div className="text-right">Size (BTC)</div>
         </div>
@@ -244,7 +244,7 @@ export const OrderBook = () => {
             transform: "translateY(-50%)",
           }}
         >
-          <div className="space-y-1 text-[9px]">
+          <div className="space-y-1 text-xs">
             <div className="flex justify-between gap-3">
               <span className="text-gray-400">Avg. Price</span>
               <span className="text-white">~{hoverStats.avgPrice.toFixed(1)}</span>
@@ -264,7 +264,7 @@ export const OrderBook = () => {
       {/* Recent Trades */}
       <div className="border-t border-gray-300 px-3 py-2">
         <h3 className="text-black text-xs font-medium mb-2">Recent Trades</h3>
-        <div className="grid grid-cols-3 text-[9px] mb-1" style={{ color: "var(--text-secondary)" }}>
+        <div className="grid grid-cols-3 text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
           <div>Price (USD)</div>
           <div className="text-right">Size (BTC)</div>
           <div className="text-right">Time</div>

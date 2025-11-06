@@ -104,7 +104,7 @@ export const useTradeStore = create<TradeState>()(
       // Initial State
       tradeType: 'short',
       period: '7',
-      orderType: 'limit',
+      orderType: 'market',
       stopPriceType: 'mark',
       stopLimitType: 'stopLimit',
       quantity: '',

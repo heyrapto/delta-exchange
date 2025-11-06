@@ -7,6 +7,10 @@ import { ConfirmationModal, NotificationModal } from "./modals"
 import { marketDataService } from "@/services/market-data"
 import { useEffect } from "react"
 import { PeriodSelector } from "./period-selector"
+import { useAppContext } from "@/context/app-context"
+import Loader from "./reusable/loader"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"
+import { TradeSummary } from "./trade-summary"
 
 export const TradeCard = () => {
     const {
@@ -51,6 +55,24 @@ export const TradeCard = () => {
         setShowStopPriceDropdown,
         setShowStopLimitDropdown
     } = useTradeStore()
+    const {
+        state,
+        handlePeriodChange,
+        handleAmountChange,
+        handleProfitZoneSelect,
+    } = useAppContext();
+
+    const {
+        premiumAndProfitZone,
+        isFetchingPremiums,
+        asset,
+        selectedProfitZone,
+    } = state;
+
+    const formatExpirationDate = (periodInDays: number) => {
+        const expirationTimestamp = Date.now() + periodInDays * 24 * 60 * 60 * 1000;
+        return new Date(expirationTimestamp).toDateString();
+    };
 
     // Modal states
     const [showConfirmation, setShowConfirmation] = useState(false)
@@ -111,16 +133,16 @@ export const TradeCard = () => {
     }
 
     const headerStats = [
-        { 
-            label: "Delta", 
-            value: getDeltaValue(), 
+        {
+            label: "Delta",
+            value: getDeltaValue(),
             icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--warning-color)' }} onClick={() => setShowDeltaDropdown(!showDeltaDropdown)} />,
             hasDropdown: true
         },
-        { 
-            label: "Lot Size", 
-            value: "0.001 BTC", 
-            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--text-secondary)' }} onClick={() => setShowLotSizeHeaderDropdown(!showLotSizeHeaderDropdown)} />, 
+        {
+            label: "Lot Size",
+            value: "0.001 BTC",
+            icon: <BiChevronDown className="w-4 h-4 cursor-pointer" style={{ color: 'var(--text-secondary)' }} onClick={() => setShowLotSizeHeaderDropdown(!showLotSizeHeaderDropdown)} />,
             center: true,
             hasDropdown: true
         },
@@ -138,27 +160,13 @@ export const TradeCard = () => {
     ] as const
 
     const orderTabs = [
-        { key: "limit" as const, label: "Limit", hasDropdown: false },
+        // { key: "limit" as const, label: "Limit", hasDropdown: false },
         { key: "market" as const, label: "Market", hasDropdown: false },
-        { key: "stopLimit" as const, label: "Stop Limit", hasDropdown: true },
+        // { key: "stopLimit" as const, label: "Stop Limit", hasDropdown: true },
     ]
-
-    const stopPriceOptions = ["mark", "last", "index"] as const
     const stopLimitOptions = [
         { value: "stopLimit", label: "Stop Limit" },
         { value: "takeProfitLimit", label: "Take Profit Limit" }
-    ]
-
-    const quantityPercents = [10, 25, 50, 75, 100]
-
-    const checkboxes = [
-        { label: "Reduce Only", checked: reduceOnly, setter: setReduceOnly, condition: true },
-        { label: "Maker", checked: maker, setter: setMaker, condition: orderType === "limit" },
-    ]
-
-    const footerLinks = [
-        { label: "GTC", hasDropdown: true, condition: orderType === "limit" },
-        { label: "% Fees", isDotted: true, condition: true }
     ]
 
     // Helper function for numeric validation
@@ -209,7 +217,7 @@ export const TradeCard = () => {
             price: limitPrice ? Number(limitPrice) : undefined,
             quantity: Number(quantity)
         })
-        
+
         setNotificationData({
             title: 'Order Placed',
             message: `${tradeType === 'long' ? 'Long' : 'Short'} order for ${quantity} lots with ${period} days period`,
@@ -223,7 +231,7 @@ export const TradeCard = () => {
     useEffect(() => {
         marketDataService.resetDemoData()
         marketDataService.startLiveUpdates()
-        
+
         return () => {
             marketDataService.stopLiveUpdates()
         }
@@ -241,7 +249,7 @@ export const TradeCard = () => {
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-label-text)' }}>{s.label}</span>
                         <span className="text-[9px] sm:text-[10px]" style={{ color: 'var(--trade-card-text)' }}>{s.value}</span>
                         {s.icon}
-                        
+
                         {/* Delta Dropdown */}
                         {s.hasDropdown && s.label === "Delta" && showDeltaDropdown && (
                             <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
@@ -256,7 +264,7 @@ export const TradeCard = () => {
                                 ))}
                             </div>
                         )}
-                        
+
                         {/* Lot Size Header Dropdown */}
                         {s.hasDropdown && s.label === "Lot Size" && showLotSizeHeaderDropdown && (
                             <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[100px]">
@@ -350,272 +358,66 @@ export const TradeCard = () => {
                     )}
                 </div>
 
-
-                {/* ORDER TABS */}
-                <div className="flex gap-3 mb-3 border-b border-gray-300 relative">
-                    {orderTabs.map((tab) => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setOrderType(tab.key)}
-                            className={`pb-1.5 text-[11px] relative ${orderType === tab.key ? "text-black" : "text-gray-400"
-                                } flex items-center gap-1 cursor-pointer`}
-                        >
-                            {tab.label}
-                            {tab.hasDropdown && (
-                                <BiChevronDown
-                                    className="w-3 h-3"
-                                    onClick={(e) => {
-                                        e.stopPropagation()
-                                        setShowStopLimitDropdown(!showStopLimitDropdown)
-                                    }}
-                                />
-                            )}
-                            {orderType === tab.key && (
-                                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-500" />
-                            )}
-                        </button>
-                    ))}
-                    {showStopLimitDropdown && (
-                        <div className="absolute top-7 left-0 bg-gray-100/50 rounded shadow-lg py-1 z-10 min-w-[140px]">
-                            {stopLimitOptions.map((opt) => (
-                                <div
-                                    key={opt.value}
-                                    onClick={() => {
-                                        setStopLimitType(opt.value as typeof stopLimitType)
-                                        setShowStopLimitDropdown(false)
-                                    }}
-                                    className={`px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer ${stopLimitType === opt.value ? "text-green-500" : ""
-                                        }`}
-                                >
-                                    {opt.label}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* STOP PRICE DROPDOWN */}
-                {orderType === "stopLimit" && (
-                    <div className="mb-3">
-                        <label className="text-gray-400 text-[10px] mb-1 block">Stop Price</label>
-                        <div className="flex gap-2">
-                            <div className="relative flex-1">
-                                <button
-                                    onClick={() => setShowStopPriceDropdown(!showStopPriceDropdown)}
-                                    className="w-full bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between"
-                                >
-                                    <span className="text-green-500 text-[11px] capitalize">{stopPriceType}</span>
-                                    <BiChevronDown className="w-3 h-3 text-gray-400" />
-                                </button>
-                                {showStopPriceDropdown && (
-                                    <div className="absolute top-full left-0 right-0 bg-gray-100/50 rounded mt-1 shadow-lg py-1 z-10">
-                                        {stopPriceOptions.map((opt) => (
-                                            <div
-                                                key={opt}
-                                                onClick={() => {
-                                                    setStopPriceType(opt)
-                                                    setShowStopPriceDropdown(false)
-                                                }}
-                                                className={`px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer capitalize ${stopPriceType === opt ? "text-green-500" : ""
-                                                    }`}
-                                            >
-                                                {opt}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex-1 bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between">
-                                <input
-                                    type="text"
-                                    value={stopPrice}
-                                    onChange={(e) => {
-                                        const value = e.target.value
-                                        if (isValidNumericInput(value)) {
-                                            setStopPrice(value)
-                                        }
-                                    }}
-                                    className="bg-transparent text-[11px] outline-none text-black flex-1"
-                                    placeholder="0.00"
-                                />
-                                <span className="text-gray-400 ml-1 text-[10px]">USD</span>
-                                <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* LIMIT PRICE */}
-                {(orderType === "limit" || orderType === "stopLimit") && (
-                    <div className="mb-3">
-                        <div className="flex justify-between items-center mb-1">
-                            <label className="text-gray-400 text-[10px]">Limit Price</label>
-                            {orderType === "limit" && (
-                                <span className="text-gray-400 text-[9px]">
-                                    {tradeType === "short" ? "Min Sell 2516.6" : "Max Buy 11509.7"}
-                                </span>
-                            )}
-                        </div>
-                        <div className="bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between">
-                            <input
-                                type="text"
-                                value={limitPrice}
-                                onChange={(e) => {
-                                    const value = e.target.value
-                                    if (isValidNumericInput(value)) {
-                                        setLimitPrice(value)
-                                    }
-                                }}
-                                placeholder={tradeType === "long" ? "Best Offer" : "Best Bid"}
-                                className="bg-transparent outline-none text-green-500 text-[11px] flex-1 placeholder-gray-500/60"
-                            />
-                            <div className="relative">
-                                <div className="flex items-center gap-1">
-                                <span className="text-gray-400 ml-1 text-[10px] cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}>USD</span>
-                                    <BiChevronUp className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)} />
-                                </div>
-                                {showCurrencyDropdown && (
-                                    <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[80px]">
-                                        {currencyOptions.map((currency) => (
-                                            <div
-                                                key={currency}
-                                                onClick={() => setShowCurrencyDropdown(false)}
-                                                className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
-                                            >
-                                                {currency}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* QUANTITY */}
+                {/* Amount */}
                 <div className="mb-3">
-                    <label className="text-gray-400 text-[10px] mb-1 block">Quantity</label>
+                    <label className="text-gray-400 text-[10px] mb-1 block">Amount</label>
                     <div className="bg-gray-100/50 rounded px-3 py-2 flex items-center justify-between mb-1.5">
                         <input
                             type="text"
                             value={quantity}
                             onChange={(e) => handleQuantityChange(e.target.value)}
-                            placeholder="1 Lot = 0.001 BTC"
+                            placeholder="1 Straps"
                             className="bg-transparent text-[11px] outline-none text-black flex-1 placeholder-gray-500"
                         />
-                        <div className="relative">
-                            <div className="flex items-center gap-1">
-                            <span className="text-gray-400 ml-1 text-[10px] cursor-pointer" onClick={() => setShowLotSizeDropdown(!showLotSizeDropdown)}>Lot</span>
-                            <BiChevronDown className="w-3 h-3 text-gray-400 ml-1 cursor-pointer" onClick={() => setShowLotSizeDropdown(!showLotSizeDropdown)} />
-                            </div>
-                            {showLotSizeDropdown && (
-                                <div className="absolute top-6 right-0 bg-white rounded shadow-lg py-1 z-10 min-w-[100px]">
-                                    {lotSizeOptions.map((size) => (
-                                        <div
-                                            key={size}
-                                            onClick={() => setShowLotSizeDropdown(false)}
-                                            className="px-3 py-1.5 text-[10px] hover:bg-gray-100/50 cursor-pointer"
-                                        >
-                                            {size}
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
                     </div>
 
-                    <div className="flex gap-3 text-[10px] text-gray-500 mb-2">
-                        {quantityPercents.map((percent) => (
-                            <button
-                                key={percent}
-                                onClick={() => handleQuantityPercentChange(percent)}
-                                className={`hover:text-gray-300 ${quantityPercent === percent ? 'text-green-500 font-medium' : ''}`}
+                    <div className="flex gap-1 text-[10px] text-gray-500 mb-2">
+                        <span>Limit ${ }</span>
+                        <p className="text-underline cursor-pointer border-b border-dotted">( check limits )</p>
+                    </div>
+                </div>
+
+                <div className="relative bg-transparent border border-white/0 rounded-lg space-y-2 mb-3">
+                    <div className="absolute inset-0 rounded-[8px] border border-white/[0.07] pointer-events-none" />
+                    <p className="text-sm font-normal text-gray-700">Profit Zone</p>
+                    <div className="space-y-2">
+                        <div className="bg-transparent w-full h-[50px] rounded-lg overflow-hidden p-px">
+                            <Select
+                                value={selectedProfitZone.toString()}
+                                onValueChange={handleProfitZoneSelect}
                             >
-                                {percent}%
-                            </button>
-                        ))}
+                                <SelectTrigger className="w-full bg-gray-100 h-full border-none outline-none rounded-lg">
+                                    <SelectValue className="text-[#191414] text-sm">
+                                        {isFetchingPremiums ? (
+                                            <Loader />
+                                        ) : (
+                                            (premiumAndProfitZone.length > 0 && selectedProfitZone) ||
+                                            premiumAndProfitZone[0]?.profitZone
+                                        )}
+                                    </SelectValue>
+                                </SelectTrigger>
+                                <SelectContent className="border border-[#666666]">
+                                    {!isFetchingPremiums &&
+                                        premiumAndProfitZone &&
+                                        premiumAndProfitZone.map((el) => (
+                                            <SelectItem
+                                                key={el.profitZone}
+                                                value={el.profitZone.toString()}
+                                            >
+                                                {el?.profitZone}
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        {/* <p></p> */}
                     </div>
                 </div>
 
-                {/* BRACKET ORDER & ADD TP/SL */}
-                {orderType === "limit" && (
-                    <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-300">
-                        <span className="text-gray-400 text-[10px] border-b border-dotted border-gray-300">
-                            Bracket Order
-                        </span>
-                        <button className="text-green-500 text-[10px] flex items-center gap-0.5">
-                            <span className="text-sm">+</span> Add TP/SL
-                        </button>
-                    </div>
-                )}
+                <div className="flex flex-col gap-4 w-full">
+          <TradeSummary />
+        </div>
 
-                {/* FUNDS REQUIRED & AVAILABLE MARGIN */}
-                <div className="space-y-1.5 mb-3">
-                    <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400 flex items-center gap-1 border-b border-dotted border-gray-300">
-                            Funds req.
-                            <div className="w-2.5 h-2.5 border border-green-500 rounded-full flex items-center justify-center">
-                                <span className="text-green-500 text-[8px]">!</span>
-                            </div>
-                        </span>
-                        <span className="text-black">{getFundsRequiredDisplay()}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-gray-400">Available Margin</span>
-                        <span className="text-black">{getAvailableMarginDisplay()}</span>
-                    </div>
-                </div>
-
-                {/* TRADE BUTTON */}
-                <button 
-                    onClick={handleTradeSubmit}
-                    className="w-full bg-[#ADFF2F] hover:bg-green-600 text-black cursor-pointer py-2.5 rounded font-medium mb-3 transition-colors text-[11px]"
-                >
-                    {tradeType === 'long' ? 'Buy' : 'Sell'} {quantity || '0'} Lots
-                </button>
-
-                {/* CHECKBOXES */}
-                <div className="mb-3 flex gap-3 items-center">
-                    {checkboxes
-                        .filter((c) => c.condition)
-                        .map((c) => (
-                            <label key={c.label} className="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={c.checked}
-                                    onChange={(e) => c.setter(e.target.checked)}
-                                    className="w-3 h-3 rounded border-gray-600 bg-transparent"
-                                />
-                                <span className="border-b border-dotted border-gray-600">{c.label}</span>
-                            </label>
-                        ))}
-                </div>
-
-                {/* FOOTER LINKS */}
-                <div className="flex items-center gap-2 text-[10px] text-gray-400 pb-3 border-b border-gray-700">
-                    {footerLinks
-                        .filter((link) => link.condition)
-                        .map((link, idx, arr) => (
-                            <div key={link.label} className="flex items-center gap-1">
-                                {link.hasDropdown ? (
-                                    <button className="flex items-center gap-0.5">
-                                        <span className="text-xs">ⓘ</span> {link.label}
-                                        <BiChevronDown className="w-2.5 h-2.5" />
-                                    </button>
-                                ) : (
-                                    <button
-                                        className={link.isDotted ? "border-b border-dotted border-gray-600" : ""}
-                                    >
-                                        {link.label}
-                                    </button>
-                                )}
-                                {idx < arr.length - 1 && orderType === "limit" && <span>|</span>}
-                            </div>
-                        ))}
-
-                </div>
-
-                {/* PROMO BANNER */}
                 <div className="mt-3 bg-gradient-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                         <span className="text-lg">🔥</span>
@@ -630,7 +432,7 @@ export const TradeCard = () => {
             <ConfirmationModal
                 isOpen={showConfirmation}
                 onClose={() => setShowConfirmation(false)}
-                onConfirm={() => {}}
+                onConfirm={() => { }}
                 title="Confirm Trade"
                 message="Are you sure you want to place this trade?"
                 type="warning"
