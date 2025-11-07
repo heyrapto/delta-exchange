@@ -15,20 +15,8 @@ import { TradeSummary } from "./trade-summary"
 export const TradeCard = () => {
     const {
         tradeType,
-        period,
-        orderType,
         stopPriceType,
-        stopLimitType,
-        quantity,
-        stopPrice,
-        limitPrice,
-        quantityPercent,
-        reduceOnly,
-        maker,
-        setAsDefault,
         showPeriodPanel,
-        showStopPriceDropdown,
-        showStopLimitDropdown,
         currentPrice,
         markPrice,
         indexPrice,
@@ -38,23 +26,10 @@ export const TradeCard = () => {
         openInterest,
         fundsRequired,
         availableMargin,
-        maxPosition,
         setTradeType,
-        setPeriod,
-        setOrderType,
-        setStopPriceType,
-        setStopLimitType,
-        setQuantity,
-        setStopPrice,
-        setLimitPrice,
-        setQuantityPercent,
-        setReduceOnly,
-        setMaker,
-        setSetAsDefault,
         setShowPeriodPanel,
-        setShowStopPriceDropdown,
-        setShowStopLimitDropdown
-    } = useTradeStore()
+    } = useTradeStore();
+    
     const {
         state,
         handleAmountChange,
