@@ -11,6 +11,7 @@ import { useAppContext } from "@/context/app-context"
 import Loader from "./reusable/loader"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"
 import { TradeSummary } from "./trade-summary"
+import { OptionType } from "@/types"
 
 export const TradeCard = () => {
     const {
@@ -59,6 +60,7 @@ export const TradeCard = () => {
         state,
         handleAmountChange,
         handleProfitZoneSelect,
+        handleStrategyChange,
     } = useAppContext();
 
     const {
@@ -141,8 +143,8 @@ export const TradeCard = () => {
     ]
 
     const tradeButtons = [
-        { label: "Call | Long", type: "long", activeColor: "bg-[#ADFF2F] text-black" },
-        { label: "Put | Short", type: "short", activeColor: "bg-red-500 text-white" },
+        { label: "Call | Long", type: "calls", activeColor: "bg-[#ADFF2F] text-black" },
+        { label: "Put | Short", type: "puts", activeColor: "bg-red-500 text-white" },
     ] as const
 
     // Helper function for numeric validation
@@ -224,7 +226,7 @@ export const TradeCard = () => {
                     {tradeButtons.map((btn) => (
                         <button
                             key={btn.label}
-                            onClick={() => setTradeType(btn.type)}
+                            onClick={() => handleStrategyChange(btn.type.toUpperCase() as OptionType)}
                             className={`
                             relative
                             flex items-center justify-center
@@ -235,7 +237,7 @@ export const TradeCard = () => {
                             mr-2
                             overflow-hidden
                             cursor-pointer
-                            ${tradeType === btn.type ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
+                            ${state.strategy as OptionType === btn.type as OptionType ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
                         `}
                             style={{
                                 transform: 'skewX(-20deg)',

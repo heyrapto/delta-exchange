@@ -181,13 +181,13 @@ export const ExchangePanel = () => {
         }
     }
 
-    const panelTabs = [
+    const panelTabs: { id: number; title: string, isHealthy?: boolean }[] = [
         { id: 0, title: "Positions" },
         { id: 1, title: "Open Orders" },
         { id: 2, title: "Stop Orders" },
-        { id: 3, title: "Tracker Assets" },
-        { id: 4, title: "Risk & Margin Details", isHealthy: true },
-        { id: 5, title: "Fills" },
+        // { id: 3, title: "Tracker Assets" },
+        // { id: 4, title: "Risk & Margin Details", isHealthy: true },
+        // { id: 5, title: "Fills" },
         { id: 6, title: "Order History" },
     ]
 

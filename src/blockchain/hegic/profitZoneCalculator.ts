@@ -123,12 +123,12 @@ export const getProfitZones = (
   strikePrice: number,
   amount: string
 ): number[] => {
-  // console.log(
-  //   "input for profit zone calculator",
-  //   premiums,
-  //   strategy,
-  //   strikePrice
-  // );
+  console.log(
+    "input for profit zone calculator",
+    premiums,
+    strategy,
+    strikePrice
+  );
   let profitZones: number[] = [];
   switch (strategy.toUpperCase()) {
     case "CALL":
