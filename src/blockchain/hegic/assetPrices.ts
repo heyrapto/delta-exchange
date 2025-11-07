@@ -57,10 +57,11 @@ export const getBtcPrice = async (): Promise<number> => {
 
   try {
     const response = await axios.get(
-      "https://api.coindesk.com/v1/bpi/currentprice.json"
+      "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD"
     );
-    const price = parseFloat(response.data?.bpi?.USD?.rate.replace(",", ""));
-    if (isNaN(price)) throw new Error("Invalid API response format");
+
+    const price = response.data?.USD;
+    if (!price) throw new Error("Invalid API response format");
 
     setCachedPrice("BTC", price);
     return price;

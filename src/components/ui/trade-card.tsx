@@ -11,7 +11,6 @@ import { useAppContext } from "@/context/app-context"
 import Loader from "./reusable/loader"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"
 import { TradeSummary } from "./trade-summary"
-import { OptionType } from "@/types"
 
 export const TradeCard = () => {
     const {
@@ -69,6 +68,8 @@ export const TradeCard = () => {
         asset,
         selectedProfitZone,
     } = state;
+
+    const currentStrategyType = state.strategy.split("-")[0]?.toUpperCase() ?? "";
 
     // Modal states
     const [showConfirmation, setShowConfirmation] = useState(false)
@@ -143,9 +144,9 @@ export const TradeCard = () => {
     ]
 
     const tradeButtons = [
-        { label: "Call | Long", type: "calls", activeColor: "bg-[#ADFF2F] text-black" },
-        { label: "Put | Short", type: "puts", activeColor: "bg-red-500 text-white" },
-    ] as const
+        { label: "Call | Long", strategy: "CALL" as const, tradeType: "long" as const, activeColor: "bg-[#ADFF2F] text-black" },
+        { label: "Put | Short", strategy: "PUT" as const, tradeType: "short" as const, activeColor: "bg-red-500 text-white" },
+    ]
 
     // Helper function for numeric validation
     const isValidNumericInput = (value: string): boolean => {
@@ -226,7 +227,10 @@ export const TradeCard = () => {
                     {tradeButtons.map((btn) => (
                         <button
                             key={btn.label}
-                            onClick={() => handleStrategyChange(btn.type.toUpperCase() as OptionType)}
+                            onClick={() => {
+                                handleStrategyChange(btn.strategy)
+                                setTradeType(btn.tradeType)
+                            }}
                             className={`
                             relative
                             flex items-center justify-center
@@ -237,7 +241,7 @@ export const TradeCard = () => {
                             mr-2
                             overflow-hidden
                             cursor-pointer
-                            ${state.strategy as OptionType === btn.type as OptionType ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
+                            ${currentStrategyType === btn.strategy ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
                         `}
                             style={{
                                 transform: 'skewX(-20deg)',
