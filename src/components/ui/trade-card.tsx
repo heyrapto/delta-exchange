@@ -29,7 +29,7 @@ export const TradeCard = () => {
         setTradeType,
         setShowPeriodPanel,
     } = useTradeStore();
-    
+
     const {
         state,
         handleAmountChange,
@@ -122,13 +122,7 @@ export const TradeCard = () => {
         { label: "Call | Long", strategy: "CALL" as const, tradeType: "long" as const, activeColor: "bg-[#ADFF2F] text-black" },
         { label: "Put | Short", strategy: "PUT" as const, tradeType: "short" as const, activeColor: "bg-red-500 text-white" },
     ]
-
-    // Helper function for numeric validation
-    const isValidNumericInput = (value: string): boolean => {
-        const numericRegex = /^[0-9]*\.?[0-9]*$/
-        return numericRegex.test(value) || value === ''
-    }
-
+    
     // Initialize demo data and start live updates
     useEffect(() => {
         marketDataService.resetDemoData()
