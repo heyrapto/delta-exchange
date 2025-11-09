@@ -134,7 +134,7 @@ export const TradeCard = () => {
     }, [])
 
     return (
-        <div className="w-full h-full overflow-y-auto border border-gray-300" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
+        <div className="w-full h-full overflow-y-auto overflow-x-hidden border border-gray-300" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
             {/* HEADER STATS */}
             <div className="flex justify-end gap-1 sm:gap-2 px-2 sm:px-3 py-2 border-b border-gray-300">
                 {headerStats.map((s, i) => (
@@ -190,7 +190,7 @@ export const TradeCard = () => {
             </div>
 
             {/* MAIN BODY */}
-            <div className="px-2 sm:px-3 py-2">
+            <div className="px-2 sm:px-3 py-2 min-w-0 overflow-x-hidden">
                 {/* TRADE TYPE BUTTONS */}
                 <div className="grid grid-cols-2 gap-1 sm:gap-2 mb-2 sm:mb-3">
                     {tradeButtons.map((btn) => (
@@ -313,7 +313,7 @@ export const TradeCard = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-4 w-full min-w-0 overflow-hidden">
                 <TradeSummary />
                 </div>
 
