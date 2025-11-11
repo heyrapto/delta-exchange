@@ -58,7 +58,7 @@ export const Footer = ({
       ? "hidden md:flex"
       : "flex"; // both
 
-  const baseClasses = `${position} bottom-0 left-0 right-0 mx-auto w-full xl:max-w-[120rem] items-center justify-between border-t border-gray-300 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-900`;
+  const baseClasses = `${position} bottom-0 left-0 right-0 mx-auto w-full xl:max-w-[120rem] items-center justify-between border-t border-gray-300 px-2 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-900 bg-white`;
 
   return (
     <footer className={`${baseClasses} ${visibilityClasses} ${className}`}>
