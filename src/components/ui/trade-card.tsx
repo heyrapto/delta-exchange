@@ -317,7 +317,7 @@ export const TradeCard = () => {
                 <TradeSummary />
                 </div>
 
-                <div className="mt-3 bg-gradient-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">
+                <div className="mt-3 bg-linear-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                         <span className="text-lg">🔥</span>
                         <span className="text-green-400 text-[10px] font-medium">Flat 50% off</span>
