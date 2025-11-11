@@ -101,23 +101,23 @@ export const Header = () => {
                       <div key={subIndex}>
                         {sub.section && (
                           <div
-                            className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500"
+                            className="px-4 pt-[20px] text-[10px] font-semibold uppercase tracking-wider text-gray-500"
                           >
                             {sub.section}
                           </div>
                         )}
                         <Link href={sub.href}>
-                          <div className="px-4 py-3 hover:bg-opacity-10 hover:bg-white transition-colors flex items-start gap-3 cursor-pointer">
+                          <div className="px-4 py-2 hover:bg-opacity-10 hover:bg-white transition-colors flex items-start gap-3 cursor-pointer">
                             {sub.icon && (
                               <div
-                                className="w-10 h-10 rounded flex items-center justify-center flex-shrink-0 mt-1"
-                                style={{ backgroundColor: sub.iconBg || "var(--icon-bg, #2a2a2a)" }}
+                                className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-1 border`}
+                                style={{ borderColor: sub.iconBg, backgroundColor: sub.iconBg }}
                               >
                                 {sub.icon}
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-sm text-black">
+                              <div className="font-medium text-xs text-black">
                                 {sub.label}
                               </div>
                               {sub.description && (
