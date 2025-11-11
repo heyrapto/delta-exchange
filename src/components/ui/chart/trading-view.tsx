@@ -32,7 +32,7 @@ export const TradingViewChart = ({ symbol, interval = '60' }: { symbol: string; 
                     symbol: symbol,
                     interval: interval,
                     timezone: "Etc/UTC",
-                    theme: "dark",
+                    theme: "light",
                     style: "1",
                     locale: "en",
                     enable_publishing: false,
