@@ -47,9 +47,7 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
         { value: "ETH", label: "ETH" },
     ]
 
-    // Initialize prices and fetch options data
     useEffect(() => {
-        // Set initial BTC price to ensure it's correct from the start
         if (selectedContract === 'BTC') {
             updateMarketData({
                 currentPrice: 108068.0,
@@ -71,7 +69,6 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
             try {
                 const mockData: OptionData[] = Array.from({ length: 20 }, (_, i) => {
                     const strike = 96000 + (i * 1000)
-                    const isITM = strike < state.assetPrice
 
                     return {
                         strike,
@@ -174,14 +171,14 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                             setStrategyView(!strategyView)
                             setStrategyBuilderActive(!strategyView)
                         }}
-                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] ${strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
+                        className={`flex items-center gap-1 px-2 sm:px-3 py-1 rounded text-[10px] sm:text-[11px] cursor-pointer ${strategyView ? "text-green-500 border border-green-500" : "text-gray-800 border border-gray-300"
                             }`}
                     >
                         <span className="hidden sm:inline">Strategy Builder</span>
                         <span className="sm:hidden">Strategy</span>
                         <div className={`w-6 h-3 sm:w-8 sm:h-4 rounded-full relative ${strategyView ? "bg-green-700" : "bg-gray-700"}`}>
                             <div
-                                className={`absolute top-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full transition-all ${strategyView ? "right-3 sm:right-4" : "right-0.5"
+                                className={`absolute top-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full cursor-pointer transition-all ${strategyView ? "right-3 sm:right-4" : "right-0.5"
                                     }`}
                             ></div>
                         </div>
@@ -245,12 +242,12 @@ export const MainExchange = ({ strategyView, setStrategyView, viewMode, setViewM
                         <span className="text-sm sm:text-[16px]" style={{ color: 'var(--text-secondary)' }}>{selectedContract === "calls" ? "Calls" : "Calls"}</span>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-4">
-                        <div className="text-center">
+                        <div className="text-[9px] sm:text-[10px] inline-flex gap-1 items-center">
                             <span className="text-[9px] sm:text-[10px] mr-1" style={{ color: 'var(--text-secondary)' }}>{state.asset}</span>
                             <span className="text-[9px] sm:text-[10px] font-bold text-red-500">{state.isFetching ? "..." : formatNumber(state.assetPrice)}</span>
                         </div>
-                        <div className="text-[9px] sm:text-[10px] text-center" style={{ color: 'var(--text-secondary)' }}>
-                            <span className="hidden sm:inline">Time to Expiry </span>
+                        <div className="text-[9px] sm:text-[10px] inline-flex gap-2 items-center" style={{ color: 'var(--text-secondary)' }}>
+                            <span className="hidden sm:inline">Time to Expiry:</span>
                             <span className="sm:hidden">Expiry </span>
                             <span style={{ color: 'var(--text-primary)' }}>{timeToExpiry}</span>
                         </div>
