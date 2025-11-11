@@ -134,7 +134,7 @@ export const TradeCard = () => {
     }, [])
 
     return (
-        <div className="w-full h-full overflow-y-auto overflow-x-hidden border border-gray-300" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
+        <div className="w-full h-full overflow-y-auto overflow-x-hidden border-b border-x border-gray-300" style={{ backgroundColor: 'var(--trade-card-bg)', color: 'var(--trade-card-text)' }}>
             {/* HEADER STATS */}
             <div className="flex justify-end gap-1 sm:gap-2 px-2 sm:px-3 py-2 border-b border-gray-300">
                 {headerStats.map((s, i) => (

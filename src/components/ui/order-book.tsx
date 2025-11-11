@@ -103,7 +103,7 @@ export const OrderBook = () => {
 
   return (
     <div
-      className="relative w-full h-full flex flex-col mborder border-gray-300"
+      className="relative w-full h-full flex flex-col border-b border-l border-gray-300"
       style={{ backgroundColor: "var(--orderbook-bg)", color: "var(--orderbook-text)" }}
     >
       {/* Header */}
