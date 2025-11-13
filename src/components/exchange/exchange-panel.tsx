@@ -1,11 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTradeStore } from "@/store/trade-store"
 import { BiDownload, BiRefresh } from "react-icons/bi"
+import { useAccount } from "wagmi"
+import CustomConnectButton from "../custom/connect-button"
+import {
+    closeHegicPosition,
+    getUserHegicPositions,
+    HegicPositionType,
+} from "@/blockchain/hegic/hegicPositions"
 
 export const ExchangePanel = () => {
     const [activePanel, setActivePanel] = useState(0)
+    const { address } = useAccount()
+    const [isFetchingPositions, setIsFetchingPositions] = useState(false)
+    const [positionsError, setPositionsError] = useState<Error | null>(null)
+    const [positions, setPositions] = useState<HegicPositionType[]>([])
+    const [selectedPosition, setSelectedPosition] = useState<HegicPositionType | null>(null)
 
     const EmptyPanelState = ({ title }: { title: string }) => (
         <div className="flex flex-col items-center justify-center py-20">
@@ -37,6 +49,32 @@ export const ExchangePanel = () => {
       
 
     const { openOrders, orderHistory, cancelOrder } = useTradeStore()
+
+    // Fetch Hegic positions for connected wallet
+    const fetchPositions = async () => {
+        if (!address) {
+            setPositions([])
+            return
+        }
+        try {
+            setIsFetchingPositions(true)
+            setPositionsError(null)
+            const res = await getUserHegicPositions(address as string)
+            setPositions(res)
+        } catch (e: any) {
+            setPositionsError(e)
+        } finally {
+            setIsFetchingPositions(false)
+        }
+    }
+
+    // Load positions when user connects or tab is active
+    useEffect(() => {
+        if (activePanel === 0) {
+            fetchPositions()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [address, activePanel])
 
     const renderOpenOrders = () => (
         <div className="p-3">
@@ -79,6 +117,83 @@ export const ExchangePanel = () => {
         </div>
     )
 
+    const renderPositions = () => (
+        <div className="p-3">
+            {!address && (
+                <div className="max-w-xs">
+                    <CustomConnectButton />
+                </div>
+            )}
+
+            {positionsError && (
+                <div className="text-sm font-medium" style={{ color: 'var(--text-danger)' }}>
+                    {positionsError.message}
+                </div>
+            )}
+
+            {isFetchingPositions && (
+                <div className="flex items-center justify-center h-20">
+                    <div className="w-4 h-4 bg-gray-400 rounded-full animate-pulse" />
+                </div>
+            )}
+
+            {address && !isFetchingPositions && positions.length === 0 && (
+                <EmptyPanelState title="Positions" />
+            )}
+
+            {positions.length > 0 && (
+                <div className="w-full overflow-x-auto">
+                    <table className="w-full text-xs">
+                        <thead>
+                            <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                <th className="text-left px-2 py-1">Qty / Strategy</th>
+                                <th className="text-left px-2 py-1">Mark</th>
+                                <th className="text-left px-2 py-1">Profit Zone</th>
+                                <th className="text-left px-2 py-1">Net P&L</th>
+                                <th className="text-left px-2 py-1">Expires In</th>
+                                <th className="text-left px-2 py-1">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {positions.map((p) => (
+                                <tr
+                                    key={`${p.positionId}-${p.strategy}`}
+                                    className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                    onClick={() => setSelectedPosition(p)}
+                                >
+                                    <td className="px-2 py-2">
+                                        <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                                            {p.amount}
+                                        </span>
+                                        <span className="text-gray-500 ml-1">{p.strategyInfo?.name}</span>
+                                    </td>
+                                    <td className="px-2 py-2">${p.markPrice}</td>
+                                    <td className="px-2 py-2">${p.strikePrice}</td>
+                                    <td className="px-2 py-2" style={{ color: 'var(--text-danger)' }}>
+                                        -${p.negPnl}
+                                    </td>
+                                    <td className="px-2 py-2">{p.expirationTimestamp}</td>
+                                    <td className="px-2 py-2">
+                                        <button
+                                            className={`text-[11px] underline ${p.payoff ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                if (!p.payoff || !address) return
+                                                closeHegicPosition(p.positionId, address as string).then(fetchPositions)
+                                            }}
+                                        >
+                                            Close
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    )
+
     const renderOrderHistory = () => (
         <div className="p-3">
             {orderHistory.length === 0 ? (
@@ -116,7 +231,7 @@ export const ExchangePanel = () => {
 
     const renderContent = () => {
         switch (activePanel) {
-            case 0: return <EmptyPanelState title="Positions" />
+            case 0: return renderPositions()
             case 1: return renderOpenOrders()
             case 2: return <EmptyPanelState title="Stop Orders" />
             case 3: return <EmptyPanelState title="Tracker Assets" />
@@ -211,7 +326,7 @@ export const ExchangePanel = () => {
                       >
                             <h1 className="truncate">{p.title}</h1>
                             {p.isHealthy && (
-                                <span className="border rounded-[40%] px-1 py-[1px] text-[8px] sm:text-[9px]" style={{ borderColor: 'var(--text-success)', backgroundColor: 'var(--text-success)', color: 'var(--text-primary)' }}>
+                                <span className="border rounded-[40%] px-1 py-px text-[8px] sm:text-[9px]" style={{ borderColor: 'var(--text-success)', backgroundColor: 'var(--text-success)', color: 'var(--text-primary)' }}>
                                     Healthy
                                 </span>
                             )}
@@ -241,6 +356,81 @@ export const ExchangePanel = () => {
             <div className="flex-1">
                 {renderContent()}
             </div>
+
+            {/* Position Details Modal */}
+            {selectedPosition && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl border border-gray-200 max-w-lg w-full mx-4">
+                        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                            <h3 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                Position #{selectedPosition.positionId}
+                            </h3>
+                            <button
+                                className="text-gray-500 hover:text-gray-700 text-sm"
+                                onClick={() => setSelectedPosition(null)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                        <div className="p-4 grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <div className="text-gray-500">Strategy</div>
+                                <div className="font-medium">{selectedPosition.strategyInfo?.name}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Amount</div>
+                                <div className="font-medium">{selectedPosition.amount}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Mark Price</div>
+                                <div className="font-medium">${selectedPosition.markPrice}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Profit Zone</div>
+                                <div className="font-medium">${selectedPosition.strikePrice}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Payout Amount</div>
+                                <div className="font-medium">${selectedPosition.payoutAmount}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Net P&L</div>
+                                <div className="font-medium" style={{ color: 'var(--text-danger)' }}>
+                                    -${selectedPosition.negPnl}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Expires In</div>
+                                <div className="font-medium">{selectedPosition.expirationTimestamp}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Payoff Available</div>
+                                <div className="font-medium">{selectedPosition.payoff ? 'Yes' : 'No'}</div>
+                            </div>
+                        </div>
+                        <div className="p-4 border-t border-gray-200 flex gap-3">
+                            <button
+                                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                                onClick={() => setSelectedPosition(null)}
+                            >
+                                Dismiss
+                            </button>
+                            <button
+                                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${selectedPosition.payoff ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                                onClick={() => {
+                                    if (!selectedPosition.payoff || !address) return
+                                    closeHegicPosition(selectedPosition.positionId, address as string).then(() => {
+                                        setSelectedPosition(null)
+                                        fetchPositions()
+                                    })
+                                }}
+                            >
+                                Close Position
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { axiosInstance } from "../../utils/axios";
 import { useAccount } from "wagmi";
 import { useAppContext } from "@/context/app-context";
-import { useTradeStore } from "@/store/trade-store";
 import CustomConnectButton from "../custom/connect-button";
 import SuccessModal from "./modals/success-modal";
 import ConfirmModal from "./modals/confirm-modal";
@@ -26,7 +25,6 @@ export function TradeSummary() {
     state;
 
   const { address } = useAccount();
-  const { placeOrder, fillOrder } = useTradeStore();
 
   const handleBalanceChange = (balance: number) => {
     setUserBalance(balance);
@@ -68,34 +66,6 @@ export function TradeSummary() {
         setTxHash(tx);
         setShowConfirmModal(false);
         setShowSuccessModal(true);
-
-        // Add order to the store and immediately fill it (since it's executed on-chain)
-        const strategyType = strategy.toUpperCase();
-        const orderSide = strategyType.includes("CALL") ? "long" : "short";
-        const premiumPrice = parseFloat(selectedPremium);
-        const orderQuantity = parseFloat(amount);
-        
-        placeOrder({
-          side: orderSide,
-          orderType: "market",
-          price: premiumPrice,
-          quantity: orderQuantity,
-        });
-
-        // Immediately fill the order since it was executed on-chain
-        // Get the most recently added order (it will be the first in the array since placeOrder adds to the front)
-        const { openOrders: currentOpenOrders } = useTradeStore.getState();
-        // Find the order that matches our criteria - should be the first one since it was just added
-        const newOrder = currentOpenOrders.find(
-          (o) => o.side === orderSide && 
-                 Math.abs((o.price || 0) - premiumPrice) < 0.01 && 
-                 Math.abs(o.quantity - orderQuantity) < 0.01 &&
-                 o.status === 'open' &&
-                 o.orderType === 'market'
-        );
-        if (newOrder) {
-          fillOrder(newOrder.id, premiumPrice);
-        }
 
         // call the referral reward function
         try {
