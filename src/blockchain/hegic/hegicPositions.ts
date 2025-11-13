@@ -18,7 +18,8 @@ export type HegicPositionType = {
   strategy: string;
   negPnl: string;
   postPnl: string;
-  expirationTimestamp: number;
+  expirationTimestamp: string;
+  expiryCountDown: string;
   amount: string;
   markPrice: string;
   isExpired: boolean;
@@ -35,28 +36,21 @@ export type HegicPositionType = {
 const HEGIC_OPERATIONAL_TREASURY = "0xec096ea6eB9aa5ea689b0CF00882366E92377371";
 const HEGOPS_CONTRACT_ADDRESS = "0x5Fe380D68fEe022d8acd42dc4D36FbfB249a76d5";
 
-function convertTimestampToCountdown(expirationTimestamp: string) {
-  const now = Date.now() / 1000;
-  console.log(
-    "now ==> ",
-    now,
-    "Expiration Timestamp ==> ",
-    Number(expirationTimestamp)
-  );
-  const timeDifference = Number(expirationTimestamp) - now;
-  console.log("Time Difference ==> ", timeDifference);
-  console.log("Expiration Date", new Date(Number(expirationTimestamp)));
+function convertTimestampToCountdown(expirationTimestamp: string | number) {
+  const expirationSeconds = Number(expirationTimestamp);
+  if (Number.isNaN(expirationSeconds)) {
+    return "Expired";
+  }
 
-  console.log("Time Difference in seconds:", timeDifference);
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const timeDifference = expirationSeconds - nowSeconds;
 
   if (timeDifference <= 0) {
     return "Expired";
   }
 
-  const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(
-    (timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  );
+  const days = Math.floor(timeDifference / 86400);
+  const hours = Math.floor((timeDifference % 86400) / 3600);
 
   return `${days} days and ${hours} hours`;
 }
@@ -83,8 +77,17 @@ export const closeHegicPosition = async (
   }
 };
 
-const formatTimeRemaining = (timestamp: number) => {
-  const totalSeconds = Number(timestamp) - Math.floor(Date.now() / 1000);
+const formatTimeRemaining = (timestamp: number | string) => {
+  const expirationSeconds = Number(timestamp);
+  if (Number.isNaN(expirationSeconds)) {
+    return "Expired";
+  }
+
+  const totalSeconds = expirationSeconds - Math.floor(Date.now() / 1000);
+  if (totalSeconds <= 0) {
+    return "Expired";
+  }
+
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -154,10 +157,14 @@ export const getHegicPositionPnl = async (positionId: string, address: Hex) => {
 
     const strategyInfo = strategies[strategy as keyof typeof strategies];
 
+    if (!strategyInfo) {
+      return null;
+    }
+
     return {
       success: true,
-      positionId,
-      state,
+      positionId: Number(positionId),
+      state: Number(state),
       strategy,
       strategyInfo,
       payoff,
@@ -193,33 +200,53 @@ export const getUserHegicPositions = async (address: string) => {
       },
     });
 
-    const NFTs = response.data.ownedNfts || [];
+    const NFTs = (response.data.ownedNfts || []) as Array<{
+      contract?: { address?: string };
+      id?: { tokenId?: string };
+    }>;
 
-    const positionIds = NFTs.map((nft: any) => {
+    const positionIds = NFTs.reduce<number[]>((acc, nft) => {
+      const contractAddress = nft?.contract?.address;
+      const tokenId = nft?.id?.tokenId;
+
       if (
-        nft.contract.address.toLowerCase() ===
-        HEGOPS_CONTRACT_ADDRESS.toLowerCase()
+        contractAddress &&
+        contractAddress.toLowerCase() === HEGOPS_CONTRACT_ADDRESS.toLowerCase() &&
+        tokenId
       ) {
-        return Number(nft.id.tokenId);
+        const numericId = Number(tokenId);
+        if (!Number.isNaN(numericId)) {
+          acc.push(numericId);
+        }
       }
-    });
 
-    let userHegicPositionsData = await Promise.all(
-      positionIds.map(async (positionId: string) => {
-        const positionData = await getHegicPositionPnl(
-          positionId,
-          address as Hex
-        );
-        return positionData;
+      return acc;
+    }, []);
+
+    if (positionIds.length === 0) {
+      return [];
+    }
+
+    const positionsData = await Promise.all(
+      positionIds.map(async (positionId) => {
+        try {
+          const positionData = await getHegicPositionPnl(
+            positionId.toString(),
+            address as Hex
+          );
+          return positionData ?? null;
+        } catch (error) {
+          console.error(`Failed to fetch position ${positionId}:`, error);
+          return null;
+        }
       })
     );
-    userHegicPositionsData = userHegicPositionsData.filter(
-      (position) => position != null
+
+    const filteredPositions = positionsData.filter(
+      (position): position is HegicPositionType => position !== null
     );
-    console.log("All positions data -", userHegicPositionsData);
-    return userHegicPositionsData
-      ? (userHegicPositionsData as HegicPositionType[])
-      : [];
+
+    return filteredPositions;
   } catch (error) {
     throw error;
   }

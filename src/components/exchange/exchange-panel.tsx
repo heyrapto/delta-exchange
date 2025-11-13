@@ -132,7 +132,7 @@ export const ExchangePanel = () => {
                 </div>
             )}
 
-            {isFetchingPositions && (
+            {isFetchingPositions && !positions && (
                 <div className="flex items-center justify-center h-20">
                     <div className="w-4 h-4 bg-gray-400 rounded-full animate-pulse" />
                 </div>
@@ -367,7 +367,7 @@ export const ExchangePanel = () => {
                                 Position #{selectedPosition.positionId}
                             </h3>
                             <button
-                                className="text-gray-500 hover:text-gray-700 text-sm"
+                                className="text-gray-500 hover:text-gray-700 text-sm cursor-pointer"
                                 onClick={() => setSelectedPosition(null)}
                             >
                                 Close
@@ -411,13 +411,13 @@ export const ExchangePanel = () => {
                         </div>
                         <div className="p-4 border-t border-gray-200 flex gap-3">
                             <button
-                                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+                                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors cursor-pointer"
                                 onClick={() => setSelectedPosition(null)}
                             >
                                 Dismiss
                             </button>
                             <button
-                                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-md transition-colors ${selectedPosition.payoff ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
+                                className={`flex-1 px-4 py-2 text-sm font-medium text-white rounded-md transition-colors cursor-pointer ${selectedPosition.payoff ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-300 cursor-not-allowed'}`}
                                 onClick={() => {
                                     if (!selectedPosition.payoff || !address) return
                                     closeHegicPosition(selectedPosition.positionId, address as string).then(() => {

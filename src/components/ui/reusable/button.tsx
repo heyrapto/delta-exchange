@@ -7,8 +7,8 @@ export interface ButtonProps
   onclick?: () => void;
 }
 
-export const Button = ({ children, variant = "primary", className, onClick, onclick }: ButtonProps) => {
-    const baseClasses = "px-2 sm:px-4 h-[36px] sm:h-[42px] rounded-none cursor-pointer min-w-[80px] sm:min-w-[130px] text-xs sm:text-sm";
+export const Button = ({ children, variant = "primary", className, onClick, onclick, disabled, ...rest }: ButtonProps) => {
+    const baseClasses = "px-2 sm:px-4 h-[36px] sm:h-[42px] rounded-none min-w-[80px] sm:min-w-[130px] text-xs sm:text-sm";
     
     const getButtonStyle = () => {
         switch (variant) {
@@ -33,9 +33,11 @@ export const Button = ({ children, variant = "primary", className, onClick, oncl
 
   return (
     <button
-     className={`${baseClasses} ${className}`} 
+     className={`${baseClasses} ${disabled ? "cursor-not-allowed" : "cursor-pointer"} ${className}`} 
      style={getButtonStyle()} 
-     onClick={onClick || onclick}
+     onClick={disabled ? undefined : onClick || onclick}
+     disabled={disabled}
+     {...rest}
      >
       {children}
     </button>

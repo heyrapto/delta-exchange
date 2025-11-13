@@ -29,6 +29,23 @@ const CustomConnectButton = ({
     }
   }, [usdcBalance, onBalanceChange]);
 
+  const isInsufficientBalance =
+    !!(
+      usdcBalance &&
+      selectedPremium &&
+      Number(usdcBalance.formatted) < Number(selectedPremium)
+    );
+
+  const handleActionClick = () => {
+    if (isInsufficientBalance) {
+      return;
+    }
+
+    if (onclick) {
+      onclick();
+    }
+  };
+
   return (
     <ConnectButton.Custom>
       {({
@@ -102,17 +119,12 @@ const CustomConnectButton = ({
                     <Button
                       variant="primary"
                       className={`w-full ${
-                        usdcBalance &&
-                        selectedPremium &&
-                        Number(usdcBalance.formatted) < Number(selectedPremium)
-                          ? "cursor-not-allowed"
-                          : ""
+                        isInsufficientBalance ? "cursor-not-allowed" : ""
                       }`}
-                      onclick={onclick}
+                      onClick={handleActionClick}
+                      disabled={isInsufficientBalance}
                     >
-                      {usdcBalance &&
-                      selectedPremium &&
-                      Number(usdcBalance.formatted) < Number(selectedPremium)
+                      {isInsufficientBalance
                         ? "Insufficient balance"
                         : "Buy this strategy"}
                     </Button>
