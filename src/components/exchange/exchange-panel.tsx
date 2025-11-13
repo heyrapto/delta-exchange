@@ -60,6 +60,7 @@ export const ExchangePanel = () => {
             setIsFetchingPositions(true)
             setPositionsError(null)
             const res = await getUserHegicPositions(address as string)
+            console.log("Position debug", res);
             setPositions(res)
         } catch (e: any) {
             setPositionsError(e)
