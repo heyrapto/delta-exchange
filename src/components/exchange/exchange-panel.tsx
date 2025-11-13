@@ -75,7 +75,7 @@ export const ExchangePanel = () => {
             fetchPositions()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, activePanel])
+    }, [address, activePanel, fetchPositions])
 
     const renderOpenOrders = () => (
         <div className="p-3">
