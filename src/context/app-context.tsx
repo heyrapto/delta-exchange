@@ -13,6 +13,9 @@ import {
     TokenType,
   } from "../blockchain/hegic/premuimCalculator";
   import { getAssetPrice } from "../blockchain/hegic/assetPrices";
+  // GNS imports
+  import { getPairPrice } from "../blockchain/gns/assetPrices";
+  import { getUserGNSPositions, getTradingVariables } from "../blockchain/gns/gnsPositions";
 import { useRouter } from "next/navigation";
 import { TSentiment } from "@/types";
   
@@ -31,6 +34,22 @@ import { TSentiment } from "@/types";
     isFetching: boolean;
     assetPrice: number;
     isFetchingPremiums: boolean;
+    // GNS specific state
+    gnsPairIndex: number;
+    gnsLeverage: number;
+    gnsTradeType: 'long' | 'short';
+    gnsOrderType: 'market' | 'limit' | 'stop';
+    gnsQuantity: string;
+    gnsLotSize: string;
+    gnsTp: string;
+    gnsSl: string;
+    gnsPairPrice: number;
+    gnsAvailableMargin: number;
+    gnsFundsRequired: number;
+    gnsPositions: any[];
+    gnsTradingVariables: any;
+    isFetchingGNSPositions: boolean;
+    isFetchingGNSPrices: boolean;
   };
   
   type AppContextType = {
@@ -42,6 +61,18 @@ import { TSentiment } from "@/types";
     handleSentimentChange: (sentiment: TSentiment) => void;
     handleStrategyChange: (strategy: string) => void;
     formatNumber: (num: number) => string;
+    // GNS handlers
+    handleGNSPairChange: (pairIndex: number) => void;
+    handleGNSLeverageChange: (leverage: number) => void;
+    handleGNSTradeTypeChange: (type: 'long' | 'short') => void;
+    handleGNSOrderTypeChange: (type: 'market' | 'limit' | 'stop') => void;
+    handleGNSQuantityChange: (quantity: string) => void;
+    handleGNSLotSizeChange: (lotSize: string) => void;
+    handleGNSTpChange: (tp: string) => void;
+    handleGNSSlChange: (sl: string) => void;
+    handleGNSQuantityPercent: (percent: number) => void;
+    fetchGNSPositions: (userAddress: string) => Promise<void>;
+    fetchGNSTradingVariables: () => Promise<void>;
   };
   
   const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -60,6 +91,22 @@ import { TSentiment } from "@/types";
       isFetching: false,
       isFetchingPremiums: false,
       assetPrice: 0,
+      // GNS initial state
+      gnsPairIndex: 0, // BTC/USD
+      gnsLeverage: 200,
+      gnsTradeType: 'long',
+      gnsOrderType: 'market',
+      gnsQuantity: '',
+      gnsLotSize: '0.001 BTC',
+      gnsTp: '',
+      gnsSl: '',
+      gnsPairPrice: 0,
+      gnsAvailableMargin: 0,
+      gnsFundsRequired: 0,
+      gnsPositions: [],
+      gnsTradingVariables: null,
+      isFetchingGNSPositions: false,
+      isFetchingGNSPrices: false,
     });
   
     const handlePeriodChange = useCallback(
@@ -117,6 +164,118 @@ import { TSentiment } from "@/types";
         setState((prev) => ({ ...prev, strategy }));
       },
       [navigate]
+    );
+
+    // GNS handlers
+    const handleGNSPairChange = useCallback(
+      (pairIndex: number) => {
+        setState((prev) => ({ ...prev, gnsPairIndex: pairIndex }));
+      },
+      []
+    );
+
+    const handleGNSLeverageChange = useCallback(
+      (leverage: number) => {
+        setState((prev) => ({ ...prev, gnsLeverage: leverage }));
+      },
+      []
+    );
+
+    const handleGNSTradeTypeChange = useCallback(
+      (type: 'long' | 'short') => {
+        setState((prev) => ({ ...prev, gnsTradeType: type }));
+      },
+      []
+    );
+
+    const handleGNSOrderTypeChange = useCallback(
+      (type: 'market' | 'limit' | 'stop') => {
+        setState((prev) => ({ ...prev, gnsOrderType: type }));
+      },
+      []
+    );
+
+    const handleGNSQuantityChange = useCallback(
+      (quantity: string) => {
+        setState((prev) => {
+          const qty = parseFloat(quantity) || 0;
+          const lotSizeValue = parseFloat(prev.gnsLotSize.replace(' BTC', '')) || 0.001;
+          const fundsRequired = qty * lotSizeValue * prev.gnsPairPrice / prev.gnsLeverage;
+          return { ...prev, gnsQuantity: quantity, gnsFundsRequired: fundsRequired };
+        });
+      },
+      []
+    );
+
+    const handleGNSLotSizeChange = useCallback(
+      (lotSize: string) => {
+        setState((prev) => ({ ...prev, gnsLotSize: lotSize }));
+      },
+      []
+    );
+
+    const handleGNSTpChange = useCallback(
+      (tp: string) => {
+        setState((prev) => ({ ...prev, gnsTp: tp }));
+      },
+      []
+    );
+
+    const handleGNSSlChange = useCallback(
+      (sl: string) => {
+        setState((prev) => ({ ...prev, gnsSl: sl }));
+      },
+      []
+    );
+
+    const handleGNSQuantityPercent = useCallback(
+      (percent: number) => {
+        setState((prev) => {
+          const maxQuantity = prev.gnsAvailableMargin > 0 
+            ? (prev.gnsAvailableMargin * prev.gnsLeverage) / prev.gnsPairPrice 
+            : 0;
+          const quantity = (maxQuantity * percent / 100).toFixed(3);
+          const lotSizeValue = parseFloat(prev.gnsLotSize.replace(' BTC', '')) || 0.001;
+          const fundsRequired = parseFloat(quantity) * lotSizeValue * prev.gnsPairPrice / prev.gnsLeverage;
+          return { 
+            ...prev, 
+            gnsQuantity: quantity, 
+            gnsFundsRequired: fundsRequired 
+          };
+        });
+      },
+      []
+    );
+
+    const fetchGNSPositions = useCallback(
+      async (userAddress: string) => {
+        if (!userAddress) return;
+        setState((prev) => ({ ...prev, isFetchingGNSPositions: true }));
+        try {
+          const positions = await getUserGNSPositions(userAddress);
+          setState((prev) => ({ ...prev, gnsPositions: positions }));
+        } catch (error) {
+          console.error("Error fetching GNS positions:", error);
+        } finally {
+          setState((prev) => ({ ...prev, isFetchingGNSPositions: false }));
+        }
+      },
+      []
+    );
+
+    const fetchGNSTradingVariables = useCallback(
+      async () => {
+        setState((prev) => ({ ...prev, isFetchingGNSPrices: true }));
+        try {
+          const variables = await getTradingVariables();
+          setState((prev) => ({ ...prev, gnsTradingVariables: variables }));
+        } catch (error) {
+          console.error("Error fetching GNS trading variables:", error);
+        } finally {
+          setState((prev) => ({ ...prev, isFetchingGNSPrices: false }));
+        }
+      },
+      []
     );
   
     // fetch asset price
@@ -194,6 +353,25 @@ import { TSentiment } from "@/types";
       state.assetPrice,
     ]);
   
+    // Fetch GNS pair price when pairIndex changes
+    useEffect(() => {
+      const fetchGNSPairPrice = async () => {
+        setState((prev) => ({ ...prev, isFetchingGNSPrices: true }));
+        try {
+          const price = await getPairPrice(state.gnsPairIndex);
+          setState((prev) => ({ ...prev, gnsPairPrice: price }));
+        } catch (error) {
+          console.error("Error fetching GNS pair price:", error);
+        } finally {
+          setState((prev) => ({ ...prev, isFetchingGNSPrices: false }));
+        }
+      };
+
+      if (state.gnsPairIndex !== undefined) {
+        fetchGNSPairPrice();
+      }
+    }, [state.gnsPairIndex]);
+
     return (
       <AppContext.Provider
         value={{
@@ -205,6 +383,18 @@ import { TSentiment } from "@/types";
           handleSentimentChange,
           handleStrategyChange,
           formatNumber,
+          // GNS handlers
+          handleGNSPairChange,
+          handleGNSLeverageChange,
+          handleGNSTradeTypeChange,
+          handleGNSOrderTypeChange,
+          handleGNSQuantityChange,
+          handleGNSLotSizeChange,
+          handleGNSTpChange,
+          handleGNSSlChange,
+          handleGNSQuantityPercent,
+          fetchGNSPositions,
+          fetchGNSTradingVariables,
         }}
       >
         {children}
