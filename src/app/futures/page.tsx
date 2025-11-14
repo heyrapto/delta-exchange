@@ -17,7 +17,7 @@ const FuturesPage = () => {
   // Generate order book data
   const [buyOrders, setBuyOrders] = useState<Array<{ price: number; size: number; total: number }>>([])
   const [sellOrders, setSellOrders] = useState<Array<{ price: number; size: number; total: number }>>([])
-  const [recentTrades, setRecentTrades] = useState<Array<{ price: number; size: number; time: string; type: "buy" | "sell" }>>([])
+  const [recentTrades, setRecentTrades] = useState<Array<{ price: number; size: number; time: string; type: "buy" | "sell" }>>([]);
 
   // Generate order book and trades data
   useEffect(() => {

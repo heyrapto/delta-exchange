@@ -344,7 +344,6 @@ export const TradeCard = () => {
                 message={notificationData.message}
                 type={notificationData.type}
             />
-
         </div>
     )
 };

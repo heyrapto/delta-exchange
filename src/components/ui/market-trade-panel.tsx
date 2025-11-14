@@ -21,8 +21,6 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
 
   const [showContractDetails, setShowContractDetails] = useState(false)
   const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
-  const [showMakerOnlyDropdown, setShowMakerOnlyDropdown] = useState(false)
-  const [reduceOnly, setReduceOnly] = useState(false)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [showTpSl, setShowTpSl] = useState(false)
   const [showLeveragePanel, setShowLeveragePanel] = useState(false)
@@ -343,17 +341,6 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
             <span className="text-xs text-black">{state.gnsAvailableMargin.toFixed(2)} USD</span>
           </div>
         </div>
-
-        {/* Reduce Only Checkbox */}
-        <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={reduceOnly}
-            onChange={(e) => setReduceOnly(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300"
-          />
-          Reduce Only
-        </label>
 
         {/* Scalper Offer Banner */}
         <div className="bg-linear-to-r from-green-300/20 to-transparent rounded p-2.5 flex items-center justify-between">

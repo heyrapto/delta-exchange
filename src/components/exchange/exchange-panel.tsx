@@ -167,8 +167,10 @@ export const ExchangePanel = () => {
                                     </td>
                                     <td className="px-2 py-2">${p.markPrice}</td>
                                     <td className="px-2 py-2">${p.strikePrice}</td>
-                                    <td className="px-2 py-2" style={{ color: 'var(--text-danger)' }}>
-                                        -${p.negPnl}
+                                    <td className="px-2 py-2" style={{ 
+                                        color: parseFloat(p.profit) >= 0 ? '#10B981' : '#EF4444' 
+                                    }}>
+                                        {parseFloat(p.profit) >= 0 ? '+' : ''}${p.profit}
                                     </td>
                                     <td className="px-2 py-2">{p.expirationTimestamp}</td>
                                     <td className="px-2 py-2">
@@ -392,8 +394,10 @@ export const ExchangePanel = () => {
                             </div>
                             <div>
                                 <div className="text-gray-500">Net P&L</div>
-                                <div className="font-medium" style={{ color: 'var(--text-danger)' }}>
-                                    -${selectedPosition.negPnl}
+                                <div className="font-medium" style={{ 
+                                    color: parseFloat(selectedPosition.profit) >= 0 ? '#10B981' : '#EF4444' 
+                                }}>
+                                    {parseFloat(selectedPosition.profit) >= 0 ? '+' : ''}${selectedPosition.profit}
                                 </div>
                             </div>
                             <div>

@@ -124,16 +124,15 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, ind
         ))}
       </div>
 
-      {/* Depth Slider - Only show for Depth tab */}
+      {/* Depth Slider - Directly below Depth tab */}
       {activeTab === "Depth" && (
-        <div className="px-4 py-2 border-gray-300">
+        <div className="px-4 py-2 border-b border-gray-300">
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-600">Depth</span>
             <div className="flex-1 max-w-[150px]">
               <Slider
                 value={[depth]}
                 onValueChange={(value) => setDepth(value[0])}
-                className="bg-red-500"
                 max={100}
                 min={0}
                 step={1}

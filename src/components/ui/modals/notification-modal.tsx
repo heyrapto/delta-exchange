@@ -78,7 +78,7 @@ export const NotificationModal = ({
           </div>
           <button
             onClick={onClose}
-            className="flex-shrink-0 p-1 hover:bg-black/10 rounded-full transition-colors cursor-pointer"
+            className="shrink-0 p-1 hover:bg-black/10 rounded-full transition-colors cursor-pointer"
           >
             <BiX className="w-4 h-4 text-gray-500" />
           </button>

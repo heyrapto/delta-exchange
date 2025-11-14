@@ -157,17 +157,17 @@ export const FuturesOrderBook = ({ buyOrders: propBuyOrders, sellOrders: propSel
         </div>
 
         {/* Current Price Separator */}
-        <div className="px-3 py-2 bg-gray-100 border-y-2 border-gray-300">
+        <div className="px-3 py-2">
           <div className="text-start">
-            <div className="text-lg font-semibold text-black">${currentPrice.toFixed(1)}</div>
+            <div className={`text-lg font-semibold ${currentPrice >= (markPrice || 0) ? "text-green-500" : "text-red-500"}`}>${currentPrice.toFixed(1)}</div>
             {markPrice && (
-              <div className="text-xs text-gray-600 mt-1">
+              <div className="text-xs text-gray-600 mt-0">
                 I {indexPrice?.toFixed(1) || currentPrice.toFixed(1)} | M {markPrice.toFixed(1)}
               </div>
             )}
-            <div className="text-xs text-gray-600 mt-1">
+            {/* <div className="text-xs text-gray-600 mt-1">
               Spread: <span className="text-black">{spread.toFixed(1)}</span> ({spreadPercent.toFixed(2)}%)
-            </div>
+            </div> */}
           </div>
         </div>
 
