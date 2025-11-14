@@ -113,7 +113,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, ind
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-xs font-medium border-b-2 transition-colors ${
+            className={`px-4 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === tab
                 ? "border-[#ADFF2F] text-black font-semibold"
                 : "border-transparent text-gray-600 hover:text-black"
@@ -133,6 +133,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, ind
               <Slider
                 value={[depth]}
                 onValueChange={(value) => setDepth(value[0])}
+                className="bg-red-500"
                 max={100}
                 min={0}
                 step={1}
@@ -147,7 +148,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, ind
         {showTradingView ? (
           <TradingViewChart symbol={getTradingViewSymbol()} interval="60" />
         ) : (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" className="relative">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
             <defs>
               <linearGradient id="colorBuy" x1="0" y1="0" x2="0" y2="1">
