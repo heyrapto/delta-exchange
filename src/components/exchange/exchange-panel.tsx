@@ -23,6 +23,10 @@ export const ExchangePanel = () => {
     const [positionsError, setPositionsError] = useState<Error | null>(null)
     const [positions, setPositions] = useState<HegicPositionType[]>([])
     const [selectedPosition, setSelectedPosition] = useState<HegicPositionType | null>(null)
+    
+    // GNS state - separate from Hegic
+    const [gnsPositions, setGnsPositions] = useState<GNSPositionType[]>([])
+    const [isFetchingGNSPositions, setIsFetchingGNSPositions] = useState(false)
 
     const EmptyPanelState = ({ title }: { title: string }) => (
         <div className="flex flex-col items-center justify-center py-20">
@@ -71,54 +75,114 @@ export const ExchangePanel = () => {
         }
     }, [])
 
+    // Fetch GNS positions separately
+    const fetchGNSPositions = useCallback(async () => {
+        if (!address) {
+            setGnsPositions([])
+            return
+        }
+        try {
+            setIsFetchingGNSPositions(true)
+            const trades = await getUserGNSPositions(address)
+            setGnsPositions(trades)
+        } catch (error) {
+            console.error("Error fetching GNS positions:", error)
+        } finally {
+            setIsFetchingGNSPositions(false)
+        }
+    }, [address])
+
     // Load positions when user connects or tab is active
     useEffect(() => {
         if (activePanel === 0) {
             fetchPositions()
+            fetchGNSPositions() // Also fetch GNS for Positions tab
+        }
+        if (activePanel === 1) {
+            fetchGNSPositions() // Fetch GNS for Open Orders tab
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, activePanel, fetchPositions])
+    }, [address, activePanel, fetchPositions, fetchGNSPositions])
 
-    const renderOpenOrders = () => (
-        <div className="p-3">
-            {openOrders.length === 0 ? (
-                <EmptyPanelState title="Open Orders" />
-            ) : (
-                <table className="w-full text-xs">
-                    <thead>
-                        <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                            <th className="text-left px-2 py-1">Time</th>
-                            <th className="text-left px-2 py-1">Side</th>
-                            <th className="text-left px-2 py-1">Type</th>
-                            <th className="text-left px-2 py-1">Price</th>
-                            <th className="text-left px-2 py-1">Qty</th>
-                            <th className="text-left px-2 py-1">Period</th>
-                            <th className="text-left px-2 py-1">Status</th>
-                            <th className="text-left px-2 py-1">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {openOrders.map(o => (
-                            <tr key={o.id} className="border-b border-gray-200">
-                                <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
-                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
-                                <td className="px-2 py-2">{o.orderType}</td>
-                                <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
-                                <td className="px-2 py-2">{o.quantity}</td>
-                                <td className="px-2 py-2">{o.period} days</td>
-                                <td className="px-2 py-2 capitalize">{o.status}</td>
-                                <td className="px-2 py-2">
-                                    {o.status === 'open' && (
-                                        <button className="text-[11px] underline" onClick={() => cancelOrder(o.id)}>Cancel</button>
-                                    )}
-                                </td>
+    // Separate GNS into orders (pending) and positions (filled)
+    const gnsOpenOrders = gnsPositions.filter((p: GNSPositionType) => p.tradeType === "LIMIT" || p.tradeType === "STOP")
+    const gnsOpenPositions = gnsPositions.filter((p: GNSPositionType) => p.tradeType === "MARKET" && p.isOpen)
+
+    const renderOpenOrders = () => {
+        const hasAnyOrders = openOrders.length > 0 || gnsOpenOrders.length > 0
+        
+        return (
+            <div className="p-3">
+                {!hasAnyOrders && !isFetchingGNSPositions ? (
+                    <EmptyPanelState title="Open Orders" />
+                ) : (
+                    <table className="w-full text-xs">
+                        <thead>
+                            <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                <th className="text-left px-2 py-1">Time</th>
+                                <th className="text-left px-2 py-1">Side</th>
+                                <th className="text-left px-2 py-1">Type</th>
+                                <th className="text-left px-2 py-1">Price</th>
+                                <th className="text-left px-2 py-1">Qty</th>
+                                <th className="text-left px-2 py-1">Period</th>
+                                <th className="text-left px-2 py-1">Status</th>
+                                <th className="text-left px-2 py-1">Action</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
-        </div>
-    )
+                        </thead>
+                        <tbody>
+                            {/* Existing Hegic orders */}
+                            {openOrders.map(o => (
+                                <tr key={o.id} className="border-b border-gray-200">
+                                    <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
+                                    <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                    <td className="px-2 py-2">{o.orderType}</td>
+                                    <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
+                                    <td className="px-2 py-2">{o.quantity}</td>
+                                    <td className="px-2 py-2">{o.period} days</td>
+                                    <td className="px-2 py-2 capitalize">{o.status}</td>
+                                    <td className="px-2 py-2">
+                                        {o.status === 'open' && (
+                                            <button className="text-[11px] underline" onClick={() => cancelOrder(o.id)}>Cancel</button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            {/* GNS Open Orders (Limit/Stop) */}
+                            {gnsOpenOrders.map((order: GNSPositionType) => (
+                                <tr key={`gns-order-${order.index}`} className="border-b border-gray-200">
+                                    <td className="px-2 py-2">-</td>
+                                    <td className="px-2 py-2" style={{ color: order.long ? '#10B981' : '#EF4444' }}>
+                                        {order.long ? 'Long' : 'Short'}
+                                    </td>
+                                    <td className="px-2 py-2">{order.tradeType}</td>
+                                    <td className="px-2 py-2">${order.openPrice}</td>
+                                    <td className="px-2 py-2">{order.collateralAmount}</td>
+                                    <td className="px-2 py-2">-</td>
+                                    <td className="px-2 py-2 capitalize">Pending</td>
+                                    <td className="px-2 py-2">
+                                        <button 
+                                            className="text-[11px] underline text-red-500 hover:text-red-700"
+                                            onClick={async () => {
+                                                if (!address) return
+                                                try {
+                                                    await cancelOpenOrder(order.index)
+                                                    fetchGNSPositions()
+                                                } catch (error) {
+                                                    console.error("Error canceling order:", error)
+                                                }
+                                            }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
+        )
+    }
 
     const renderPositions = () => (
         <div className="p-3">
@@ -140,11 +204,11 @@ export const ExchangePanel = () => {
                 </div>
             )}
 
-            {address && !isFetchingPositions && positions.length === 0 && (
+            {address && !isFetchingPositions && !isFetchingGNSPositions && positions.length === 0 && gnsOpenPositions.length === 0 && (
                 <EmptyPanelState title="Positions" />
             )}
 
-            {positions.length > 0 && (
+            {(positions.length > 0 || gnsOpenPositions.length > 0) && (
                 <div className="w-full overflow-x-auto">
                     <table className="w-full text-xs">
                         <thead>
@@ -158,6 +222,7 @@ export const ExchangePanel = () => {
                             </tr>
                         </thead>
                         <tbody>
+                            {/* Existing Hegic positions - unchanged */}
                             {positions.map((p) => (
                                 <tr
                                     key={`${p.positionId}-${p.strategy}`}
@@ -192,6 +257,48 @@ export const ExchangePanel = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {/* GNS Positions - added below Hegic positions */}
+                            {gnsOpenPositions.map((p: GNSPositionType) => {
+                                const pnl = parseFloat(p.pnl || "0")
+                                return (
+                                    <tr
+                                        key={`gns-pos-${p.index}`}
+                                        className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                    >
+                                        <td className="px-2 py-2">
+                                            <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                                                {p.collateralAmount}
+                                            </span>
+                                            <span className="text-gray-500 ml-1">{p.pairName}</span>
+                                        </td>
+                                        <td className="px-2 py-2">${p.currentPrice || p.openPrice}</td>
+                                        <td className="px-2 py-2">${p.tp !== "0" ? p.tp : '-'}</td>
+                                        <td className="px-2 py-2" style={{ 
+                                            color: pnl >= 0 ? '#10B981' : '#EF4444' 
+                                        }}>
+                                            {pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}
+                                        </td>
+                                        <td className="px-2 py-2">-</td>
+                                        <td className="px-2 py-2">
+                                            <button
+                                                className="text-[11px] underline text-red-500 hover:text-red-700"
+                                                onClick={async (e) => {
+                                                    e.stopPropagation()
+                                                    if (!address) return
+                                                    try {
+                                                        await closeTrade(p.index)
+                                                        fetchGNSPositions()
+                                                    } catch (error) {
+                                                        console.error("Error closing position:", error)
+                                                    }
+                                                }}
+                                            >
+                                                Close
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>
