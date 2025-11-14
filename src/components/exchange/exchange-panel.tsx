@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTradeStore } from "@/store/trade-store"
 import { BiDownload, BiRefresh } from "react-icons/bi"
 import { useAccount } from "wagmi"
@@ -32,11 +32,11 @@ export const ExchangePanel = () => {
 
     const tableData = [
         {
-          status: 'Healthy',
-          initialMargin: '$0.00',
-          initialPercent: '0.00%',
-          maintenanceMargin: '$0.00',
-          maintenancePercent: '0.00%',
+            status: 'Healthy',
+            initialMargin: '$0.00',
+            initialPercent: '0.00%',
+            maintenanceMargin: '$0.00',
+            maintenancePercent: '0.00%',
         },
         // {
         //   status: 'Warning',
@@ -45,13 +45,10 @@ export const ExchangePanel = () => {
         //   maintenanceMargin: '$1,200.00',
         //   maintenancePercent: '4.07%',
         // },
-      ]
-      
-
+    ]
     const { openOrders, orderHistory, cancelOrder } = useTradeStore()
 
-    // Fetch Hegic positions for connected wallet
-    const fetchPositions = async () => {
+    const fetchPositions = useCallback(async () => {
         if (!address) {
             setPositions([])
             return
@@ -67,7 +64,7 @@ export const ExchangePanel = () => {
         } finally {
             setIsFetchingPositions(false)
         }
-    }
+    }, [])
 
     // Load positions when user connects or tab is active
     useEffect(() => {
@@ -239,58 +236,58 @@ export const ExchangePanel = () => {
             case 4:
                 return (
                     <div className="p-4">
-                      <table className="w-full text-xs border-separate border-spacing-y-2">
-                        <thead>
-                          <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                            <th className="text-left font-medium px-2 py-1">Status</th>
-                            <th className="text-left font-medium px-2 py-1">Initial Margin</th>
-                            <th className="text-left font-medium px-2 py-1">Maintenance Margin</th>
-                          </tr>
-                        </thead>
-                  
-                        <tbody>
-                          {tableData.map((row, i) => (
-                            <tr key={i} className="bg-gray-100/50 rounded">
-                              <td className="px-2 py-2 border-b border-gray-300">
-                                <span
-                                  className="border-b border-dotted pb-[2px]"
-                                  style={{
-                                    borderColor:
-                                      row.status.toLowerCase() === 'healthy'
-                                        ? 'var(--text-success)'
-                                        : 'var(--text-warning)',
-                                    color:
-                                      row.status.toLowerCase() === 'healthy'
-                                        ? 'var(--text-success)'
-                                        : 'var(--text-warning)',
-                                  }}
-                                >
-                                  {row.status}
-                                </span>
-                              </td>
-                  
-                              <td
-                                className="px-2 py-2 border-b border-gray-300 text-[11px]"
-                                style={{ color: 'var(--text-primary)' }}
-                              >
-                                {row.initialMargin}{' '}
-                                <span className="text-gray-400">({row.initialPercent})</span>
-                              </td>
-                  
-                              <td
-                                className="px-2 py-2 border-b border-gray-300 text-[11px]"
-                                style={{ color: 'var(--text-primary)' }}
-                              >
-                                {row.maintenanceMargin}{' '}
-                                <span className="text-gray-400">({row.maintenancePercent})</span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                        <table className="w-full text-xs border-separate border-spacing-y-2">
+                            <thead>
+                                <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                    <th className="text-left font-medium px-2 py-1">Status</th>
+                                    <th className="text-left font-medium px-2 py-1">Initial Margin</th>
+                                    <th className="text-left font-medium px-2 py-1">Maintenance Margin</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {tableData.map((row, i) => (
+                                    <tr key={i} className="bg-gray-100/50 rounded">
+                                        <td className="px-2 py-2 border-b border-gray-300">
+                                            <span
+                                                className="border-b border-dotted pb-[2px]"
+                                                style={{
+                                                    borderColor:
+                                                        row.status.toLowerCase() === 'healthy'
+                                                            ? 'var(--text-success)'
+                                                            : 'var(--text-warning)',
+                                                    color:
+                                                        row.status.toLowerCase() === 'healthy'
+                                                            ? 'var(--text-success)'
+                                                            : 'var(--text-warning)',
+                                                }}
+                                            >
+                                                {row.status}
+                                            </span>
+                                        </td>
+
+                                        <td
+                                            className="px-2 py-2 border-b border-gray-300 text-[11px]"
+                                            style={{ color: 'var(--text-primary)' }}
+                                        >
+                                            {row.initialMargin}{' '}
+                                            <span className="text-gray-400">({row.initialPercent})</span>
+                                        </td>
+
+                                        <td
+                                            className="px-2 py-2 border-b border-gray-300 text-[11px]"
+                                            style={{ color: 'var(--text-primary)' }}
+                                        >
+                                            {row.maintenanceMargin}{' '}
+                                            <span className="text-gray-400">({row.maintenancePercent})</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                  )
-                  
+                )
+
             case 5: return <EmptyPanelState title="Fills" />
             case 6: return renderOrderHistory()
             default: return null
@@ -316,15 +313,14 @@ export const ExchangePanel = () => {
                 <div className="flex flex-wrap gap-2 sm:gap-4 lg:gap-6 overflow-x-auto scrollbar-hide">
                     {panelTabs.map((p) => (
                         <div
-                        key={p.id}
-                        onClick={() => handlePanelToggle(p.id)}
-                        className={`text-[12px] sm:text-[14px] flex items-center gap-1 sm:gap-2 cursor-pointer relative pb-2 whitespace-nowrap  transition-all duration-200
-                          ${
-                            activePanel === p.id
-                              ? "text-green-500"
-                              : ""
-                          }`}
-                      >
+                            key={p.id}
+                            onClick={() => handlePanelToggle(p.id)}
+                            className={`text-[12px] sm:text-[14px] flex items-center gap-1 sm:gap-2 cursor-pointer relative pb-2 whitespace-nowrap  transition-all duration-200
+                          ${activePanel === p.id
+                                    ? "text-green-500"
+                                    : ""
+                                }`}
+                        >
                             <h1 className="truncate">{p.title}</h1>
                             {p.isHealthy && (
                                 <span className="border rounded-[40%] px-1 py-px text-[8px] sm:text-[9px]" style={{ borderColor: 'var(--text-success)', backgroundColor: 'var(--text-success)', color: 'var(--text-primary)' }}>

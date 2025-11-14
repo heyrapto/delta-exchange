@@ -1,9 +1,7 @@
 "use client"
 
-import { useTradeStore } from "@/store/trade-store"
 import { Slider } from "./reusable/slider"
 import { useAppContext } from "@/context/app-context"
-import { useState } from "react"
 
 const formatExpirationDate = (days: number): string => {
   const today = new Date()

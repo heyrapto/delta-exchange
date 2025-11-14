@@ -347,4 +347,4 @@ export const TradeCard = () => {
 
         </div>
     )
-}
+};

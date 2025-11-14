@@ -19,4 +19,3 @@ export const takePlatformFee = async (trxAmount: number) => {
   console.log("feeSent", feeSentHash);
   return feeSentHash;
 };
-

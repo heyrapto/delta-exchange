@@ -92,7 +92,7 @@ export const FuturesOrderBook = ({ buyOrders, sellOrders, currentPrice, markPric
 
         {/* Current Price Separator */}
         <div className="px-3 py-2 bg-gray-100 border-y-2 border-gray-300">
-          <div className="text-center">
+          <div className="text-start">
             <div className="text-lg font-semibold text-black">${currentPrice.toFixed(1)}</div>
             {markPrice && (
               <div className="text-xs text-gray-600 mt-1">
