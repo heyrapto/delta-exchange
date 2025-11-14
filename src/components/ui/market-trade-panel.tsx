@@ -17,14 +17,14 @@ interface FuturesTradePanelProps {
 export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps) => {
   const { address } = useAccount()
   const { state, handleGNSTradeTypeChange, handleGNSOrderTypeChange, handleGNSQuantityChange, handleGNSLotSizeChange, handleGNSTpChange, handleGNSSlChange, handleGNSQuantityPercent, handleGNSLeverageChange } = useAppContext()
-  
+
   const [showContractDetails, setShowContractDetails] = useState(false)
   const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
   const [showMakerOnlyDropdown, setShowMakerOnlyDropdown] = useState(false)
   const [reduceOnly, setReduceOnly] = useState(false)
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [showTpSl, setShowTpSl] = useState(false)
-
+  const [showLeveragePanel, setShowLeveragePanel] = useState(false)
   const lotSizeOptions = ['0.001 BTC', '0.01 BTC', '0.1 BTC', '1 BTC']
   const percentageOptions = [10, 25, 50, 75, 100]
 
@@ -80,6 +80,11 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
     status: "Operational"
   }
 
+  const tradeButtons = [
+    { label: "Call | Long", tradeType: "long" as const, activeColor: "bg-[#ADFF2F] text-black" },
+    { label: "Put | Short", tradeType: "short" as const, activeColor: "bg-red-500 text-white" },
+  ]
+
   return (
     <div className="w-full h-full flex flex-col bg-white border border-gray-300">
       {/* Contract Details Header */}
@@ -96,7 +101,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
               <BiChevronDown className="w-4 h-4" />
             )}
           </button>
-          
+
           {showContractDetails && (
             <div className="absolute top-8 right-0 bg-white border border-gray-300 rounded shadow-lg p-4 z-20 min-w-[280px]">
               <div className="text-sm font-semibold mb-3 text-[#ADFF2F]">Contract Details</div>
@@ -154,79 +159,76 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
       {/* Main Trade Panel */}
       <div className="flex-1 flex flex-col p-3 space-y-3 overflow-y-auto">
         {/* Trade Direction Buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => handleGNSTradeTypeChange('long')}
-            className={`py-2 px-3 rounded text-sm font-medium transition-colors ${
-              state.gnsTradeType === 'long'
-                ? 'bg-[#ADFF2F] text-black'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Buy | Long
-          </button>
-          <button
-            onClick={() => handleGNSTradeTypeChange('short')}
-            className={`py-2 px-3 rounded text-sm font-medium transition-colors ${
-              state.gnsTradeType === 'short'
-                ? 'bg-red-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Sell | Short
-          </button>
+        <div className="grid grid-cols-2 gap-1 sm:gap-2 mb-2 sm:mb-3">
+          {tradeButtons.map((btn) => (
+            <button
+              key={btn.label}
+              onClick={() => {
+                handleGNSTradeTypeChange(btn.tradeType)
+              }}
+              className={`
+                            relative
+                            flex items-center justify-center
+                            h-7
+                            rounded
+                            text-[11px] font-medium
+                            transition-colors
+                            mr-2
+                            overflow-hidden
+                            cursor-pointer
+                            ${state.gnsTradeType === btn.tradeType ? `${btn.activeColor}` : 'bg-transparent border border-gray-300 text-gray-900'}
+                        `}
+              style={{
+                transform: 'skewX(-20deg)',
+              }}
+            >
+              {/* Button Text Skewed Back */}
+              <span className="relative z-10" style={{ transform: 'skewX(20deg)' }}>
+                {btn.label}
+              </span>
+            </button>
+          ))}
         </div>
 
         {/* Leverage Selector */}
-        <div className="border border-[#ADFF2F] rounded px-3 py-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-600">Leverage</span>
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={state.gnsLeverage}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value) || 1
-                  handleGNSLeverageChange(Math.max(1, Math.min(200, value)))
-                }}
-                className="bg-transparent w-16 text-right text-sm font-semibold outline-none text-black"
-                min={1}
-                max={200}
-              />
-              <span className="text-sm font-semibold text-black">x</span>
+        <div className="mb-3 bg-gray-100/50 p-3">
+          <div
+            onClick={() => setShowLeveragePanel(!showLeveragePanel)}
+            className="flex items-center justify-between py-2 cursor-pointer"
+          >
+            <div className="flex gap-2 items-center">
+              <span className="text-gray-900 text-[11px]">Leverage</span>
+              <span className="text-green-500 text-[11px] font-medium">{state.gnsLeverage}x</span>
+            </div>
+            <div className="flex items-center gap-2">
+              {showLeveragePanel ? (
+                <BiChevronUp className="w-3 h-3 text-gray-400" />
+              ) : (
+                <BiChevronDown className="w-3 h-3 text-gray-400" />
+              )}
             </div>
           </div>
-          <LeverageSelector maxLeverage={200} isGNS={true} />
+
+          {showLeveragePanel && (
+            <LeverageSelector maxLeverage={200} isGNS={true} />
+          )}
         </div>
 
         {/* Order Type Tabs */}
         <div className="flex border-b border-gray-300">
-          {(['limit', 'market', 'maker'] as const).map((type) => (
+          {(['limit', 'market'] as const).map((type) => (
             <button
               key={type}
               onClick={() => {
-                if (type === 'maker') {
-                  handleGNSOrderTypeChange('limit')
-                  setShowMakerOnlyDropdown(true)
-                } else {
-                  handleGNSOrderTypeChange(type === 'limit' ? 'limit' : 'market')
-                }
+                handleGNSOrderTypeChange(type === 'limit' ? 'limit' : 'market')
               }}
-              className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors relative ${
-                (type === 'market' && state.gnsOrderType === 'market') ||
-                (type === 'limit' && state.gnsOrderType === 'limit')
+              className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors relative ${(type === 'market' && state.gnsOrderType === 'market') ||
+                  (type === 'limit' && state.gnsOrderType === 'limit')
                   ? 'border-[#ADFF2F] text-black font-semibold'
                   : 'border-transparent text-gray-600 hover:text-black'
-              }`}
+                }`}
             >
-              {type === 'maker' ? (
-                <div className="flex items-center justify-center gap-1">
-                  Maker Only
-                  <BiChevronDown className="w-3 h-3" />
-                </div>
-              ) : (
-                type.charAt(0).toUpperCase() + type.slice(1)
-              )}
+              {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
@@ -270,7 +272,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
               )}
             </div>
           </div>
-          
+
           {/* Percentage Buttons */}
           <div className="flex gap-1 mt-2">
             {percentageOptions.map((percent) => (
@@ -365,11 +367,10 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
         <button
           onClick={handlePlaceOrder}
           disabled={!address || !state.gnsQuantity || isPlacingOrder || state.gnsFundsRequired > state.gnsAvailableMargin}
-          className={`w-full py-3 rounded text-sm font-semibold transition-colors ${
-            !address || !state.gnsQuantity || isPlacingOrder || state.gnsFundsRequired > state.gnsAvailableMargin
+          className={`w-full py-3 rounded text-sm font-semibold transition-colors ${!address || !state.gnsQuantity || isPlacingOrder || state.gnsFundsRequired > state.gnsAvailableMargin
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-[#ADFF2F] text-black hover:bg-[#9EE52F]'
-          }`}
+            }`}
         >
           {!address ? (
             'Connect Wallet'
