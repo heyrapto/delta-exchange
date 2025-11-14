@@ -106,41 +106,43 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, ind
   const showTradingView = activeTab !== "Depth"
 
   return (
-    <div className="w-full h-full flex flex-col bg-white border border-gray-300 relative">
+    <div className="w-full h-full flex flex-col bg-white border border-gray-300 ">
       {/* Tabs */}
-      <div className="flex border-b border-gray-300 px-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
-              activeTab === tab
-                ? "border-[#ADFF2F] text-black font-semibold"
-                : "border-transparent text-gray-600 hover:text-black"
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
+      <div className="flex flex-col border-b border-gray-300 relative">
+  <div className="flex px-4">
+    {tabs.map((tab) => (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`px-4 py-2 text-xs font-medium border-b-2 transition-colors cursor-pointer ${
+          activeTab === tab
+            ? "border-[#ADFF2F] text-black font-semibold relative"
+            : "border-transparent text-gray-600 hover:text-black"
+        }`}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
 
-      {/* Depth Slider - Directly below Depth tab */}
-      {activeTab === "Depth" && (
-        <div className="px-4 py-2 border-b border-gray-300">
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-600">Depth</span>
-            <div className="flex-1 max-w-[150px]">
-              <Slider
-                value={[depth]}
-                onValueChange={(value) => setDepth(value[0])}
-                max={100}
-                min={0}
-                step={1}
-              />
-            </div>
-          </div>
+  {activeTab === "Depth" && (
+    <div className="px-4 py-2 absolute top-full left-50 right-0 z-50 bg-white">
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-gray-600">Depth</span>
+        <div className="flex-1 max-w-[150px]">
+          <Slider
+            value={[depth]}
+            onValueChange={(value) => setDepth(value[0])}
+            max={100}
+            min={0}
+            step={1}
+          />
         </div>
-      )}
+      </div>
+    </div>
+  )}
+</div>
+
 
       {/* Chart Content */}
       <div className="flex-1 p-4">

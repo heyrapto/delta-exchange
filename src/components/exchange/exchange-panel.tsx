@@ -10,6 +10,11 @@ import {
     getUserHegicPositions,
     HegicPositionType,
 } from "@/blockchain/hegic/hegicPositions"
+import {
+    getUserGNSPositions,
+    GNSPositionType,
+} from "@/blockchain/gns/gnsPositions"
+import { cancelOpenOrder, closeTrade } from "@/blockchain/gns/gnsCalls"
 
 export const ExchangePanel = () => {
     const [activePanel, setActivePanel] = useState(0)
