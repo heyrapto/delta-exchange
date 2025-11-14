@@ -9,6 +9,7 @@ import { BiChevronDown, BiChevronUp } from "react-icons/bi"
 import { openTrade } from "@/blockchain/gns/gnsCalls"
 import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
 import Loader from "./reusable/loader"
+import CustomConnectButton from "@/components/custom/connect-button"
 
 interface FuturesTradePanelProps {
   isLoggedIn?: boolean
@@ -364,29 +365,14 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
         </div>
 
         {/* Place Order Button */}
-        <button
-          onClick={handlePlaceOrder}
-          disabled={!address || !state.gnsQuantity || isPlacingOrder || state.gnsFundsRequired > state.gnsAvailableMargin}
-          className={`w-full py-3 rounded text-sm font-semibold transition-colors ${!address || !state.gnsQuantity || isPlacingOrder || state.gnsFundsRequired > state.gnsAvailableMargin
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-[#ADFF2F] text-black hover:bg-[#9EE52F]'
-            }`}
-        >
-          {!address ? (
-            'Connect Wallet'
-          ) : !state.gnsQuantity ? (
-            'Enter Quantity'
-          ) : state.gnsFundsRequired > state.gnsAvailableMargin ? (
-            'Insufficient Margin'
-          ) : isPlacingOrder ? (
-            <span className="flex items-center justify-center gap-2">
-              <Loader />
-              Placing Order...
-            </span>
-          ) : (
-            `${state.gnsTradeType === 'long' ? 'Buy' : 'Sell'} ${getPairName()}`
-          )}
-        </button>
+        <CustomConnectButton
+          isGNS={true}
+          requiredAmount={state.gnsFundsRequired}
+          onclick={handlePlaceOrder}
+          onBalanceChange={(balance) => {
+            // Update available margin in context if needed
+          }}
+        />
 
         {/* Fees Display */}
         <div className="text-center">

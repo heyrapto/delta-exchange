@@ -78,6 +78,8 @@ const FuturesPage = () => {
               currentPrice={currentPrice}
               buyOrders={buyOrders}
               sellOrders={sellOrders}
+              markPrice={markPrice}
+              indexPrice={indexPrice}
             />
           </div>
 

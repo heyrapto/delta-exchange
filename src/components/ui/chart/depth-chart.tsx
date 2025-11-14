@@ -12,15 +12,35 @@ import {
 } from "recharts"
 import { useState } from "react"
 import { Slider } from "../reusable/slider"
+import { TradingViewChart } from "./trading-view"
+import { useAppContext } from "@/context/app-context"
+import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
 
 interface DepthChartProps {
   currentPrice: number
   buyOrders: Array<{ price: number; size: number; total: number }>
   sellOrders: Array<{ price: number; size: number; total: number }>
+  markPrice?: number
+  indexPrice?: number
 }
 
-export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartProps) => {
+type ChartTab = "Traded Price" | "Mark Price" | "Funding" | "Depth"
+
+export const DepthChart = ({ currentPrice, buyOrders, sellOrders, markPrice, indexPrice }: DepthChartProps) => {
   const [depth, setDepth] = useState(50)
+  const [activeTab, setActiveTab] = useState<ChartTab>("Depth")
+  const { state } = useAppContext()
+  
+  // Get symbol for TradingView based on GNS pair
+  const getTradingViewSymbol = () => {
+    const pair = state.gnsPairIndex !== undefined 
+      ? GNS_CONTRACTS.PAIRS[state.gnsPairIndex as keyof typeof GNS_CONTRACTS.PAIRS]
+      : null
+    if (pair) {
+      return `BINANCE:${pair.from}USDT`
+    }
+    return "BINANCE:BTCUSDT"
+  }
 
   // Prepare data for the chart
   // Buy orders are below current price (bids), sell orders are above (asks)
@@ -82,15 +102,19 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartPr
     return null
   }
 
+  const tabs: ChartTab[] = ["Traded Price", "Mark Price", "Funding", "Depth"]
+  const showTradingView = activeTab !== "Depth"
+
   return (
     <div className="w-full h-full flex flex-col bg-white border border-gray-300 relative">
       {/* Tabs */}
       <div className="flex border-b border-gray-300 px-4">
-        {["Traded Price", "Mark Price", "Funding", "Depth"].map((tab) => (
+        {tabs.map((tab) => (
           <button
             key={tab}
+            onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-xs font-medium border-b-2 transition-colors ${
-              tab === "Depth"
+              activeTab === tab
                 ? "border-[#ADFF2F] text-black font-semibold"
                 : "border-transparent text-gray-600 hover:text-black"
             }`}
@@ -100,24 +124,29 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartPr
         ))}
       </div>
 
-      {/* Depth Slider */}
-      <div className="px-4 py-2 border-gray-300">
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-600">Depth</span>
-          <div className="flex-1 max-w-[150px]">
-            <Slider
-              value={[depth]}
-              onValueChange={(value) => setDepth(value[0])}
-              max={100}
-              min={0}
-              step={1}
-            />
+      {/* Depth Slider - Only show for Depth tab */}
+      {activeTab === "Depth" && (
+        <div className="px-4 py-2 border-gray-300">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-600">Depth</span>
+            <div className="flex-1 max-w-[150px]">
+              <Slider
+                value={[depth]}
+                onValueChange={(value) => setDepth(value[0])}
+                max={100}
+                min={0}
+                step={1}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Chart */}
+      {/* Chart Content */}
       <div className="flex-1 p-4">
+        {showTradingView ? (
+          <TradingViewChart symbol={getTradingViewSymbol()} interval="60" />
+        ) : (
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 10 }}>
             <defs>
@@ -176,6 +205,7 @@ export const DepthChart = ({ currentPrice, buyOrders, sellOrders }: DepthChartPr
             />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
     </div>
   )

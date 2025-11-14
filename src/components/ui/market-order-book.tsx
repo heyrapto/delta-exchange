@@ -1,20 +1,86 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BiChevronDown } from "react-icons/bi"
 import { OrderBookEntry } from "@/types"
+import { useAppContext } from "@/context/app-context"
+import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
 
 interface FuturesOrderBookProps {
-  buyOrders: OrderBookEntry[]
-  sellOrders: OrderBookEntry[]
-  currentPrice: number
+  buyOrders?: OrderBookEntry[]
+  sellOrders?: OrderBookEntry[]
+  currentPrice?: number
   markPrice?: number
   indexPrice?: number
 }
 
-export const FuturesOrderBook = ({ buyOrders, sellOrders, currentPrice, markPrice, indexPrice }: FuturesOrderBookProps) => {
+export const FuturesOrderBook = ({ buyOrders: propBuyOrders, sellOrders: propSellOrders, currentPrice: propCurrentPrice, markPrice, indexPrice }: FuturesOrderBookProps) => {
   const [priceAggregation, setPriceAggregation] = useState(0.5)
   const [showAggregationDropdown, setShowAggregationDropdown] = useState(false)
+  const { state } = useAppContext()
+  
+  // Real-time order book data
+  const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>(propBuyOrders || [])
+  const [sellOrders, setSellOrders] = useState<OrderBookEntry[]>(propSellOrders || [])
+  const [currentPrice, setCurrentPrice] = useState(propCurrentPrice || state.gnsPairPrice || 0)
+  const [spread, setSpread] = useState(0)
+  const [spreadPercent, setSpreadPercent] = useState(0)
+
+  // Get symbol for API based on GNS pair
+  const getSymbol = () => {
+    const pair = state.gnsPairIndex !== undefined 
+      ? GNS_CONTRACTS.PAIRS[state.gnsPairIndex as keyof typeof GNS_CONTRACTS.PAIRS]
+      : null
+    if (pair) {
+      return `${pair.from}USDT`
+    }
+    return "BTCUSDT"
+  }
+
+  // Fetch real-time data from Binance API
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+    const controller = new AbortController()
+    const symbol = getSymbol()
+
+    const fetchData = async () => {
+      try {
+        // Depth
+        const depthRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=25`, { signal: controller.signal })
+        const depth = await depthRes.json()
+        const newSellOrders: OrderBookEntry[] = (depth.asks || []).map((a: [string, string]) => ({ 
+          price: parseFloat(a[0]), 
+          size: parseFloat(a[1]) 
+        }))
+        const newBuyOrders: OrderBookEntry[] = (depth.bids || []).map((b: [string, string]) => ({ 
+          price: parseFloat(b[0]), 
+          size: parseFloat(b[1]) 
+        }))
+
+        setSellOrders(newSellOrders)
+        setBuyOrders(newBuyOrders)
+
+        const bestAsk = newSellOrders[0]?.price
+        const bestBid = newBuyOrders[0]?.price
+        if (bestAsk && bestBid) {
+          const s = bestAsk - bestBid
+          setSpread(s)
+          setSpreadPercent((s / ((bestAsk + bestBid) / 2)) * 100)
+          setCurrentPrice((bestAsk + bestBid) / 2)
+        }
+      } catch (_) {
+        // ignore aborted or transient errors
+      }
+    }
+
+    fetchData()
+    interval = setInterval(fetchData, 2000)
+
+    return () => {
+      if (interval) clearInterval(interval)
+      controller.abort()
+    }
+  }, [state.gnsPairIndex])
 
   // Calculate cumulative totals
   const buyOrdersWithTotal = buyOrders.map((order, index) => ({
@@ -96,9 +162,12 @@ export const FuturesOrderBook = ({ buyOrders, sellOrders, currentPrice, markPric
             <div className="text-lg font-semibold text-black">${currentPrice.toFixed(1)}</div>
             {markPrice && (
               <div className="text-xs text-gray-600 mt-1">
-                I {markPrice.toFixed(1)} | M {indexPrice?.toFixed(1) || currentPrice.toFixed(1)}
+                I {indexPrice?.toFixed(1) || currentPrice.toFixed(1)} | M {markPrice.toFixed(1)}
               </div>
             )}
+            <div className="text-xs text-gray-600 mt-1">
+              Spread: <span className="text-black">{spread.toFixed(1)}</span> ({spreadPercent.toFixed(2)}%)
+            </div>
           </div>
         </div>
 

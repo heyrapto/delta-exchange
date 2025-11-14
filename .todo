@@ -2,12 +2,4 @@ Critical:
 1. The calls has an orange border that reaches the strikecell in that same row when active (see image attached)
 2. Buy/sell buttons positioning
 
-1. For the chart toggle, the others i.e Traded Price
-Mark Price
-Funding Should show accordingly/the casual trading view chart when toggled just like in exchange-view(you import the trade-view component and use if possible). then the deth should show the depth chart
-
-2. We need to use real-time data and updates from api for the FuturesOrderBook just like in the order-book.tsx.
-
-3. Cant we make use of the CustomConnectButton even in the FuturesTradePanel? we can update the button to also work for gns
-
-4. we also need to ensure the prices in MarketOverview and MarketsTable are actual prices reference to order-book.tsx
+1. If we have things/functionalities in the FuturesTradePanel that are not availabe in the gnsGuide.md file (or gns does not offer) please remove them aas we do not want anything to cause issues or not make it work when trying to trade. i.e the Limit and market toggle

@@ -5,22 +5,32 @@ import { Hex } from "viem";
 import { useAppContext } from "@/context/app-context";
 import { Button } from "../ui/reusable/button";
 export const arbitrumUsdcAddress = "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8";
+export const gnsUsdcAddress = "0xaf88d065e77c8cc2239327c5edb3a432268e5831"; // GNS USDC on Arbitrum
 
 const CustomConnectButton = ({
   onclick,
   onBalanceChange,
+  isGNS = false,
+  requiredAmount,
 }: {
   onclick?: () => void;
   onBalanceChange?: (balance: number) => void;
+  isGNS?: boolean;
+  requiredAmount?: number;
 }) => {
   const { address } = useAccount();
 
   const { state } = useAppContext();
-  const { selectedPremium } = state;
+  const { selectedPremium, gnsFundsRequired } = state;
+
+  // Use GNS USDC address if isGNS, otherwise use default
+  const usdcAddress = isGNS ? gnsUsdcAddress : arbitrumUsdcAddress;
+  const requiredFunds = isGNS ? gnsFundsRequired : (selectedPremium ? Number(selectedPremium) : 0);
+  const actualRequiredAmount = requiredAmount !== undefined ? requiredAmount : requiredFunds;
 
   const { data: usdcBalance } = useBalance({
     address: address as Hex,
-    token: arbitrumUsdcAddress,
+    token: usdcAddress,
   });
 
   useEffect(() => {
@@ -32,8 +42,8 @@ const CustomConnectButton = ({
   const isInsufficientBalance =
     !!(
       usdcBalance &&
-      selectedPremium &&
-      Number(usdcBalance.formatted) < Number(selectedPremium)
+      actualRequiredAmount > 0 &&
+      Number(usdcBalance.formatted) < actualRequiredAmount
     );
 
   const handleActionClick = () => {
@@ -126,6 +136,8 @@ const CustomConnectButton = ({
                     >
                       {isInsufficientBalance
                         ? "Insufficient balance"
+                        : isGNS
+                        ? "Place Order"
                         : "Buy this strategy"}
                     </Button>
                   )}
