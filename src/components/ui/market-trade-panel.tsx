@@ -215,14 +215,15 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
 
         {/* Order Type Tabs */}
         <div className="flex border-b border-gray-300">
-          {(['limit', 'market'] as const).map((type) => (
+          {(['limit', 'market', 'stop'] as const).map((type) => (
             <button
               key={type}
               onClick={() => {
-                handleGNSOrderTypeChange(type === 'limit' ? 'limit' : 'market')
+                handleGNSOrderTypeChange(type === 'limit' ? 'limit' : type === 'market' ? 'market' : 'stop')
               }}
-              className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors relative ${(type === 'market' && state.gnsOrderType === 'market') ||
-                  (type === 'limit' && state.gnsOrderType === 'limit')
+              className={`flex-1 py-2 text-xs font-medium border-b-2 transition-colors relative cursor-pointer ${(type === 'market' && state.gnsOrderType === 'market') ||
+                  (type === 'limit' && state.gnsOrderType === 'limit') ||
+                  (type === 'stop' && state.gnsOrderType === 'stop')
                   ? 'border-[#ADFF2F] text-black font-semibold'
                   : 'border-transparent text-gray-600 hover:text-black'
                 }`}
@@ -360,11 +361,6 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
             // Update available margin in context if needed
           }}
         />
-
-        {/* Fees Display */}
-        <div className="text-center">
-          <span className="text-xs text-gray-500">% Fees</span>
-        </div>
       </div>
     </div>
   )
