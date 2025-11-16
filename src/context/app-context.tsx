@@ -50,6 +50,9 @@ import { TSentiment } from "@/types";
     gnsTradingVariables: any;
     isFetchingGNSPositions: boolean;
     isFetchingGNSPrices: boolean;
+    gnsCollateralAmount: string;
+    gnsCollateralIndex: number;
+    gnsPrice: string;
   };
   
   type AppContextType = {
@@ -71,6 +74,9 @@ import { TSentiment } from "@/types";
     handleGNSTpChange: (tp: string) => void;
     handleGNSSlChange: (sl: string) => void;
     handleGNSQuantityPercent: (percent: number) => void;
+    handleGNSCollateralAmountChange: (amount: string) => void;
+    handleGNSCollateralIndexChange: (index: number) => void;
+    handleGNSPriceChange: (price: string) => void;
     fetchGNSPositions: (userAddress: string) => Promise<void>;
     fetchGNSTradingVariables: () => Promise<void>;
   };
@@ -107,6 +113,9 @@ import { TSentiment } from "@/types";
       gnsTradingVariables: null,
       isFetchingGNSPositions: false,
       isFetchingGNSPrices: false,
+      gnsCollateralAmount: '',
+      gnsCollateralIndex: 1, // USDC default
+      gnsPrice: '',
     });
   
     const handlePeriodChange = useCallback(
@@ -243,6 +252,27 @@ import { TSentiment } from "@/types";
             gnsFundsRequired: fundsRequired 
           };
         });
+      },
+      []
+    );
+
+    const handleGNSCollateralAmountChange = useCallback(
+      (amount: string) => {
+        setState((prev) => ({ ...prev, gnsCollateralAmount: amount }));
+      },
+      []
+    );
+
+    const handleGNSCollateralIndexChange = useCallback(
+      (index: number) => {
+        setState((prev) => ({ ...prev, gnsCollateralIndex: index }));
+      },
+      []
+    );
+
+    const handleGNSPriceChange = useCallback(
+      (price: string) => {
+        setState((prev) => ({ ...prev, gnsPrice: price }));
       },
       []
     );
@@ -393,6 +423,9 @@ import { TSentiment } from "@/types";
           handleGNSTpChange,
           handleGNSSlChange,
           handleGNSQuantityPercent,
+          handleGNSCollateralAmountChange,
+          handleGNSCollateralIndexChange,
+          handleGNSPriceChange,
           fetchGNSPositions,
           fetchGNSTradingVariables,
         }}
