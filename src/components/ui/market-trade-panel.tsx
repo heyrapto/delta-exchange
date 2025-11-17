@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAccount } from "wagmi"
 import { useAppContext } from "@/context/app-context"
 import { LeverageSelector } from "./leverage-selector"
@@ -23,9 +23,55 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
   const [isPlacingOrder, setIsPlacingOrder] = useState(false)
   const [showTpSl, setShowTpSl] = useState(false)
   const [showLeveragePanel, setShowLeveragePanel] = useState(false)
+  const [selectedSlOption, setSelectedSlOption] = useState<string>('NONE')
+  const [selectedTpOption, setSelectedTpOption] = useState<string>('NONE')
+  const [showSlPriceInput, setShowSlPriceInput] = useState(false)
+  const [showTpPriceInput, setShowTpPriceInput] = useState(false)
   const collateralOptions = [
     { label: 'USDC', index: 1, symbol: '$' }
   ]
+  
+  // Calculate USDC value for stop loss
+  const calculateSlUsdcValue = () => {
+    if (!state.gnsSl || !state.gnsCollateralAmount) return '--'
+    const currentPrice = state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)
+    const slPrice = parseFloat(state.gnsSl)
+    const collateral = parseFloat(state.gnsCollateralAmount)
+    const leverage = state.gnsLeverage
+    
+    // For long: if SL < currentPrice, loss is negative
+    // For short: if SL > currentPrice, loss is negative
+    let priceDiff: number
+    if (state.gnsTradeType === 'long') {
+      priceDiff = (slPrice - currentPrice) / currentPrice
+    } else {
+      priceDiff = (currentPrice - slPrice) / currentPrice
+    }
+    
+    const usdcValue = collateral * leverage * priceDiff
+    return usdcValue.toFixed(2)
+  }
+  
+  // Calculate USDC value for take profit
+  const calculateTpUsdcValue = () => {
+    if (!state.gnsTp || !state.gnsCollateralAmount) return '--'
+    const currentPrice = state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)
+    const tpPrice = parseFloat(state.gnsTp)
+    const collateral = parseFloat(state.gnsCollateralAmount)
+    const leverage = state.gnsLeverage
+    
+    // For long: if TP > currentPrice, profit is positive
+    // For short: if TP < currentPrice, profit is positive
+    let priceDiff: number
+    if (state.gnsTradeType === 'long') {
+      priceDiff = (tpPrice - currentPrice) / currentPrice
+    } else {
+      priceDiff = (currentPrice - tpPrice) / currentPrice
+    }
+    
+    const usdcValue = collateral * leverage * priceDiff
+    return usdcValue.toFixed(2)
+  }
   
   // Calculate position size from collateral, leverage, and price
   const calculatePositionSize = () => {
@@ -40,6 +86,21 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
   }
   
   const positionSize = calculatePositionSize()
+
+  // Sync selected state when values are cleared externally
+  useEffect(() => {
+    if (!state.gnsSl) {
+      setSelectedSlOption('NONE')
+      setShowSlPriceInput(false)
+    }
+  }, [state.gnsSl])
+
+  useEffect(() => {
+    if (!state.gnsTp) {
+      setSelectedTpOption('NONE')
+      setShowTpPriceInput(false)
+    }
+  }, [state.gnsTp])
 
   const getPairName = () => {
     const pair = GNS_CONTRACTS.PAIRS[state.gnsPairIndex as keyof typeof GNS_CONTRACTS.PAIRS]
@@ -373,10 +434,16 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
             <div className="space-y-3 pt-2">
               {/* Stop Loss Section */}
               <div>
-                <div className="flex justify-between">
-                  <label className="text-xs text-gray-600 mb-1 block">Stop Loss (a value should be here just like in ss)</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">
+                    Stop Loss {state.gnsSl ? (
+                      <span className="text-red-500">({parseFloat(state.gnsSl).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                    ) : (
+                      <span className="text-gray-500">(None)</span>
+                    )}
+                  </label>
                   <span className={`text-[11px] ${state.gnsSl ? 'text-red-500' : 'text-gray-500'}`}>
-                    {/*the usdc value should be here just like in ss*/}
+                    {state.gnsSl ? `-${Math.abs(parseFloat(calculateSlUsdcValue())).toFixed(2)} USDC` : '-4 USDC'}
                   </span>
                 </div>
                 <div className="flex gap-1 mb-2">
@@ -386,18 +453,23 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                       onClick={() => {
                         if (option === 'NONE') {
                           handleGNSSlChange('')
+                          setSelectedSlOption('NONE')
+                          setShowSlPriceInput(false)
                         } else if (option === 'PRICE') {
-                          // For price input, user can type manually
+                          setSelectedSlOption('PRICE')
+                          setShowSlPriceInput(true)
                         } else {
                           const percent = parseFloat(option.replace('%', ''))
                           const currentPrice = state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)
                           // For stop loss, negative percent means price goes down
                           const slPrice = currentPrice * (1 + percent / 100)
                           handleGNSSlChange(slPrice.toFixed(2))
+                          setSelectedSlOption(option)
+                          setShowSlPriceInput(false)
                         }
                       }}
                       className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 cursor-pointer ${
-                        option === 'NONE' && !state.gnsSl
+                        selectedSlOption === option
                           ? 'bg-[#ADFF2F] text-black font-semibold'
                           : 'text-gray-700'
                       }`}
@@ -406,66 +478,81 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                     </button>
                   ))}
                 </div>
-                {/* <input
-                  type="text"
-                  value={state.gnsSl}
-                  onChange={(e) => handleGNSSlChange(e.target.value)}
-                  placeholder="Stop Loss Price"
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs outline-none"
-                />
-                {state.gnsSl && (
-                  <div className="text-xs text-red-500 mt-1">
-                    {((parseFloat(state.gnsSl) - (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice))) / (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)) * 100).toFixed(2)}% / {state.gnsCollateralAmount ? `-${state.gnsCollateralAmount} USDC` : '--'}
-                  </div>
-                )} */}
+                {showSlPriceInput && (
+                  <input
+                    type="text"
+                    value={state.gnsSl}
+                    onChange={(e) => {
+                      handleGNSSlChange(e.target.value)
+                      if (e.target.value) {
+                        setSelectedSlOption('PRICE')
+                      }
+                    }}
+                    placeholder="Stop Loss Price"
+                    className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs outline-none mb-1"
+                  />
+                )}
               </div>
 
               {/* Take Profit Section */}
               <div>
-                <div className="flex justify-between">
-                  <label className="text-xs text-gray-600 mb-1 block">Take Profit (a value should be here just like in ss)</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs text-gray-600">
+                    Take Profit {state.gnsTp ? (
+                      <span className="text-green-500">({parseFloat(state.gnsTp).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})</span>
+                    ) : (
+                      <span className="text-gray-500">(None)</span>
+                    )}
+                  </label>
                   <span className={`text-[11px] ${state.gnsTp ? 'text-green-500' : 'text-gray-500'}`}>
-                  {/*the usdc value should be here just like in ss*/}
+                    {state.gnsTp ? `${calculateTpUsdcValue()} USDC` : '--'}
                   </span>  
                 </div>
                 <div className="flex gap-1 mb-2">
                   {['NONE', '25%', '50%', '100%', '300%', 'PRICE'].map((option) => (
-            <button
+                    <button
                       key={option}
                       onClick={() => {
                         if (option === 'NONE') {
                           handleGNSTpChange('')
+                          setSelectedTpOption('NONE')
+                          setShowTpPriceInput(false)
                         } else if (option === 'PRICE') {
-                          // For price input, user can type manually
+                          setSelectedTpOption('PRICE')
+                          setShowTpPriceInput(true)
                         } else {
                           const percent = parseFloat(option.replace('%', ''))
                           const currentPrice = state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)
                           const tpPrice = currentPrice * (1 + percent / 100)
                           handleGNSTpChange(tpPrice.toFixed(2))
+                          setSelectedTpOption(option)
+                          setShowTpPriceInput(false)
                         }
                       }}
                       className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 cursor-pointer ${
-                        option === 'NONE' && !state.gnsTp
+                        selectedTpOption === option
                           ? 'bg-[#ADFF2F] text-black font-semibold'
                           : 'text-gray-700'
                       }`}
                     >
                       {option}
-            </button>
+                    </button>
                   ))}
                 </div>
-                {/* <input
-                  type="text"
-                  value={state.gnsTp}
-                  onChange={(e) => handleGNSTpChange(e.target.value)}
-                  placeholder="Take Profit Price"
-                  className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs outline-none"
-                />
-                {state.gnsTp && (
-                  <div className="text-xs text-green-500 mt-1">
-                    {((parseFloat(state.gnsTp) - (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice))) / (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)) * 100).toFixed(2)}%
-                  </div>
-                )} */}
+                {showTpPriceInput && (
+                  <input
+                    type="text"
+                    value={state.gnsTp}
+                    onChange={(e) => {
+                      handleGNSTpChange(e.target.value)
+                      if (e.target.value) {
+                        setSelectedTpOption('PRICE')
+                      }
+                    }}
+                    placeholder="Take Profit Price"
+                    className="w-full border border-gray-300 rounded px-2 py-1.5 text-xs outline-none mb-1"
+                  />
+                )}
               </div>
             </div>
           )}
