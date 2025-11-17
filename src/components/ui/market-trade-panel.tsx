@@ -103,8 +103,8 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
   }
 
   const tradeButtons = [
-    { label: "Call | Long", tradeType: "long" as const, activeColor: "bg-[#ADFF2F] text-black" },
-    { label: "Put | Short", tradeType: "short" as const, activeColor: "bg-red-500 text-white" },
+    { label: "Long", tradeType: "long" as const, activeColor: "bg-[#ADFF2F] text-black" },
+    { label: "Short", tradeType: "short" as const, activeColor: "bg-red-500 text-white" },
   ]
 
   return (
@@ -373,7 +373,12 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
             <div className="space-y-3 pt-2">
               {/* Stop Loss Section */}
               <div>
-                <label className="text-xs text-gray-600 mb-1 block">Stop Loss</label>
+                <div className="flex justify-between">
+                  <label className="text-xs text-gray-600 mb-1 block">Stop Loss (a value should be here just like in ss)</label>
+                  <span className={`text-[11px] ${state.gnsSl ? 'text-red-500' : 'text-gray-500'}`}>
+                    {/*the usdc value should be here just like in ss*/}
+                  </span>
+                </div>
                 <div className="flex gap-1 mb-2">
                   {['NONE', '-10%', '-25%', '-50%', '-75%', 'PRICE'].map((option) => (
                     <button
@@ -391,7 +396,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                           handleGNSSlChange(slPrice.toFixed(2))
                         }
                       }}
-                      className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 ${
+                      className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 cursor-pointer ${
                         option === 'NONE' && !state.gnsSl
                           ? 'bg-[#ADFF2F] text-black font-semibold'
                           : 'text-gray-700'
@@ -401,7 +406,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                     </button>
                   ))}
                 </div>
-                <input
+                {/* <input
                   type="text"
                   value={state.gnsSl}
                   onChange={(e) => handleGNSSlChange(e.target.value)}
@@ -412,12 +417,17 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                   <div className="text-xs text-red-500 mt-1">
                     {((parseFloat(state.gnsSl) - (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice))) / (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)) * 100).toFixed(2)}% / {state.gnsCollateralAmount ? `-${state.gnsCollateralAmount} USDC` : '--'}
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Take Profit Section */}
               <div>
-                <label className="text-xs text-gray-600 mb-1 block">Take Profit</label>
+                <div className="flex justify-between">
+                  <label className="text-xs text-gray-600 mb-1 block">Take Profit (a value should be here just like in ss)</label>
+                  <span className={`text-[11px] ${state.gnsTp ? 'text-green-500' : 'text-gray-500'}`}>
+                  {/*the usdc value should be here just like in ss*/}
+                  </span>  
+                </div>
                 <div className="flex gap-1 mb-2">
                   {['NONE', '25%', '50%', '100%', '300%', 'PRICE'].map((option) => (
             <button
@@ -434,7 +444,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                           handleGNSTpChange(tpPrice.toFixed(2))
                         }
                       }}
-                      className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 ${
+                      className={`flex-1 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 cursor-pointer ${
                         option === 'NONE' && !state.gnsTp
                           ? 'bg-[#ADFF2F] text-black font-semibold'
                           : 'text-gray-700'
@@ -444,7 +454,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
             </button>
                   ))}
                 </div>
-                <input
+                {/* <input
                   type="text"
                   value={state.gnsTp}
                   onChange={(e) => handleGNSTpChange(e.target.value)}
@@ -455,7 +465,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                   <div className="text-xs text-green-500 mt-1">
                     {((parseFloat(state.gnsTp) - (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice))) / (state.gnsOrderType === 'market' ? state.gnsPairPrice : (parseFloat(state.gnsPrice) || state.gnsPairPrice)) * 100).toFixed(2)}%
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           )}
