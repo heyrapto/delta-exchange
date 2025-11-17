@@ -16,6 +16,9 @@ import { NotificationPanel } from "../panels/notification-panel";
 import { SettingsPanel } from "../panels/settings-panel";
 import { MorePanel } from "../panels/more-panel";
 import { useToast } from "../ui/reusable/toast";
+import { useAccount, useBalance } from "wagmi";
+import { Hex } from "viem";
+import { arbitrumUsdcAddress } from "../custom/connect-button";
 
 export const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null);
@@ -24,7 +27,11 @@ export const Header = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const { showToast, ToastContainer } = useToast();
-
+  const { address } = useAccount();
+  const { data: balance } = useBalance({
+    address: address as Hex,
+    token: arbitrumUsdcAddress,
+  });
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -95,7 +102,7 @@ export const Header = () => {
 
                 {item.dropdown && activeDropdown === index && (
                   <div
-                    className="absolute top-full left-0 mt-2 shadow-2xl rounded-md min-w-[320px] z-50 overflow-hidden py-4 bg-white border border-gray-300 text-black"
+                    className="absolute top-full left-0 mt-2 shadow-2xl rounded-md min-w-[320px] z-999999 overflow-hidden py-4 bg-white border border-gray-300 text-black"
                   >
                     {item.dropdown.map((sub, subIndex) => (
                       <div key={subIndex}>
@@ -162,7 +169,7 @@ export const Header = () => {
           <Button variant="primary" onClick={() => showToast("Coming soon", "info")}>Add Bank</Button>
 
           <AccountMargin />
-          <Wallet balance="0.00" />
+          <Wallet balance={balance?.formatted} />
           <div className="flex gap-4 items-center">
             <AccountDropdown />
             <GrNotification

@@ -148,7 +148,7 @@ body {
   background-color: var(--page-bg-color);
   color: var(--text-primary);
   min-height: 100vh;
-  font-family: 'Aileron', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .container {

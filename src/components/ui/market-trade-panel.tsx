@@ -114,7 +114,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
         <div className="relative">
           <button
             onClick={() => setShowContractDetails(!showContractDetails)}
-            className="flex items-center gap-1 text-xs text-gray-600 hover:text-black"
+            className="flex items-center gap-1 text-xs text-gray-600 hover:text-black cursor-pointer"
           >
             Contract Details
             {showContractDetails ? (
@@ -126,7 +126,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
 
           {showContractDetails && (
             <div className="absolute top-8 right-0 bg-white border border-gray-300 rounded shadow-lg p-4 z-20 min-w-[280px]">
-              <div className="text-sm font-semibold mb-3 text-[#ADFF2F]">Contract Details</div>
+              <div className="text-sm font-semibold mb-3 text-green-500">Contract Details</div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Bitcoin Perpetual</span>
@@ -157,7 +157,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Underlying Index:</span>
-                  <span className="text-[#ADFF2F] cursor-pointer">{contractDetails.underlyingIndex}</span>
+                  <span className="text-green-500 cursor-pointer">{contractDetails.underlyingIndex}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Position Limit:</span>
@@ -168,7 +168,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
                   <span className="text-green-500">{contractDetails.status}</span>
                 </div>
                 <div className="pt-2 border-t border-gray-200">
-                  <a href="#" className="text-xs text-[#ADFF2F] hover:underline">
+                  <a href="#" className="text-xs text-green-500 hover:underline">
                     See full contract specifications →
                   </a>
                 </div>
@@ -299,7 +299,7 @@ export const FuturesTradePanel = ({ isLoggedIn = false }: FuturesTradePanelProps
           </div>
           <div className="text-xs text-gray-500 mt-1">
             <span>{state.gnsAvailableMargin.toFixed(2)} USDC available</span>
-            <button className="ml-2 text-[#ADFF2F] hover:underline">Bridge / Swap</button>
+            <button className="ml-2 text-green-500 hover:underline">Bridge / Swap</button>
           </div>
         </div>
 
