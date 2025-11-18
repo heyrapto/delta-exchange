@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { useTradeStore } from "@/store/trade-store"
 import { BiDownload, BiRefresh } from "react-icons/bi"
 import { useAccount } from "wagmi"
 import CustomConnectButton from "../custom/connect-button"
@@ -13,9 +12,11 @@ import {
 import {
     getUserGNSPositions,
     getUserTradingHistory,
+    getUserOpenTradesFromBackend,
     GNSPositionType,
 } from "@/blockchain/gns/gnsPositions"
 import { cancelOpenOrder, closeTrade } from "@/blockchain/gns/gnsCalls"
+import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
 
 export const ExchangePanel = () => {
     const [activePanel, setActivePanel] = useState(0)
@@ -28,11 +29,14 @@ export const ExchangePanel = () => {
     // GNS state - separate from Hegic
     const [gnsPositions, setGnsPositions] = useState<GNSPositionType[]>([])
     const [isFetchingGNSPositions, setIsFetchingGNSPositions] = useState(false)
+    const [gnsOpenOrdersBackend, setGnsOpenOrdersBackend] = useState<any[]>([])
+    const [isFetchingGnsOrders, setIsFetchingGnsOrders] = useState(false)
     const [gnsTradeHistory, setGnsTradeHistory] = useState<any[]>([])
     const [isFetchingGnsHistory, setIsFetchingGnsHistory] = useState(false)
+    const [selectedHistoryEntry, setSelectedHistoryEntry] = useState<any | null>(null)
 
-    const formatTimestamp = (value: any) => {
-        if (!value) return "-"
+    const toDate = (value: any): Date | null => {
+        if (value === undefined || value === null || value === "") return null
         let date: Date
         if (typeof value === "number") {
             date = new Date(value.toString().length === 10 ? value * 1000 : value)
@@ -42,8 +46,38 @@ export const ExchangePanel = () => {
         } else {
             date = new Date(value)
         }
-        if (isNaN(date.getTime())) return "-"
+        if (isNaN(date.getTime())) return null
+        return date
+    }
+
+    const formatTimestamp = (value: any) => {
+        const date = toDate(value)
+        if (!date) return "-"
         return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+    }
+
+    const formatDateParts = (value: any) => {
+        const date = toDate(value)
+        if (!date) {
+            return { dateLabel: "-", timeLabel: "--" }
+        }
+        return {
+            dateLabel: date.toLocaleDateString([], { month: "2-digit", day: "2-digit" }),
+            timeLabel: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        }
+    }
+
+    const formatDuration = (start?: Date | null, end?: Date | null) => {
+        if (!start || !end) return "--"
+        const ms = Math.max(end.getTime() - start.getTime(), 0)
+        const days = Math.floor(ms / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60))
+        const parts = []
+        if (days) parts.push(`${days}d`)
+        if (hours || parts.length) parts.push(`${hours}h`)
+        parts.push(`${minutes}m`)
+        return parts.join(" ")
     }
 
     const formatNumberValue = (value: any, options: { prefix?: string; suffix?: string } = {}) => {
@@ -60,6 +94,42 @@ export const ExchangePanel = () => {
         if (isNaN(num)) return "-"
         const adjusted = num > 1e6 ? num / 1e8 : num
         return `$${adjusted.toFixed(2)}`
+    }
+
+    const fromDecimals = (value: any, decimals = 6) => {
+        if (value === undefined || value === null || value === "") return undefined
+        if (typeof value === "bigint") {
+            return Number(value) / Math.pow(10, decimals)
+        }
+        if (typeof value === "number") return value
+        const str = value.toString()
+        if (/^\d+$/.test(str)) {
+            return Number(str) / Math.pow(10, decimals)
+        }
+        const num = Number(str)
+        return isNaN(num) ? undefined : num
+    }
+
+    const fromPrice = (value: any) => {
+        if (value === undefined || value === null || value === "") return undefined
+        if (typeof value === "bigint") {
+            return Number(value) / 1e8
+        }
+        if (typeof value === "number") {
+            return value > 1e6 ? value / 1e8 : value
+        }
+        const num = Number(value)
+        if (isNaN(num)) return undefined
+        return num > 1e6 ? num / 1e8 : num
+    }
+
+    const mapTradeTypeLabel = (value: number | string | undefined) => {
+        if (value === undefined || value === null) return "-"
+        if (typeof value === "string" && value.trim()) return value.replace(/_/g, " ")
+        if (typeof value === "number") {
+            return ["MARKET", "LIMIT", "STOP"][value] ?? `TYPE_${value}`
+        }
+        return "-"
     }
 
     const EmptyPanelState = ({ title }: { title: string }) => (
@@ -89,7 +159,6 @@ export const ExchangePanel = () => {
         //   maintenancePercent: '4.07%',
         // },
     ]
-    const { openOrders, orderHistory, cancelOrder } = useTradeStore()
 
     const fetchPositions = useCallback(async () => {
         if (!address) {
@@ -126,6 +195,22 @@ export const ExchangePanel = () => {
         }
     }, [address])
 
+    const fetchGNSOpenOrders = useCallback(async () => {
+        if (!address) {
+            setGnsOpenOrdersBackend([])
+            return
+        }
+        try {
+            setIsFetchingGnsOrders(true)
+            const orders = await getUserOpenTradesFromBackend(address)
+            setGnsOpenOrdersBackend(Array.isArray(orders) ? orders : [])
+        } catch (error) {
+            console.error("Error fetching GNS open orders:", error)
+        } finally {
+            setIsFetchingGnsOrders(false)
+        }
+    }, [address])
+
     const fetchGNSTradeHistory = useCallback(async () => {
         if (!address) {
             setGnsTradeHistory([])
@@ -144,6 +229,28 @@ export const ExchangePanel = () => {
 
     const normalizedGnsHistory = useMemo(() => {
         if (!gnsTradeHistory?.length) return []
+
+        const openDateMap = new Map<string, Date>()
+        gnsTradeHistory.forEach((entry) => {
+            const trade = entry?.trade ?? entry
+            const tradeIndex = trade?.tradeIndex ?? trade?.index
+            if (tradeIndex === undefined || tradeIndex === null) return
+            const pairKey = trade?.pair ?? trade?.pairIndex ?? ""
+            const key = `${tradeIndex}-${pairKey}`
+            const action = (entry?.action ?? trade?.action ?? "").toLowerCase()
+            if (!action.includes("tradeopened")) return
+            const ts =
+                entry?.date ??
+                entry?.timestamp ??
+                entry?.time ??
+                entry?.createdAt ??
+                entry?.openTimestamp
+            const parsed = toDate(ts)
+            if (parsed && !openDateMap.has(key)) {
+                openDateMap.set(key, parsed)
+            }
+        })
+
         return gnsTradeHistory.map((entry, idx) => {
             const trade = entry?.trade ?? entry
             const pair =
@@ -151,51 +258,94 @@ export const ExchangePanel = () => {
                 trade?.pairName ??
                 trade?.pair ??
                 (trade?.from && trade?.to ? `${trade.from}/${trade.to}` : "-")
+            const [baseSymbol = "-"] = (pair || "-").split("/")
             const direction =
                 entry?.direction ??
                 trade?.direction ??
                 (typeof trade?.long === "boolean" ? (trade.long ? "Long" : "Short") : "-")
             const typeValue =
+                entry?.action ??
+                trade?.action ??
                 entry?.type ??
                 entry?.orderType ??
                 entry?.tradeType ??
                 trade?.tradeType ??
                 trade?.type ??
                 "-"
-            const collateral = entry?.collateral ?? entry?.collateralAmount ?? trade?.collateralAmount
+            const collateral = entry?.size ?? entry?.collateral ?? entry?.collateralAmount ?? trade?.collateralAmount
             const pnl =
                 entry?.pnl ??
                 entry?.pnlUsd ??
                 entry?.pnlInUsd ??
-                entry?.pnlPercentage ??
-                trade?.pnl
+                trade?.pnl ??
+                0
             const timestamp =
+                entry?.date ??
                 entry?.timestamp ??
                 entry?.time ??
                 entry?.updatedAt ??
                 entry?.createdAt ??
                 entry?.closeTimestamp ??
                 entry?.openTimestamp
+            const closeDate = toDate(timestamp)
             const entryPrice = entry?.openPrice ?? trade?.openPrice
-            const exitPrice = entry?.closePrice ?? entry?.price ?? trade?.closePrice
+            const exitPrice = entry?.closePrice ?? entry?.price ?? trade?.closePrice ?? entryPrice
+            const priceValue = fromPrice(exitPrice)
             const leverage = entry?.leverage ?? (trade?.leverage ? Number(trade.leverage) / 1000 : undefined)
             const status =
                 entry?.status ??
                 entry?.result ??
                 (trade?.isOpen === false ? "Closed" : trade?.isOpen === true ? "Open" : "-")
+            const collateralValue = typeof collateral === "number" ? collateral : Number(collateral ?? 0)
+            const pnlValue = typeof pnl === "number" ? pnl : Number(pnl ?? 0)
+            const pnlPercent = collateralValue ? (pnlValue / collateralValue) * 100 : undefined
+            const feesValue =
+                entry?.fees ??
+                entry?.fee ??
+                entry?.meta?.uiRealizedPnlData?.realizedTradingFeesCollateral ??
+                entry?.meta?.tradeFeesData?.realizedTradingFeesCollateral
+            const sizeToken = entry?.meta?.priceImpact?.positionSizeToken ?? entry?.meta?.positionSizeToken
+            const sizeUsd = sizeToken && priceValue ? sizeToken * priceValue : undefined
+            const collateralDelta = entry?.collateralDelta ?? trade?.collateralDelta
+            const tradeIndex = trade?.tradeIndex ?? trade?.index ?? idx
+            const key = `${tradeIndex}-${trade?.pair ?? trade?.pairIndex ?? ""}`
+            const openDate = openDateMap.get(key) ?? toDate(entry?.meta?.openDate)
+            const durationLabel = formatDuration(openDate, closeDate)
+            const typeLabel =
+                typeof typeValue === "string"
+                    ? typeValue.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/_/g, " ").toUpperCase()
+                    : mapTradeTypeLabel(typeValue as number | undefined)
+
+            const dateParts = formatDateParts(timestamp)
 
             return {
-                id: entry?.id ?? `${trade?.index ?? idx}-${timestamp ?? idx}`,
-                time: formatTimestamp(timestamp),
+                id: entry?.id ?? `${tradeIndex}-${timestamp ?? idx}`,
                 pair: pair || "-",
+                baseSymbol,
                 side: direction || "-",
-                type: typeof typeValue === "number" ? ["Market", "Limit", "Stop"][typeValue] ?? typeValue : typeValue,
-                price: normalizePrice(exitPrice ?? entryPrice),
-                collateral: collateral ? `${formatNumberValue(collateral, { suffix: " USDC" })}` : "-",
-                leverage: leverage ? `${leverage}x` : "-",
-                pnlValue: pnl ? Number(pnl) : undefined,
-                pnl: pnl !== undefined ? formatNumberValue(pnl, { prefix: "$" }) : "-",
+                type: typeLabel,
+                priceValue,
+                price: priceValue ? priceValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-",
+                collateralValue,
+                collateral: collateralValue ? `${collateralValue.toFixed(2)} USDC` : "-",
+                collateralDelta,
+                sizeUsd,
+                sizeToken,
+                sizeDisplayUsd: sizeUsd ? `${sizeUsd.toFixed(2)} USDC` : "-",
+                sizeDisplayToken: sizeToken ? `${sizeToken.toFixed(4)} ${baseSymbol}` : "-",
+                feesValue,
+                fees: feesValue !== undefined ? `${Number(feesValue).toFixed(2)} USDC` : "-",
+                pnlValue,
+                pnlPercent,
+                pnl: pnlValue || pnlValue === 0 ? `${pnlValue >= 0 ? "+" : ""}${pnlValue.toFixed(2)} USDC` : "-",
+                pnlPercentLabel: pnlPercent !== undefined ? `(${pnlPercent.toFixed(2)}%)` : "",
+                leverage: leverage ? `${Number(leverage).toFixed(3)}x` : "-",
                 status: status || "-",
+                dateParts,
+                openDate,
+                closeDate,
+                durationLabel,
+                raw: entry,
             }
         })
     }, [gnsTradeHistory])
@@ -208,76 +358,97 @@ export const ExchangePanel = () => {
         }
         if (activePanel === 1) {
             fetchGNSPositions() // Fetch GNS for Open Orders tab
+            fetchGNSOpenOrders()
         }
         if (activePanel === 6) {
             fetchGNSTradeHistory()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, activePanel, fetchPositions, fetchGNSPositions, fetchGNSTradeHistory])
+    }, [address, activePanel, fetchPositions, fetchGNSPositions, fetchGNSOpenOrders, fetchGNSTradeHistory])
 
     // Separate GNS into orders (pending) and positions (filled)
-    const gnsOpenOrders = gnsPositions.filter((p: GNSPositionType) => p.tradeType === "LIMIT" || p.tradeType === "STOP")
     const gnsOpenPositions = gnsPositions.filter((p: GNSPositionType) => p.tradeType === "MARKET" && p.isOpen)
 
+    const normalizedGnsOpenOrders = useMemo(() => {
+        if (!gnsOpenOrdersBackend?.length) return []
+        return gnsOpenOrdersBackend.map((order, idx) => {
+            const trade = order.trade ?? order
+            const pairIndex = trade.pairIndex ?? order.pairIndex ?? 0
+            const pairInfo = GNS_CONTRACTS.PAIRS[pairIndex as keyof typeof GNS_CONTRACTS.PAIRS]
+            const pairName = pairInfo ? `${pairInfo.from}/${pairInfo.to}` : (order.pair ?? "UNKNOWN")
+            const priceValue = fromPrice(trade.openPrice ?? trade.price ?? order.price)
+            const collateralValue = fromDecimals(trade.collateralAmount ?? order.collateral, 6)
+            const leverageValue = trade.leverage ? Number(trade.leverage) / 1000 : undefined
+            const dateParts = formatDateParts(order.timestamp ?? order.createdAt ?? order.updatedAt ?? null)
+            const indexValue = trade.index ?? trade.tradeIndex ?? order.index ?? idx
+            return {
+                id: `${indexValue}-${pairName}`,
+                pair: pairName,
+                pairSymbol: pairInfo?.from ?? pairName.split("/")[0] ?? "-",
+                side: typeof trade.long === "boolean" ? (trade.long ? "Long" : "Short") : "-",
+                type: mapTradeTypeLabel(trade.tradeType ?? order.tradeType),
+                price: priceValue ? `$${priceValue.toFixed(2)}` : "-",
+                collateral: collateralValue !== undefined ? `${collateralValue.toFixed(2)} USDC` : "-",
+                leverage: leverageValue ? `${leverageValue.toFixed(2)}x` : "-",
+                status: order.status ?? "Pending",
+                tp: trade.tp,
+                sl: trade.sl,
+                dateParts,
+                index: indexValue,
+            }
+        })
+    }, [gnsOpenOrdersBackend])
+
     const renderOpenOrders = () => {
-        const hasAnyOrders = openOrders.length > 0 || gnsOpenOrders.length > 0
+        const hasOrders = normalizedGnsOpenOrders.length > 0
         
         return (
             <div className="p-3">
-                {!hasAnyOrders && !isFetchingGNSPositions ? (
+                {!hasOrders && !isFetchingGnsOrders ? (
                     <EmptyPanelState title="Open Orders" />
                 ) : (
                     <table className="w-full text-xs">
                         <thead>
                             <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                                <th className="text-left px-2 py-1">Time</th>
+                                <th className="text-left px-2 py-1">Date</th>
+                                <th className="text-left px-2 py-1">Pair</th>
                                 <th className="text-left px-2 py-1">Side</th>
                                 <th className="text-left px-2 py-1">Type</th>
                                 <th className="text-left px-2 py-1">Price</th>
-                                <th className="text-left px-2 py-1">Qty</th>
-                                <th className="text-left px-2 py-1">Period</th>
+                                <th className="text-left px-2 py-1">Collateral</th>
+                                <th className="text-left px-2 py-1">Lev.</th>
                                 <th className="text-left px-2 py-1">Status</th>
-                                <th className="text-left px-2 py-1">Action</th>
+                                <th className="px-2 py-1 text-right">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Existing Hegic orders */}
-                            {openOrders.map(o => (
-                                <tr key={o.id} className="border-b border-gray-200">
-                                    <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
-                                    <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
-                                    <td className="px-2 py-2">{o.orderType}</td>
-                                    <td className="px-2 py-2">{o.price ? o.price.toFixed(2) : '-'}</td>
-                                    <td className="px-2 py-2">{o.quantity}</td>
-                                    <td className="px-2 py-2">{o.period} days</td>
-                                    <td className="px-2 py-2 capitalize">{o.status}</td>
-                                    <td className="px-2 py-2">
-                                        {o.status === 'open' && (
-                                            <button className="text-[11px] underline" onClick={() => cancelOrder(o.id)}>Cancel</button>
-                                        )}
+                            {normalizedGnsOpenOrders.map((order) => (
+                                <tr key={order.id} className="border-b border-gray-200">
+                                    <td className="px-2 py-2 text-[11px]">
+                                        <div>{order.dateParts.dateLabel}</div>
+                                        <div className="text-gray-500">{order.dateParts.timeLabel}</div>
                                     </td>
-                                </tr>
-                            ))}
-                            {/* GNS Open Orders (Limit/Stop) */}
-                            {gnsOpenOrders.map((order: GNSPositionType) => (
-                                <tr key={`gns-order-${order.index}`} className="border-b border-gray-200">
-                                    <td className="px-2 py-2">-</td>
-                                    <td className="px-2 py-2" style={{ color: order.long ? '#10B981' : '#EF4444' }}>
-                                        {order.long ? 'Long' : 'Short'}
+                                    <td className="px-2 py-2 font-medium" style={{ color: 'var(--text-primary)' }}>
+                                        {order.pair}
                                     </td>
-                                    <td className="px-2 py-2">{order.tradeType}</td>
-                                    <td className="px-2 py-2">${order.openPrice}</td>
-                                    <td className="px-2 py-2">{order.collateralAmount}</td>
-                                    <td className="px-2 py-2">-</td>
-                                    <td className="px-2 py-2 capitalize">Pending</td>
-                                    <td className="px-2 py-2">
+                                    <td className="px-2 py-2" style={{ color: order.side === 'Long' ? '#10B981' : '#EF4444' }}>
+                                        {order.side}
+                                    </td>
+                                    <td className="px-2 py-2 uppercase text-[11px]" style={{ color: 'var(--text-success)' }}>
+                                        {order.type}
+                                    </td>
+                                    <td className="px-2 py-2">{order.price}</td>
+                                    <td className="px-2 py-2">{order.collateral}</td>
+                                    <td className="px-2 py-2">{order.leverage}</td>
+                                    <td className="px-2 py-2 capitalize">{order.status}</td>
+                                    <td className="px-2 py-2 text-right">
                                         <button 
                                             className="text-[11px] underline text-red-500 hover:text-red-700"
                                             onClick={async () => {
                                                 if (!address) return
                                                 try {
                                                     await cancelOpenOrder(order.index)
-                                                    fetchGNSPositions()
+                                                    fetchGNSOpenOrders()
                                                 } catch (error) {
                                                     console.error("Error canceling order:", error)
                                                 }
@@ -417,14 +588,16 @@ export const ExchangePanel = () => {
         </div>
     )
 
+    const hegicOrderHistory: any[] = []
+
     const renderOrderHistory = () => {
-        const hasHegicHistory = orderHistory.length > 0
+        const hasHegicHistory = hegicOrderHistory.length > 0
         const hasGnsHistory = normalizedGnsHistory.length > 0
 
         if (!hasHegicHistory && !hasGnsHistory && !isFetchingGnsHistory) {
             return (
-                <div className="p-3">
-                    <EmptyPanelState title="Order History" />
+        <div className="p-3">
+                <EmptyPanelState title="Order History" />
                 </div>
             )
         }
@@ -436,32 +609,32 @@ export const ExchangePanel = () => {
                         <h4 className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
                             Hegic Order History
                         </h4>
-                        <table className="w-full text-xs">
-                            <thead>
-                                <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                                    <th className="text-left px-2 py-1">Time</th>
-                                    <th className="text-left px-2 py-1">Side</th>
-                                    <th className="text-left px-2 py-1">Type</th>
-                                    <th className="text-left px-2 py-1">Price</th>
-                                    <th className="text-left px-2 py-1">Qty</th>
-                                    <th className="text-left px-2 py-1">Period</th>
-                                    <th className="text-left px-2 py-1">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orderHistory.map(o => (
-                                    <tr key={o.id} className="border-b border-gray-200">
-                                        <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
-                                        <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
-                                        <td className="px-2 py-2">{o.orderType}</td>
-                                        <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
-                                        <td className="px-2 py-2">{o.quantity}</td>
-                                        <td className="px-2 py-2">{o.period} days</td>
-                                        <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                <table className="w-full text-xs">
+                    <thead>
+                        <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                            <th className="text-left px-2 py-1">Time</th>
+                            <th className="text-left px-2 py-1">Side</th>
+                            <th className="text-left px-2 py-1">Type</th>
+                            <th className="text-left px-2 py-1">Price</th>
+                            <th className="text-left px-2 py-1">Qty</th>
+                            <th className="text-left px-2 py-1">Period</th>
+                            <th className="text-left px-2 py-1">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                                {hegicOrderHistory.map(o => (
+                            <tr key={o.id} className="border-b border-gray-200">
+                                <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
+                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                <td className="px-2 py-2">{o.orderType}</td>
+                                <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
+                                <td className="px-2 py-2">{o.quantity}</td>
+                                <td className="px-2 py-2">{o.period} days</td>
+                                <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
                     </div>
                 )}
 
@@ -491,21 +664,52 @@ export const ExchangePanel = () => {
                             </thead>
                             <tbody>
                                 {normalizedGnsHistory.map((trade) => (
-                                    <tr key={trade.id} className="border-b border-gray-200">
-                                        <td className="px-2 py-2">{trade.time}</td>
-                                        <td className="px-2 py-2">{trade.pair}</td>
-                                        <td className="px-2 py-2" style={{ color: trade.side === 'Long' ? '#10B981' : trade.side === 'Short' ? '#EF4444' : 'inherit' }}>
-                                            {trade.side}
+                                    <tr
+                                        key={trade.id}
+                                        className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                        onClick={() => setSelectedHistoryEntry(trade)}
+                                    >
+                                        <td className="px-2 py-2 text-[11px]">
+                                            <div>{trade.dateParts.dateLabel}</div>
+                                            <div className="text-gray-500">{trade.dateParts.timeLabel}</div>
                                         </td>
-                                        <td className="px-2 py-2">{trade.type}</td>
-                                        <td className="px-2 py-2">{trade.price}</td>
-                                        <td className="px-2 py-2">{trade.collateral}</td>
-                                        <td className="px-2 py-2">{trade.leverage}</td>
+                                        <td className="px-2 py-2">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px]">
+                                                    {trade.baseSymbol?.slice(0, 3)}
+                                                </div>
+                                                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{trade.pair}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-2 py-2 uppercase text-[11px]" style={{ color: '#10B981' }}>
+                                            {trade.type}
+                                        </td>
+                                        <td className="px-2 py-2">
+                                            {trade.price ? `$${trade.price}` : "-"}
+                                        </td>
+                                        <td className="px-2 py-2 text-[11px]">
+                                            <div className="flex items-center gap-1">
+                                                <span>{trade.collateral}</span>
+                                                {trade.collateralDelta !== undefined && (
+                                                    <span className={trade.collateralDelta > 0 ? "text-green-500" : trade.collateralDelta < 0 ? "text-red-500" : "text-gray-400"}>
+                                                        {trade.collateralDelta > 0 ? "↑" : trade.collateralDelta < 0 ? "↓" : ""}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-2 py-2 text-[11px]">
+                                            <div>{trade.sizeDisplayUsd}</div>
+                                            <div className="text-gray-500">{trade.sizeDisplayToken}</div>
+                                        </td>
+                                        <td className="px-2 py-2">{trade.fees}</td>
                                         <td
-                                            className="px-2 py-2"
+                                            className="px-2 py-2 font-medium"
                                             style={{ color: (trade.pnlValue ?? 0) >= 0 ? '#10B981' : '#EF4444' }}
                                         >
                                             {trade.pnl}
+                                            <span className="ml-1 text-[10px]">
+                                                {trade.pnlPercentLabel}
+                                            </span>
                                         </td>
                                         <td className="px-2 py-2">{trade.status}</td>
                                     </tr>
@@ -518,8 +722,8 @@ export const ExchangePanel = () => {
                         </div>
                     )}
                 </div>
-            </div>
-        )
+        </div>
+    )
     }
 
     const renderContent = () => {
@@ -722,6 +926,86 @@ export const ExchangePanel = () => {
                                 Close Position
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {selectedHistoryEntry && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-xl border border-gray-200 max-w-lg w-full mx-4">
+                        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                            <div>
+                                <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                    {selectedHistoryEntry.pair}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    Close @ {selectedHistoryEntry.price ? `$${selectedHistoryEntry.price}` : '--'}
+                                </div>
+                            </div>
+                            <button
+                                className="text-gray-500 hover:text-gray-700 text-sm cursor-pointer"
+                                onClick={() => setSelectedHistoryEntry(null)}
+                            >
+                                Close
+                            </button>
+                        </div>
+                        <div className="p-4 grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <div className="text-gray-500">Date</div>
+                                <div className="font-medium">
+                                    {selectedHistoryEntry.dateParts?.dateLabel} {selectedHistoryEntry.dateParts?.timeLabel}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Open Date</div>
+                                <div className="font-medium">
+                                    {selectedHistoryEntry.openDate ? formatTimestamp(selectedHistoryEntry.openDate) : '--'}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Duration</div>
+                                <div className="font-medium">{selectedHistoryEntry.durationLabel}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Position Size</div>
+                                <div className="font-medium">
+                                    {selectedHistoryEntry.sizeDisplayUsd}
+                                    <div className="text-gray-500 text-[12px]">
+                                        {selectedHistoryEntry.sizeDisplayToken}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Leverage</div>
+                                <div className="font-medium">{selectedHistoryEntry.leverage}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Collateral</div>
+                                <div className="font-medium">{selectedHistoryEntry.collateral}</div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">PnL</div>
+                                <div className="font-medium" style={{ color: (selectedHistoryEntry.pnlValue ?? 0) >= 0 ? '#10B981' : '#EF4444' }}>
+                                    {selectedHistoryEntry.pnl} {selectedHistoryEntry.pnlPercentLabel}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-gray-500">Fees</div>
+                                <div className="font-medium">{selectedHistoryEntry.fees}</div>
+                            </div>
+                        </div>
+                        {selectedHistoryEntry.raw?.tx && (
+                            <div className="px-4 pb-4 text-xs">
+                                <a
+                                    href={`https://arbiscan.io/tx/${selectedHistoryEntry.raw.tx}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-green-600 underline"
+                                >
+                                    View transaction
+                                </a>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
