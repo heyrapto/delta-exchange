@@ -12,6 +12,7 @@ import {
 } from "@/blockchain/hegic/hegicPositions"
 import {
     getUserGNSPositions,
+    getUserTradingHistory,
     GNSPositionType,
 } from "@/blockchain/gns/gnsPositions"
 import { cancelOpenOrder, closeTrade } from "@/blockchain/gns/gnsCalls"
@@ -27,6 +28,39 @@ export const ExchangePanel = () => {
     // GNS state - separate from Hegic
     const [gnsPositions, setGnsPositions] = useState<GNSPositionType[]>([])
     const [isFetchingGNSPositions, setIsFetchingGNSPositions] = useState(false)
+    const [gnsTradeHistory, setGnsTradeHistory] = useState<any[]>([])
+    const [isFetchingGnsHistory, setIsFetchingGnsHistory] = useState(false)
+
+    const formatTimestamp = (value: any) => {
+        if (!value) return "-"
+        let date: Date
+        if (typeof value === "number") {
+            date = new Date(value.toString().length === 10 ? value * 1000 : value)
+        } else if (typeof value === "string" && /^\d+$/.test(value)) {
+            const numeric = Number(value)
+            date = new Date(value.length === 10 ? numeric * 1000 : numeric)
+        } else {
+            date = new Date(value)
+        }
+        if (isNaN(date.getTime())) return "-"
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+    }
+
+    const formatNumberValue = (value: any, options: { prefix?: string; suffix?: string } = {}) => {
+        if (value === undefined || value === null || value === "") return "-"
+        const num = typeof value === "string" ? Number(value) : value
+        if (isNaN(num)) return "-"
+        const formatted = num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        return `${options.prefix ?? ""}${formatted}${options.suffix ?? ""}`
+    }
+
+    const normalizePrice = (value: any) => {
+        if (value === undefined || value === null || value === "") return "-"
+        const num = typeof value === "string" ? Number(value) : value
+        if (isNaN(num)) return "-"
+        const adjusted = num > 1e6 ? num / 1e8 : num
+        return `$${adjusted.toFixed(2)}`
+    }
 
     const EmptyPanelState = ({ title }: { title: string }) => (
         <div className="flex flex-col items-center justify-center py-20">
@@ -92,6 +126,80 @@ export const ExchangePanel = () => {
         }
     }, [address])
 
+    const fetchGNSTradeHistory = useCallback(async () => {
+        if (!address) {
+            setGnsTradeHistory([])
+            return
+        }
+        try {
+            setIsFetchingGnsHistory(true)
+            const history = await getUserTradingHistory(address)
+            setGnsTradeHistory(history || [])
+        } catch (error) {
+            console.error("Error fetching GNS trade history:", error)
+        } finally {
+            setIsFetchingGnsHistory(false)
+        }
+    }, [address])
+
+    const normalizedGnsHistory = useMemo(() => {
+        if (!gnsTradeHistory?.length) return []
+        return gnsTradeHistory.map((entry, idx) => {
+            const trade = entry?.trade ?? entry
+            const pair =
+                entry?.pairName ??
+                trade?.pairName ??
+                trade?.pair ??
+                (trade?.from && trade?.to ? `${trade.from}/${trade.to}` : "-")
+            const direction =
+                entry?.direction ??
+                trade?.direction ??
+                (typeof trade?.long === "boolean" ? (trade.long ? "Long" : "Short") : "-")
+            const typeValue =
+                entry?.type ??
+                entry?.orderType ??
+                entry?.tradeType ??
+                trade?.tradeType ??
+                trade?.type ??
+                "-"
+            const collateral = entry?.collateral ?? entry?.collateralAmount ?? trade?.collateralAmount
+            const pnl =
+                entry?.pnl ??
+                entry?.pnlUsd ??
+                entry?.pnlInUsd ??
+                entry?.pnlPercentage ??
+                trade?.pnl
+            const timestamp =
+                entry?.timestamp ??
+                entry?.time ??
+                entry?.updatedAt ??
+                entry?.createdAt ??
+                entry?.closeTimestamp ??
+                entry?.openTimestamp
+            const entryPrice = entry?.openPrice ?? trade?.openPrice
+            const exitPrice = entry?.closePrice ?? entry?.price ?? trade?.closePrice
+            const leverage = entry?.leverage ?? (trade?.leverage ? Number(trade.leverage) / 1000 : undefined)
+            const status =
+                entry?.status ??
+                entry?.result ??
+                (trade?.isOpen === false ? "Closed" : trade?.isOpen === true ? "Open" : "-")
+
+            return {
+                id: entry?.id ?? `${trade?.index ?? idx}-${timestamp ?? idx}`,
+                time: formatTimestamp(timestamp),
+                pair: pair || "-",
+                side: direction || "-",
+                type: typeof typeValue === "number" ? ["Market", "Limit", "Stop"][typeValue] ?? typeValue : typeValue,
+                price: normalizePrice(exitPrice ?? entryPrice),
+                collateral: collateral ? `${formatNumberValue(collateral, { suffix: " USDC" })}` : "-",
+                leverage: leverage ? `${leverage}x` : "-",
+                pnlValue: pnl ? Number(pnl) : undefined,
+                pnl: pnl !== undefined ? formatNumberValue(pnl, { prefix: "$" }) : "-",
+                status: status || "-",
+            }
+        })
+    }, [gnsTradeHistory])
+
     // Load positions when user connects or tab is active
     useEffect(() => {
         if (activePanel === 0) {
@@ -101,8 +209,11 @@ export const ExchangePanel = () => {
         if (activePanel === 1) {
             fetchGNSPositions() // Fetch GNS for Open Orders tab
         }
+        if (activePanel === 6) {
+            fetchGNSTradeHistory()
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, activePanel, fetchPositions, fetchGNSPositions])
+    }, [address, activePanel, fetchPositions, fetchGNSPositions, fetchGNSTradeHistory])
 
     // Separate GNS into orders (pending) and positions (filled)
     const gnsOpenOrders = gnsPositions.filter((p: GNSPositionType) => p.tradeType === "LIMIT" || p.tradeType === "STOP")
@@ -306,40 +417,110 @@ export const ExchangePanel = () => {
         </div>
     )
 
-    const renderOrderHistory = () => (
-        <div className="p-3">
-            {orderHistory.length === 0 ? (
-                <EmptyPanelState title="Order History" />
-            ) : (
-                <table className="w-full text-xs">
-                    <thead>
-                        <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                            <th className="text-left px-2 py-1">Time</th>
-                            <th className="text-left px-2 py-1">Side</th>
-                            <th className="text-left px-2 py-1">Type</th>
-                            <th className="text-left px-2 py-1">Price</th>
-                            <th className="text-left px-2 py-1">Qty</th>
-                            <th className="text-left px-2 py-1">Period</th>
-                            <th className="text-left px-2 py-1">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orderHistory.map(o => (
-                            <tr key={o.id} className="border-b border-gray-200">
-                                <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
-                                <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
-                                <td className="px-2 py-2">{o.orderType}</td>
-                                <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
-                                <td className="px-2 py-2">{o.quantity}</td>
-                                <td className="px-2 py-2">{o.period} days</td>
-                                <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
-        </div>
-    )
+    const renderOrderHistory = () => {
+        const hasHegicHistory = orderHistory.length > 0
+        const hasGnsHistory = normalizedGnsHistory.length > 0
+
+        if (!hasHegicHistory && !hasGnsHistory && !isFetchingGnsHistory) {
+            return (
+                <div className="p-3">
+                    <EmptyPanelState title="Order History" />
+                </div>
+            )
+        }
+
+        return (
+            <div className="p-3 space-y-6">
+                {hasHegicHistory && (
+                    <div>
+                        <h4 className="text-xs font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                            Hegic Order History
+                        </h4>
+                        <table className="w-full text-xs">
+                            <thead>
+                                <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                    <th className="text-left px-2 py-1">Time</th>
+                                    <th className="text-left px-2 py-1">Side</th>
+                                    <th className="text-left px-2 py-1">Type</th>
+                                    <th className="text-left px-2 py-1">Price</th>
+                                    <th className="text-left px-2 py-1">Qty</th>
+                                    <th className="text-left px-2 py-1">Period</th>
+                                    <th className="text-left px-2 py-1">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orderHistory.map(o => (
+                                    <tr key={o.id} className="border-b border-gray-200">
+                                        <td className="px-2 py-2">{new Date(o.time).toLocaleTimeString()}</td>
+                                        <td className="px-2 py-2" style={{ color: o.side === 'long' ? '#10B981' : '#EF4444' }}>{o.side === 'long' ? 'Buy' : 'Sell'}</td>
+                                        <td className="px-2 py-2">{o.orderType}</td>
+                                        <td className="px-2 py-2">{o.filledPrice ? o.filledPrice.toFixed(2) : (o.price ? o.price.toFixed(2) : '-')}</td>
+                                        <td className="px-2 py-2">{o.quantity}</td>
+                                        <td className="px-2 py-2">{o.period} days</td>
+                                        <td className="px-2 py-2 capitalize" style={{ color: o.status === 'filled' ? '#10B981' : '#EF4444' }}>{o.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                <div className="">
+                    <div className="flex items-center justify-between mb-2">
+                        {/* <h4 className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>
+                            GNS Trade History
+                        </h4> */}
+                        {isFetchingGnsHistory && (
+                            <span className="text-[10px] text-gray-500">Syncing...</span>
+                        )}
+                    </div>
+                    {hasGnsHistory ? (
+                        <table className="w-full text-xs">
+                            <thead>
+                                <tr className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>
+                                    <th className="text-left px-2 py-1">Time</th>
+                                    <th className="text-left px-2 py-1">Pair</th>
+                                    <th className="text-left px-2 py-1">Side</th>
+                                    <th className="text-left px-2 py-1">Type</th>
+                                    <th className="text-left px-2 py-1">Price</th>
+                                    <th className="text-left px-2 py-1">Collateral</th>
+                                    <th className="text-left px-2 py-1">Lev.</th>
+                                    <th className="text-left px-2 py-1">P&L</th>
+                                    <th className="text-left px-2 py-1">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {normalizedGnsHistory.map((trade) => (
+                                    <tr key={trade.id} className="border-b border-gray-200">
+                                        <td className="px-2 py-2">{trade.time}</td>
+                                        <td className="px-2 py-2">{trade.pair}</td>
+                                        <td className="px-2 py-2" style={{ color: trade.side === 'Long' ? '#10B981' : trade.side === 'Short' ? '#EF4444' : 'inherit' }}>
+                                            {trade.side}
+                                        </td>
+                                        <td className="px-2 py-2">{trade.type}</td>
+                                        <td className="px-2 py-2">{trade.price}</td>
+                                        <td className="px-2 py-2">{trade.collateral}</td>
+                                        <td className="px-2 py-2">{trade.leverage}</td>
+                                        <td
+                                            className="px-2 py-2"
+                                            style={{ color: (trade.pnlValue ?? 0) >= 0 ? '#10B981' : '#EF4444' }}
+                                        >
+                                            {trade.pnl}
+                                        </td>
+                                        <td className="px-2 py-2">{trade.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <div className="text-[11px] text-gray-500">
+                            {isFetchingGnsHistory ? "Fetching latest trades..." : "No GNS trades yet."}
+                        </div>
+                    )}
+                </div>
+            </div>
+        )
+    }
 
     const renderContent = () => {
         switch (activePanel) {
@@ -410,12 +591,12 @@ export const ExchangePanel = () => {
 
     const panelTabs: { id: number; title: string, isHealthy?: boolean }[] = [
         { id: 0, title: "Positions" },
-        { id: 1, title: "Open Orders" },
-        { id: 2, title: "Stop Orders" },
+        { id: 1, title: "Orders" },
+        // { id: 2, title: "Stop Orders" },
         // { id: 3, title: "Tracker Assets" },
         // { id: 4, title: "Risk & Margin Details", isHealthy: true },
         // { id: 5, title: "Fills" },
-        { id: 6, title: "Order History" },
+        { id: 6, title: "History" },
     ]
 
     const handlePanelToggle = (id: number) => setActivePanel(id)
