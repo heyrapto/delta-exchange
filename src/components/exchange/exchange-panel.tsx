@@ -676,7 +676,7 @@ export const ExchangePanel = () => {
                                         </td>
                                         <td className="px-2 py-2">
                                             <div className="flex items-center gap-2">
-                                                <div className={`w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] ${trade.baseSymbol === "ETH/USD" ? trade.baseSymbol === "BTC/USD" ? "bg-yellow-500" : "bg-blue-500" : "bg-gray-900"}`}>
+                                                <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center text-[10px] ${trade.baseSymbol === "ETH" ? "bg-blue-500" : trade.baseSymbol === "BTC" ? "bg-yellow-500" : "bg-gray-900"}`}>
                                                     {trade.baseSymbol === "ETH" && (
                                                         <FaEthereum className="w-4 h-4 text-white" />
                                                     )}
