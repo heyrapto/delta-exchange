@@ -17,6 +17,7 @@ import {
 } from "@/blockchain/gns/gnsPositions"
 import { cancelOpenOrder, closeTrade } from "@/blockchain/gns/gnsCalls"
 import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
+import { FaBitcoin, FaEthereum } from "react-icons/fa"
 
 export const ExchangePanel = () => {
     const [activePanel, setActivePanel] = useState(0)
@@ -675,8 +676,13 @@ export const ExchangePanel = () => {
                                         </td>
                                         <td className="px-2 py-2">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px]">
-                                                    {trade.baseSymbol?.slice(0, 3)}
+                                                <div className={`w-6 h-6 rounded-full bg-gray-900 text-white flex items-center justify-center text-[10px] ${trade.baseSymbol === "ETH/USD" ? trade.baseSymbol === "BTC/USD" ? "bg-yellow-500" : "bg-blue-500" : "bg-gray-900"}`}>
+                                                    {trade.baseSymbol === "ETH" && (
+                                                        <FaEthereum className="w-4 h-4 text-white" />
+                                                    )}
+                                                    {trade.baseSymbol === "BTC" && (
+                                                        <FaBitcoin className="w-4 h-4 text-yellow-500" />
+                                                    )}
                                                 </div>
                                                 <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{trade.pair}</span>
                                             </div>
