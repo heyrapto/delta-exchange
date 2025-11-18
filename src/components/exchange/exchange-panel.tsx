@@ -405,7 +405,7 @@ export const ExchangePanel = () => {
         
         return (
             <div className="p-3">
-                {!hasOrders && !isFetchingGnsOrders ? (
+                {!hasOrders ? (
                     <EmptyPanelState title="Open Orders" />
                 ) : (
                     <table className="w-full text-xs">
