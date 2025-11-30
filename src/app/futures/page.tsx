@@ -17,7 +17,7 @@ const FuturesPage = () => {
   // Generate order book data
   const [buyOrders, setBuyOrders] = useState<Array<{ price: number; size: number; total: number }>>([])
   const [sellOrders, setSellOrders] = useState<Array<{ price: number; size: number; total: number }>>([])
-  const [recentTrades, setRecentTrades] = useState<Array<{ price: number; size: number; time: string; type: "buy" | "sell" }>>([])
+  const [recentTrades, setRecentTrades] = useState<Array<{ price: number; size: number; time: string; type: "buy" | "sell" }>>([]);
 
   // Generate order book and trades data
   useEffect(() => {
@@ -73,16 +73,18 @@ const FuturesPage = () => {
           {/* Main Trading Area */}
           <div className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
           {/* Left Section - Depth Chart */}
-          <div className="w-full lg:w-[60%] h-[400px] lg:h-auto border-r border-gray-300">
+          <div className="w-full lg:w-[60%] h-[400px] lg:h-auto ">
             <DepthChart 
               currentPrice={currentPrice}
               buyOrders={buyOrders}
               sellOrders={sellOrders}
+              markPrice={markPrice}
+              indexPrice={indexPrice}
             />
           </div>
 
           {/* Middle Section - Order Book and Recent Trades */}
-          <div className="w-full lg:w-[20%] flex flex-col border-r border-gray-300">
+          <div className="w-full lg:w-[20%] flex flex-col">
             {/* Order Book */}
             <div className="flex-1 min-h-0">
               <FuturesOrderBook
@@ -95,7 +97,7 @@ const FuturesPage = () => {
             </div>
 
             {/* Recent Trades */}
-            <div className="h-[200px] border-t border-gray-300">
+            <div className="h-[200px]">
               <RecentTrades trades={recentTrades} />
             </div>
           </div>

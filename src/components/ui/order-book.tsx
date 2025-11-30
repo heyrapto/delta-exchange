@@ -5,12 +5,16 @@ import { useEffect, useState } from "react"
 import { useTradeStore } from "@/store/trade-store"
 import { BiChart, BiChevronDown, BiStar, BiTrendingDown, BiTrendingUp } from "react-icons/bi"
 import { OrderBookRow, RecentTradeRow } from "../shared/order-book-card"
+import { useAppContext } from "@/context/app-context"
 
 type ViewMode = "all" | "buy" | "sell"
 
 export const OrderBook = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("all")
   const [lotSize, setLotSize] = useState(0.1)
+  const price = Math.random() * 1000;
+  const { state, formatNumber } = useAppContext();
+  const { assetPrice, isFetching, asset } = state;
   const [showLotSizeDropdown, setShowLotSizeDropdown] = useState(false)
   const [hoveredData, setHoveredData] = useState<{ price: number; size: number } | null>(null)
   const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null)
@@ -20,8 +24,7 @@ export const OrderBook = () => {
   const [buyOrders, setBuyOrders] = useState<OrderBookEntry[]>([])
   const [recentTrades, setRecentTrades] = useState<RecentTrade[]>([])
 
-  const store = useTradeStore()
-  const currentPrice = store.currentPrice
+  const currentPriceNumber = assetPrice
   const [spread, setSpread] = useState(99)
   const [spreadPercent, setSpreadPercent] = useState(0.09)
 
@@ -43,39 +46,54 @@ export const OrderBook = () => {
   }
 
   const hoverStats = calculateHoverStats()
-
-
-  // 🔄 Generate orderbook around current price
+  
   useEffect(() => {
-    const basePrice = store.currentPrice
-    const spread = basePrice * 0.0001 // 0.01% spread for realistic trading
-    
-    // Generate sell orders above current price
-    const newSellOrders = Array.from({ length: 7 }, (_, i) => ({
-      price: basePrice + spread + (i * spread * 10),
-      size: 1.2 + Math.random() * 1.5
-    }))
-    
-    // Generate buy orders below current price  
-    const newBuyOrders = Array.from({ length: 8 }, (_, i) => ({
-      price: basePrice - spread - (i * spread * 10),
-      size: 1.5 + Math.random() * 2.0
-    }))
-    
-    // Generate recent trades around current price
-    const newRecentTrades = Array.from({ length: 4 }, (_, i) => ({
-      price: basePrice + (Math.random() - 0.5) * spread * 20,
-      size: 0.001 + Math.random() * 0.05,
-      time: new Date(Date.now() - i * 60000).toLocaleTimeString("en-US", { hour12: false }),
-      type: Math.random() > 0.5 ? "buy" : "sell" as "buy" | "sell"
-    }))
-    
-    setSellOrders(newSellOrders)
-    setBuyOrders(newBuyOrders)
-    setRecentTrades(newRecentTrades)
-    setSpread(spread)
-    setSpreadPercent((spread / basePrice) * 100)
-  }, [store.currentPrice])
+    let interval: NodeJS.Timeout | null = null
+    const controller = new AbortController()
+    const symbol = `${state.asset.toUpperCase()}USDT`
+
+    const fetchData = async () => {
+      try {
+        // Depth
+        const depthRes = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=25`, { signal: controller.signal })
+        const depth = await depthRes.json()
+        const newSellOrders: OrderBookEntry[] = (depth.asks || []).map((a: [string, string]) => ({ price: parseFloat(a[0]), size: parseFloat(a[1]) }))
+        const newBuyOrders: OrderBookEntry[] = (depth.bids || []).map((b: [string, string]) => ({ price: parseFloat(b[0]), size: parseFloat(b[1]) }))
+
+        // Trades
+        const tradesRes = await fetch(`https://api.binance.com/api/v3/trades?symbol=${symbol}&limit=20`, { signal: controller.signal })
+        const trades = await tradesRes.json()
+        const newRecentTrades: RecentTrade[] = (trades || []).map((t: any) => ({
+          price: parseFloat(t.price),
+          size: parseFloat(t.qty),
+          time: new Date(t.time).toLocaleTimeString("en-US", { hour12: false }),
+          type: t.isBuyerMaker ? "sell" : "buy",
+        }))
+
+        setSellOrders(newSellOrders)
+        setBuyOrders(newBuyOrders)
+        setRecentTrades(newRecentTrades)
+
+        const bestAsk = newSellOrders[0]?.price
+        const bestBid = newBuyOrders[0]?.price
+        if (bestAsk && bestBid) {
+          const s = bestAsk - bestBid
+          setSpread(s)
+          setSpreadPercent((s / ((bestAsk + bestBid) / 2)) * 100)
+        }
+      } catch (_) {
+        // ignore aborted or transient errors
+      }
+    }
+
+    fetchData()
+    interval = setInterval(fetchData, 2000)
+
+    return () => {
+      if (interval) clearInterval(interval)
+      controller.abort()
+    }
+  }, [state.asset])
 
   const viewModeIcons = [
     { mode: "sell" as ViewMode, icon: <BiTrendingDown />, color: "text-red-400" },
@@ -85,15 +103,15 @@ export const OrderBook = () => {
 
   return (
     <div
-      className="relative w-full h-full flex flex-col mborder border-gray-300"
+      className="relative w-full h-full flex flex-col border-b border-l border-gray-300"
       style={{ backgroundColor: "var(--orderbook-bg)", color: "var(--orderbook-text)" }}
     >
       {/* Header */}
       <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
         <div className="flex items-center gap-1 sm:gap-2 mb-2">
-          <BiStar className="text-xs sm:text-sm" style={{ color: "var(--warning-color)" }} />
+          <BiStar className="text-xs" style={{ color: "var(--warning-color)" }} />
           <span
-            className="text-[10px] sm:text-xs font-medium truncate"
+            className="text-xs font-medium truncate"
             style={{ color: "var(--orderbook-text)" }}
           >
             P-BTC-106000-281125
@@ -102,12 +120,12 @@ export const OrderBook = () => {
         <div className="grid grid-cols-2 gap-1 sm:gap-2">
           <div>
             <div
-              className="text-[8px] sm:text-[9px]"
+              className="text-xs"
               style={{ color: "var(--orderbook-text-secondary)" }}
             >
               24h Change
             </div>
-            <div className="text-[10px] sm:text-[11px] font-medium text-green-500">14.68%</div>
+            <div className="text-xs font-medium text-green-500">14.68%</div>
           </div>
           <div className="text-right">
             <div
@@ -116,8 +134,8 @@ export const OrderBook = () => {
             >
               Price
             </div>
-            <div className="text-[10px] sm:text-[11px] font-medium text-green-500">
-              ${currentPrice.toFixed(2)}
+            <div className="text-xs font-medium text-green-500">
+              {isFetching ? "..." : formatNumber(assetPrice)}
             </div>
           </div>
         </div>
@@ -127,7 +145,7 @@ export const OrderBook = () => {
       <div className="px-2 sm:px-3 py-2 border-b border-gray-300">
         <div className="flex items-center justify-between">
           <h3
-            className="text-[10px] sm:text-xs font-medium"
+            className="text-xs sm:text-xs font-medium"
             style={{ color: "var(--orderbook-text)" }}
           >
             Order Book
@@ -176,7 +194,7 @@ export const OrderBook = () => {
         </div>
 
         {/* Column Headers */}
-        <div className="grid grid-cols-2 mt-1 sm:mt-2 text-[8px] sm:text-[9px] text-gray-400">
+        <div className="grid grid-cols-2 mt-1 sm:mt-2 text-xs text-gray-400">
           <div>Price (USD)</div>
           <div className="text-right">Size (BTC)</div>
         </div>
@@ -201,22 +219,16 @@ export const OrderBook = () => {
         {/* Current Price & Spread */}
         <div className="px-3 py-1.5 border-y border-gray-300">
           <div className="flex items-center justify-between">
-            <div className="text-red-400 text-sm font-bold">${currentPrice.toFixed(1)}</div>
+            <div className=" flex flex-col">
+              <p className="text-xs">Current Price:</p>
+              <span className="text-red-400 text-sm font-bold">{isFetching ? "..." : formatNumber(assetPrice)}</span>
+              </div>
             <div className="text-gray-900 text-[9px]">
               Spread: <span className="text-black">{spread.toFixed(1)}</span> (
               {spreadPercent.toFixed(2)}%)
             </div>
           </div>
-          <div className="flex items-center gap-3 mt-0.5 text-[9px]">
-            <div className="flex items-center gap-1">
-              <span className="text-gray-900">I</span>
-              <span className="text-black">{(currentPrice * 19.85).toFixed(1)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-gray-900">M</span>
-              <span className="text-black">{(currentPrice * 1.03).toFixed(1)}</span>
-            </div>
-          </div>
+          <div className="flex items-center gap-3 mt-0.5 text-[9px]"></div>
         </div>
 
         {(viewMode === "all" || viewMode === "buy") && (
@@ -244,7 +256,7 @@ export const OrderBook = () => {
             transform: "translateY(-50%)",
           }}
         >
-          <div className="space-y-1 text-[9px]">
+          <div className="space-y-1 text-xs">
             <div className="flex justify-between gap-3">
               <span className="text-gray-400">Avg. Price</span>
               <span className="text-white">~{hoverStats.avgPrice.toFixed(1)}</span>
@@ -264,7 +276,7 @@ export const OrderBook = () => {
       {/* Recent Trades */}
       <div className="border-t border-gray-300 px-3 py-2">
         <h3 className="text-black text-xs font-medium mb-2">Recent Trades</h3>
-        <div className="grid grid-cols-3 text-[9px] mb-1" style={{ color: "var(--text-secondary)" }}>
+        <div className="grid grid-cols-3 text-xs mb-1" style={{ color: "var(--text-secondary)" }}>
           <div>Price (USD)</div>
           <div className="text-right">Size (BTC)</div>
           <div className="text-right">Time</div>

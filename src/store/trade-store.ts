@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
 
 export interface TradeState {
   // Trade Configuration
@@ -11,6 +10,7 @@ export interface TradeState {
   
   // Order Details
   quantity: string
+  amount: string
   stopPrice: string
   limitPrice: string
   quantityPercent: number
@@ -72,6 +72,7 @@ export interface TradeState {
   setStopPriceType: (type: 'mark' | 'last' | 'index') => void
   setStopLimitType: (type: 'stopLimit' | 'takeProfitLimit') => void
   setQuantity: (quantity: string) => void
+  setAmount: (amount: string) => void
   setStopPrice: (price: string) => void
   setLimitPrice: (price: string) => void
   setQuantityPercent: (percent: number) => void
@@ -104,10 +105,11 @@ export const useTradeStore = create<TradeState>()(
       // Initial State
       tradeType: 'short',
       period: '7',
-      orderType: 'limit',
+      orderType: 'market',
       stopPriceType: 'mark',
       stopLimitType: 'stopLimit',
       quantity: '',
+      amount: '',
       stopPrice: '',
       limitPrice: '',
       quantityPercent: 0,
@@ -136,9 +138,18 @@ export const useTradeStore = create<TradeState>()(
       setStopLimitType: (type: any) => set({ stopLimitType: type }),
       setQuantity: (quantity: any) => {
         set({ quantity })
+        set({ amount: quantity })
         // Calculate funds required after quantity change (options: quantity * price)
         const { currentPrice } = get()
         const qty = parseFloat(quantity) || 0
+        const funds = qty * currentPrice
+        set({ fundsRequired: funds })
+      },
+      setAmount: (amount: any) => {
+        set({ amount })
+        set({ quantity: amount })
+        const { currentPrice } = get()
+        const qty = parseFloat(amount) || 0
         const funds = qty * currentPrice
         set({ fundsRequired: funds })
       },

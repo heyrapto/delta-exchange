@@ -2,9 +2,7 @@
 import { HiHome } from "react-icons/hi";
 import { GiTrade } from "react-icons/gi";
 import { MdShowChart } from "react-icons/md";
-import { IoBriefcaseOutline } from "react-icons/io5";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { LuChartCandlestick } from "react-icons/lu";
 import { useUiStore, type ActiveTab } from "@/store/ui-store";
 
 interface BottomNavigationProps {

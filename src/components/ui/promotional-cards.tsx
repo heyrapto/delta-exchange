@@ -28,7 +28,7 @@ export const PromotionalCards = () => {
     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 px-4 py-6 bg-white">
       
       {/* Top Coins Card */}
-      <div className="relative bg-white border border-gray-300 rounded-lg p-4 flex flex-col justify-between h-full">
+      <div className="relative bg-white border border-gray-300 rounded-lg p-4 flex flex-col gap-3 justify-between h-full">
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold">Top Coins</h3>
@@ -158,11 +158,11 @@ export const PromotionalCards = () => {
           <div className="space-y-1 mb-3 text-xs">
             <div className="flex items-center justify-between">
               <span className="text-gray-600 line-through">0.03%</span>
-              <span className="text-[#ADFF2F] font-semibold">0.015%</span>
+              <span className="text-[#7dc511] font-semibold">0.015%</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600 line-through">10% Prem cap</span>
-              <span className="text-[#ADFF2F] font-semibold">5% Prem Cap</span>
+              <span className="text-[#7dc511] font-semibold">5% Prem Cap</span>
             </div>
           </div>
         </div>

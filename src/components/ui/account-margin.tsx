@@ -19,13 +19,13 @@ export const AccountMargin = () => {
           borderColor: 'var(--button-secondary-border)'
         }}
       >
-        <div className="flex items-center justify-between gap-1 sm:gap-2 w-[90px] sm:w-[110px]">
-          <div className="flex gap-1 sm:gap-3 min-w-0">
-            <h1 className="text-[10px] sm:text-xs font-bold truncate" style={{ color: 'var(--text-secondary)' }}>Account Margin</h1>
-            <p className="text-[10px] sm:text-xs truncate" style={{ color: 'var(--text-primary)' }}>Main Cross</p>
+        <div className="flex items-center justify-between gap-2 sm:gap-2 w-[90px] sm:w-[120px]">
+          <div className="flex gap-1 sm:gap-3 min-w-0 pr-3">
+            <h1 className="text-[10px] sm:text-xs font-bold" style={{ color: 'var(--text-secondary)' }}>Account Margin</h1>
+            <p className="text-[10px] sm:text-xs " style={{ color: 'var(--text-primary)' }}>Main Cross</p>
           </div>
           <BiChevronDown
-            className="group-hover:rotate-[180deg] transition-colors w-4 h-4 sm:w-6 sm:h-6 flex-shrink-0"
+            className="group-hover:rotate-180 transition-colors w-4 h-4 sm:w-6 sm:h-6 shrink-0 "
             style={{ color: 'var(--text-muted)' }}
           />
         </div>
@@ -52,7 +52,7 @@ export const AccountMargin = () => {
 
         {/* Right-aligned button */}
         <div className="flex justify-end mt-4">
-          <button className="inline-flex items-center justify-center border text-xs px-3 py-2 rounded-md transition-colors" style={{ borderColor: 'var(--button-primary-bg)', color: 'var(--button-primary-bg)' }}>
+          <button className="inline-flex items-center justify-center border text-xs px-3 py-2 rounded-md transition-colors border-green-500 text-green-500">
             Change margin mode
           </button>
         </div>

@@ -13,11 +13,12 @@ export const PageLayout = ({ children }: PageLayoutProps) => {
         <div className="relative mx-auto w-full xl:max-w-[120rem] min-h-screen overflow-x-hidden" style={{ backgroundColor: 'var(--page-bg-color)' }}>
         <Banner />
         <Header />
+        
         <main>
          {children}
         </main>
+
         <Footer />
-        {/* Mobile Bottom Navigation (fixed) */}
         <BottomNavigation />
      </div>
     )

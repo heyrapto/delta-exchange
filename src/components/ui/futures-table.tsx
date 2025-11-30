@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { BiChevronDown, BiChevronUp, BiDownload, BiSearch, BiStar } from "react-icons/bi"
+import { getPairPrice } from "@/blockchain/gns/assetPrices"
+import GNS_CONTRACTS from "@/blockchain/gns/gnsContracts"
 
 interface MarketsContract {
   contract: string
@@ -14,6 +16,7 @@ interface MarketsContract {
   low24h: number
   funding: number
   leverage: number
+  pairIndex?: number
 }
 
 type SortField = "contract" | "change24h" | "volume24h" | "openInterest" | "funding"
@@ -27,69 +30,71 @@ export const MarketsTable = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set())
 
-  // Sample data
-  const contracts: MarketsContract[] = [
-    {
-      contract: "BTCUSD",
-      description: "Bitcoin Perpetual 200x",
-      lastPrice: 103728.5,
-      change24h: -3.44,
-      volume24h: 926.25,
-      openInterest: 56.0,
-      high24h: 108291.0,
-      low24h: 103661.5,
-      funding: 0.0100,
-      leverage: 200,
-    },
-    {
-      contract: "ETHUSD",
-      description: "Ethereum Perpetual 200x",
-      lastPrice: 3484.0,
-      change24h: -6.26,
-      volume24h: 1130.0,
-      openInterest: 32.6,
-      high24h: 3748.0,
-      low24h: 3460.65,
-      funding: 0.0100,
-      leverage: 200,
-    },
-    {
-      contract: "SOLUSD",
-      description: "Solana Perpetual 100x",
-      lastPrice: 159.52,
-      change24h: -9.19,
-      volume24h: 327.82,
-      openInterest: 16.2,
-      high24h: 176.897,
-      low24h: 155.886,
-      funding: 0.0100,
-      leverage: 100,
-    },
-    {
-      contract: "AVAXUSD",
-      description: "Avalanche Perpetual 100x",
-      lastPrice: 45.32,
-      change24h: -5.12,
-      volume24h: 125.45,
-      openInterest: 8.5,
-      high24h: 48.90,
-      low24h: 44.20,
-      funding: 0.0100,
-      leverage: 100,
-    },
-    {
-      contract: "XRPUSD",
-      description: "Ripple Perpetual 100x",
-      lastPrice: 0.5234,
-      change24h: 2.34,
-      volume24h: 98.76,
-      openInterest: 12.3,
-      high24h: 0.5350,
-      low24h: 0.5100,
-      funding: 0.0100,
-      leverage: 100,
-    },
-  ]
+  // Generate contracts from GNS pairs
+  const [contracts, setContracts] = useState<MarketsContract[]>([])
+
+  // Fetch real prices for all active pairs
+  useEffect(() => {
+    const fetchContractData = async () => {
+      const activePairs = Object.entries(GNS_CONTRACTS.PAIRS).filter(([, pair]) => pair.active)
+      
+      const contractsData = await Promise.all(
+        activePairs.map(async ([pairIndexStr, pair]) => {
+          const pairIndex = Number(pairIndexStr)
+          try {
+            const symbol = `${pair.from}USDT`
+            const tickerRes = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`)
+            const ticker = await tickerRes.json()
+            
+            if (ticker) {
+              const lastPrice = parseFloat(ticker.lastPrice)
+              const openPrice = parseFloat(ticker.openPrice)
+              const change24h = ((lastPrice - openPrice) / openPrice) * 100
+              const volume24h = parseFloat(ticker.quoteVolume) / 1000000 // Convert to millions
+              
+              return {
+                contract: `${pair.from}USD`,
+                description: `${pair.from} Perpetual 200x`,
+                lastPrice,
+                change24h,
+                volume24h,
+                openInterest: 0, // Would need separate API call
+                high24h: parseFloat(ticker.highPrice),
+                low24h: parseFloat(ticker.lowPrice),
+                funding: 0.0100,
+                leverage: 200,
+                pairIndex,
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching data for ${pair.from}:`, error)
+          }
+          
+          // Fallback data
+          return {
+            contract: `${pair.from}USD`,
+            description: `${pair.from} Perpetual 200x`,
+            lastPrice: 0,
+            change24h: 0,
+            volume24h: 0,
+            openInterest: 0,
+            high24h: 0,
+            low24h: 0,
+            funding: 0.0100,
+            leverage: 200,
+            pairIndex,
+          }
+        })
+      )
+      
+      setContracts(contractsData.filter(c => c.lastPrice > 0))
+    }
+
+    fetchContractData()
+    const interval = setInterval(fetchContractData, 10000) // Update every 10 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   const tabs = ["Watchlist", "Options", "Futures", "Straddle", "Trackers", "Analytics"]
   const categories = [

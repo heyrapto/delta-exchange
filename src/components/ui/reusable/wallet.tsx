@@ -45,8 +45,8 @@ export const Wallet = ({ balance }: any) => {
               <h4 className="text-sm font-semibold mb-3 text-[#1a1a1a]">
                 Account Value
               </h4>
-              <p className="text-2xl font-bold text-[#4caf50] mb-1">₹0.00</p>
-              <p className="text-xs text-gray-500 mb-3">$0.00</p>
+              <p className="text-2xl font-bold text-[#4caf50] mb-1">₹{balance}</p>
+              <p className="text-xs text-gray-500 mb-3">${balance}</p>
 
               <div className="flex gap-2 mb-4">
                 <button
@@ -72,22 +72,22 @@ export const Wallet = ({ balance }: any) => {
                   <span className="text-[#1a1a1a] font-medium">
                     Trading Wallet
                   </span>
-                  <span className="text-[#4caf50] font-medium">₹0.00</span>
+                  <span className="text-[#4caf50] font-medium">₹{balance}</span>
                 </div>
 
                 <div className="flex justify-between py-2">
                   <span>Available Margin</span>
-                  <span className="text-[#4caf50]">₹0.00</span>
+                  <span className="text-[#4caf50]">₹{balance}</span>
                 </div>
 
                 <div className="flex justify-between py-2">
                   <span>Trackers Wallet</span>
-                  <span className="text-[#4caf50]">₹0.00</span>
+                  <span className="text-[#4caf50]">₹{balance}</span>
                 </div>
 
                 <div className="flex justify-between py-2">
                   <span>Delta Cash</span>
-                  <span className="text-[#4caf50]">₹0.00</span>
+                  <span className="text-[#4caf50]">₹{balance}</span>
                 </div>
               </div>
 

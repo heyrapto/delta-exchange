@@ -1,13 +1,3 @@
 Critical:
 1. The calls has an orange border that reaches the strikecell in that same row when active (see image attached)
 2. Buy/sell buttons positioning
-
-1. We have to work on the options trading screen(you need to understand really what options trading is and how it works so you can also implement properly and with your own ideas), all live calculation as user inputs values, main our white bg/transparent bg and green color.
-
-use, where needed:
-1. @trading-view.tsx 
-2. @trade-card.tsx 
-
-see reference images attached.
-
-2. The trading view widget isn't taking screen height on mobile

@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Exchange } from "@/components/exchange"
-import { Footer } from "@/components/layout/footer"
 import { LoadingScreen } from "@/components/ui/loading-screen"
-import { BottomNavigation } from "@/components/layout/bottom-nav"
 import { MobileTradeView } from "@/components/exchange/mobile-trade-view"
 import { PageLayout } from "@/components/layout/page-layout"
 import { useUiStore } from "@/store/ui-store"

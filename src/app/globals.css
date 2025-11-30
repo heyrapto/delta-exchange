@@ -148,9 +148,8 @@ body {
   background-color: var(--page-bg-color);
   color: var(--text-primary);
   min-height: 100vh;
-  font-family: 'Aileron', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
-
 
 .container {
   max-width: 80%;
@@ -159,7 +158,6 @@ body {
   display: flex;
 }
 
-/* Utility Classes for Common Colors */
 .bg-primary { background-color: var(--button-primary-bg); }
 .bg-secondary { background-color: var(--button-secondary-bg); }
 .bg-dark { background-color: var(--button-dark-bg); }
@@ -176,7 +174,6 @@ body {
 .border-primary { border-color: var(--button-primary-bg); }
 .border-secondary { border-color: var(--button-secondary-border); }
 
-/* Scrollbar Styling */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -198,9 +195,11 @@ input[type='range']::-webkit-slider-thumb {
   margin-top: -5px;
   transition: all 0.2s;
 }
+
 input[type='range']::-webkit-slider-thumb:hover {
   background: #caff60;
 }
+
 input[type='range']::-moz-range-thumb {
   width: 14px;
   height: 14px;
